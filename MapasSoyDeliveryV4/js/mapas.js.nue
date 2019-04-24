@@ -1,0 +1,2700 @@
+
+// VARIABLES PARA PARAMETRIZAR
+var MINCHARSSUGEST          =     2;
+var vAnchoLinea             =     3;
+var vLatInicio              =     EXT_VAR_LATINICIO;    //-34.8785578;
+var vLongInicio             =     EXT_VAR_LONGINICIO;   //-56.0788487;
+var vZoom                   =     EXT_VAR_vZOOM;        //13
+var vPoligonoColor          =     '#FF0000';
+var vPoligonoFillColor      =     '#FF0000';
+var vANCHOLABEL_1           =     40;
+var vANCHOLABEL_2           =     70;
+var URLZONAS                =     EXT_VAR_URLZONAS;         //'http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/awsgetzonaskml.aspx';
+var URLZONASMANUAL          =     EXT_VAR_URLZONASMANUAL;   //"http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/awsgetzonas.aspx";
+var URLGETPEDIDOS           =     EXT_VAR_URLGETPEDIDOS;    //"http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/awsgetpedidos.aspx";
+var URLGETORIGENES          =     EXT_VAR_URLGETORIGENES;   //"http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/awsgetorigenes.aspx";
+var URLSETRUTAS             =     EXT_VAR_URLSETRUTAS;      //"http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/awssetrutas.aspx";
+var URLSETPOLIGONOS         =     EXT_VAR_URLSETPOLIGONOS;  //"http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/awssetpoligono.aspx";
+var URLGETPOLIGONOS         =     EXT_VAR_URLGETPOLIGONOS;  //"http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/awsgetpoligonos.aspx";
+var CARGAR_ZONAS_AL_INICIO  =     EXT_CARGAR_ZONAS_AL_INICIO;
+var vMAXHEIGHT_RUTA         =     EXT_VAR_MAXHEIGHT_RUTA;
+var vMAXHEIGHT_MAPA         =     EXT_VAR_MAXHEIGHT_MAPA;
+var MAX_PUNTOS_X_POLY_RUTEO =     VAR_MAX_PUNTOS_X_POLY_RUTEO;
+
+var vCOLOR_GRILLA_PAR       =     "snow";
+var vCOLOR_GRILLA_IMPPAR    =     "white";
+
+var iconBase = EXT_VAR_ICONBASE; //'file:///Users/pablogeymonat/Documents/MapasSoyDelivery/images/';
+
+var TOPE_PUNTOS_SERV_RUTA     = 23;
+var vCOLORFONOSPOLY_X_DEFECTO = "#1E90FF";
+var vCOLORBORDEPOLY_X_DEFECTO = "#1E90FF";
+var vCOLORCIRCLE_X_DEFECTO = "yellow";
+var vCOLORBORDECIRCLE_X_DEFECTO = "red";
+var vMarcaORIGEN              = "O";
+var vMarcaDESTINO             = "D";
+var vCLASE_CSS_LABELMARKER    = "labels"
+var vSIZE_SVG                 = 25;
+var vOPACIDADPOLYBORDE        = 0.3;
+var vOPACIDADPOLY             = 0.20;
+var vVERBOSE = true;
+var vecColor = ["#4dd126","#6c92e4","#e46cdd", "#e24a1d", "#e8a441", "B3FF33","5A4F4F"];
+//VARIABLES GLOBALES
+var tandas = 0;
+var map;    //identificador que indica el mapa de google map
+//var poligono;
+
+var EDITADO = "0";
+var SALVADO = "1"
+var vecMarkersPedidos   = []; //some array;
+var vecPoligonos        = []; //some array;
+var vectorOrigenes      = [];
+var verInfoWindow       = false;
+var vectorDePedidosJSON = [];
+var div_pedidos;
+var rutarunning         = false;
+
+var selMarker;
+var selectedShape;
+var selectedZona;
+var numberOfShapes;
+var ZonasSistema          = [];
+var largoEstimadoLabel    = 50;
+var alturaEstimadaLabel   = 20;
+var newShapeUltTxt        = "";
+var newShapeUltId         = 9000;
+var DTFechaHoraInicioRuta = EXT_VAR_FECHA_HORA_INI; //"2018-12-18T10:10";
+var modoOptimizacion      = true;
+var infoWindow;
+
+var rutaCerradaWH       = true;
+var rutaAbiertaWH       = false;
+var rutaCerradaUsuario  = false;
+var rutaAbiertaUsuario  = false;
+
+//** PARA EDITAR EL TEXTO DE LOS OVERLAYS
+var editando            = false;
+var PLACEHOLDERZONA     = "Nuevo";
+var CLASEEDITARZONA     = "labelzonasedit";
+var MAXVALUE            = 99999999.9;
+var PATHIMAGES          = EXT_VAR_PATHIMAGES; //'file:///Users/pablogeymonat/Documents/MapasSoyDelivery/images';
+var ALTOIMGSAVE         = "40px";
+var ANCHOIMGSAVE        = "40px";
+
+var vecPonderadoDistancia = []; //Se usa para colocar las dinacias de un puntos con los demas
+var vecAdyacenciaLineal   = [];  //Se usa para ordenar el set de nodos resultante
+var vecDireccionServices  = [];
+var vecDireccionDisplay   = [];
+var numero = 0;
+var vVRRutaDirServiceData;
+
+var vMARKER_INICIO  = "pininicio.svg";
+var vMARKER_FIN     = "pinfinal_1.svg";
+var vMARKER_COMUN   = "pincomun_1.svg";
+var vMARKER_WHS     = "where.svg";
+var vMARKER_WHN     = "where.svg";
+var vTRAVEL_MODE    = 'DRIVING';
+
+var VKEY = EXT_VAR_vKEY; //"AIzaSyAmAcD2utpt3GNw6LlM7cE1PCNUuYq2_I0"
+
+var currentOverlay;
+var selecteShapeRuteada;
+
+var CANT_ENVIOS_RUTA =  VAR_EXT_CANT_ENVIOS_RUTA;
+
+var CANT_RUTAS = 0;
+//var asignarZonaDadoUnPolyAlosMarcadores_sem = true;
+
+
+function getLatLongOrigen(){
+  msg("***getLatLongOrigen***");
+  var latlng;
+  var encontre = false;
+  for (i=0; (i<vectorDePedidosJSON.length && !encontre); i++){
+    var x = vectorDePedidosJSON[i];
+    if (x.ZonaId == selectedShape.tag){
+      if (x.Marca == vMarcaORIGEN){
+        latlng = new google.maps.LatLng({lat: x.PedidoLat, lng: x.PedidoLong});
+        encontre = true;
+      }
+    }
+  }
+  return latlng;
+}
+
+/*
+function sleep(milliseconds) {
+  var start = new Date().getTime();
+  for (var i = 0; i < 1e7; i++) {
+    if ((new Date().getTime() - start) > milliseconds){
+      break;
+    }
+  }
+}*/
+function calcularOrigenTentativo(){
+    msg("***calcularOrigenTentativo***");
+    var origenlatlong = undefined;
+    if (rutaCerradaWH || rutaAbiertaWH){
+        //comienza en el WH
+        origenlatlong = getLatLongWareHouse();
+    }else{
+        //comienza en un origen dispuesto por el usuario
+      if (rutaAbiertaUsuario || rutaCerradaUsuario){
+        origenlatlong = getLatLongOrigen();
+      }
+    }
+    if (origenlatlong == undefined){
+      msg("Se necesita determinar el origen de la ruta");
+      return;
+    }
+    //buscar el mas cercano en distancia linea directa
+    deltamin = MAXVALUE;
+    posSiguiente  = -1;
+    for (i=0; i<vectorDePedidosJSON.length; i++){
+      if (vectorDePedidosJSON[i].ZonaId == selectedShape.tag){
+          var x = vectorDePedidosJSON[i];
+          vectorDePedidosJSON[i].Orden = 1;
+          var latlng0 = origenlatlong;
+          var latlng1 = new google.maps.LatLng({lat: x.PedidoLat, lng: x.PedidoLong});
+          var delta = calcdistancia(latlng0, latlng1);
+          if (delta < deltamin){  //A la minima distancia
+              deltamin      = delta;   //Se queda con la menor
+              posSiguiente  = i;   //Y la posicion siguiente
+          }
+      }
+    }
+    if (posSiguiente  != -1){
+      vectorDePedidosJSON[posSiguiente].Orden = 0;
+      MarcarOrigen(vectorDePedidosJSON[posSiguiente].PedidoId);
+      OrdenarVector(); //Deja el origen al princio
+    }
+}
+
+
+
+function exedeMaxPuntosPorPoligono(poly){
+  var exede = false;
+  var cant = 0;
+  for (i=0; ((i < vectorDePedidosJSON.length) && (!exede)); i++){
+    if (vectorDePedidosJSON[i].ZonaId == poly){
+      cant ++;
+      if (cant > MAX_PUNTOS_X_POLY_RUTEO){
+        exede = true;
+      }
+    }
+  }
+  return exede;
+}
+function rutear(rutear){
+  //Ordena el vector de tramos mas cercandos a cada nodo
+  if (selectedShape==undefined){return};
+  if (vectorDePedidosJSON.length==0){return};
+
+  if (exedeMaxPuntosPorPoligono(selectedShape.Tag)){
+    alerta("Debe seleccionar un poligono de menos de " + MAX_PUNTOS_X_POLY_RUTEO + " puntos.\n Puede intentar trazar un poligono seleccionando los puntos requeridos para corregir esto." );
+    return;
+  }
+  return new Promise((resolve, reject) => {
+          mostrarWait();
+          var tope = vectorDePedidosJSON.length;
+
+          //Asigna poligono seleccionado a los puntos incluidos en este
+
+          for (x=0; x < tope; x++){
+            var latlng = new google.maps.LatLng({lat: vectorDePedidosJSON[x].PedidoLat, lng: vectorDePedidosJSON[x].PedidoLong});
+            vectorDePedidosJSON[x].ZonaId = getZonaLatLong(latlng);
+
+          }
+
+          inicializarInfoRutas(selectedShape.Tag);
+
+          //Ordena los puntos por cercania
+          calcularOrigenTentativo();
+
+          var posOrigen =getPosOrigen(vectorDePedidosJSON);
+          var listaOrdenada = [];
+          if (posOrigen != -1){
+            var vecaux = vectorDePedidosJSON.slice(0);
+            listaOrdenada = armarListaOrdenada(selectedShape, posOrigen, vecaux);
+          }else{
+            msg("No encontró el origen al rutear ");
+          }
+
+          //ORDENAR SEGUN LISTA DE CERCANIA
+          for (i=0; i < vectorDePedidosJSON.length; i++){
+              vectorDePedidosJSON[i].Orden = 0;
+              for (j=0; j < listaOrdenada.length; j++){
+                if ( vectorDePedidosJSON[i].PedidoId == listaOrdenada[j]){
+                  vectorDePedidosJSON[i].Orden = j;
+                }
+              }
+          }
+
+          //Ordena el vector segun orden otorgado
+          OrdenarVector();
+
+          //Marcar como destino el ultimo punto
+
+          var posDestino = hayDestino(selectedShape.tag);
+          if ((posDestino == 0) && (!rutaCerradaEnOrigen())){
+            vectorDePedidosJSON[tope -1].Orden = maxOrdenDelaZona() + 1;
+            MarcarDestino(vectorDePedidosJSON[tope -1].PedidoId);
+          }else{
+            vectorDePedidosJSON[posDestino].Orden = maxOrdenDelaZona() + 1;
+          }
+
+          cargarPuntos(false);
+          ocultarWait();
+          if (rutear){
+              var ruta = 0;
+              var cantEnvios = 0;
+              for (i=0; i < vectorDePedidosJSON.length; i++){
+                  if (vectorDePedidosJSON[i].ZonaId == selectedShape.tag){
+                      vectorDePedidosJSON[i].Ruta = ruta;
+                      vectorDePedidosJSON[i].Color = vecColor[((ruta + 10) % vecColor.length)]
+
+                      cantEnvios ++;
+                      if (cantEnvios >= CANT_ENVIOS_RUTA){
+                        cantEnvios = 0;
+                        ruta ++;
+                      }
+                  }
+              }
+            CANT_RUTAS = ruta;
+            for (var x=0; x <= ruta; x++){
+                calcularYDesplegarLaRuta(selectedShape.tag, x);
+                //sleep(3000);
+            }
+
+          }
+
+		  selecteShapeRuteada = selectedShape;
+
+  });
+
+}
+
+
+function getPosOrigen(v){
+  var encontre =false;
+  var pos = -1;
+  for (i=0; ((i< vectorDePedidosJSON.length) && (!encontre)); i++){
+    if (vectorDePedidosJSON[i].Marca == vMarcaORIGEN){
+      pos = i;
+      encontre = true;
+    }
+  }
+  return pos;
+}
+
+
+
+
+function hayDestino(ZonaId){
+  msg("***hayDestino***");
+  var encontre = false;
+  var pos = 0;
+  for (i = 0; ((i < vectorDePedidosJSON.length) && !encontre); i++ ){
+      if (vectorDePedidosJSON[i].ZonaId == ZonaId){
+        if (vectorDePedidosJSON[i].Marca == vMarcaDESTINO){
+          encontre = true;
+          pos = i;
+        }
+      }
+  }
+  return pos;
+}
+
+
+
+
+function agregaPedidoEnElMapa(pedido){
+		//agrega un punto al mapa
+		var marker;
+		var contentString = "";
+		//CREAR EL MAKER
+		marker= new google.maps.Marker({
+			position: new google.maps.LatLng({lat: pedido.PedidoLat, lng: pedido.PedidoLong}),
+			title: pedido.PedidoNombreCliente + " " + pedido.PedidoDireccion,
+			labelContent: pedido.PedidoId,
+			labelAnchor: new google.maps.Point(vANCHOLABEL_1, vANCHOLABEL_2),
+			icon: { url: iconBase + pedido.Icon, scaledSize: new google.maps.Size(vSIZE_SVG, vSIZE_SVG) },
+			labelClass: vCLASE_CSS_LABELMARKER, // the CSS class for the label
+			draggable:      false,
+			map: map
+		});
+
+         google.maps.event.addListener(marker, 'rightclick', function(e){
+        var menucontextualmapa = '<div id="menucontextualmapa" class="menucontextualmapa" onclick="this.style.display=' + "'" + 'none' + "'" + '">' +
+                                  "<div class = 'topbar' ><a class='cerrar' onclick='cerrarMenuContextOD();'>x</a></div> " +
+                                  '<p class = "enmarcar" id="pOrigen" onclick="MarcarOrigenDesdeMarker()">Marcar Origen</p>' +
+                                  '<p class = "enmarcar" id="pDestino" onclick="MarcarDestinoDesdeMarker()">Marcar Destino</p>' +
+                                  '</div>'
+        selMarker = marker;
+        var latLng = e.latLng;
+        var v = new TxtOverlay(latLng, menucontextualmapa, "labelzonas", map);
+        return false;
+
+      });
+
+
+
+      google.maps.event.addListener(marker, 'click', function(e){
+        var fichapedido = muestroInformacionPedido(marker.labelContent);
+        msg("Ficha pedido = " + fichapedido);
+        selMarker = marker;
+        var latLng = e.latLng;
+        var v = new TxtOverlay(latLng, fichapedido, "labelzonas", map);
+        return false;
+      });
+
+
+
+      vecMarkersPedidos.push(marker);
+
+
+}
+
+function cerrarFichaPedido(){
+  var fichapedido = document.getElementById("fichapedido");
+  fichapedido.style.display = 'none';
+
+}
+
+
+
+function muestroInformacionPedido(PedidoId){
+  var html = "";
+  for (i=0; i < vectorDePedidosJSON.length; i++){
+      p = vectorDePedidosJSON[i];
+      if (p.PedidoId == PedidoId){
+
+        html = '<div id = "fichapedido" class = "menuancho" onclick="this.style.display=' + "'" + 'none' + "'" + '">' +
+        "<div class = 'topbar' ><a class='cerrar' onclick='cerrarFichaPedido();'>x</a></div> ";
+
+
+
+
+		html = html + '<div class = "container-fluid mygrid-wrapper-div">';
+		html += '    <div class="row enmarcar" ">';
+		if (p.PedidoId != undefined){
+		  html = html + '<div class="col-sm-8 col-md-8">';
+          html = html + '<p class = "titulocampoficha">#Pedido</p>';
+          html = html + '<div><span>' + p.PedidoId + '</div></span>';
+		  html = html + '</div>';
+
+		  html = html + '<div class="col-sm-1 col-md-1">';
+		  html = html + '<img class ="imgInfo" src="' + PATHIMAGES + '/info.svg">';
+		  html = html + '</div>';
+		}
+		html = html + '</div>';
+
+		html += '    <div class="row enmarcar">';
+        if (p.PedidoDireccion != undefined){
+			html = html + '<div class="col-sm-12 col-md-12">';
+			html = html + '<p class = "titulocampoficha">Direccion</p>';
+			html = html + '<div class = "palabra"><span>' + p.PedidoDireccion + '</span></div>';
+			html = html + '</div>';
+        }
+		html = html + '</div>';
+
+		html += '    <div class="row enmarcar">';
+        if (p.PedidoNombreCliente != undefined){
+		  html = html + '<div class="col-sm-12 col-md-12">';
+          html = html +'<p class = "titulocampoficha">Contacto</p>';
+          html = html +'<div><span>' + p.PedidoNombreCliente + '</span></div>';
+		  html = html + '</div>';
+        }
+		html = html + '</div>';
+
+		html += '    <div class="row enmarcar">';
+        if (p.FilterPedidoTelefonoCliente != undefined){
+			html = html + '<div class="col-sm-12 col-md-12">';
+			html = html +'<p = "titulocampoficha">Telefono</p>';
+			html = html +'<div><span>' + p.FilterPedidoTelefonoCliente + '</span></div>';
+			html = html + '</div>';
+        }
+	    html = html + '</div>';
+
+		html += '    <div class="row enmarcar">';
+        if (p.fechaHora  != undefined){
+			html = html + '<div class="col-sm-7 col-md-7">';
+			html = html +'<p class = "titulocampoficha">Hora de visita estimada</p>';
+			html = html +'<div>' + p.fechaHora + '</div>';
+			html = html + '</div>';
+        }
+
+
+        html = html + '</div>';
+		html = html + '</div>';
+		html = html + '</div>';
+        msg(html);
+      }
+    }
+  return html;
+}
+
+function cerrarMenuContextOD(){
+  var menucontextualmapa = document.getElementById("menucontextualmapa");
+  menucontextualmapa.style.display = 'none';
+}
+
+
+
+
+function getParametrosJsonPuntos(){
+
+
+
+
+    var parametro = {
+      PedidoNegocioId: EXT_VAR_NEGOCIOID,
+      PedidoNegocioSucursalId: EXT_VAR_NEGOCIOSUCURSALID,
+      FilterFechaEntregaDesde: VAR_EXT_FilterFechaEntregaDesde,
+      FilterFechaEntregaHasta: VAR_EXT_FilterFechaEntregaHasta ,
+      FilterFranjaHorariaId: VAR_EXT_FilterFranjaHorariaId,
+      FilterPedidoTelefonoCliente: VAR_EXT_FilterPedidoTelefonoCliente,
+      FilterPedidoNombreCliente: VAR_EXT_FilterPedidoNombreCliente,
+      FilterPedidoDetalle: VAR_EXT_FilterPedidoDetalle,
+      FilterPedidoDireccion: VAR_EXT_FilterPedidoDireccion,
+      FilterPedidoTipo: VAR_EXT_FilterPedidoTipo,
+      FilterPedidoPaisId: VAR_EXT_FilterPedidoPaisId,
+      FilterPedidoPaisCiudadId: VAR_EXT_FilterPedidoPaisCiudadId,
+      FilterPedidoZonaId: VAR_EXT_FilterPedidoZonaId
+    }
+    return JSON.stringify(parametro);
+}
+
+
+function getIcono(opcion){
+      var icono="";
+      switch(opcion){
+         case vMarcaORIGEN:
+              icono = vMARKER_INICIO; //"markerinicio.svg";
+              break;
+         case vMarcaDESTINO:
+              icono = vMARKER_FIN; //"markerfin.svg";
+              break;
+         case "":
+              icono = vMARKER_COMUN; //"markercomun.svg";
+              break;
+         case "WHS":
+              icono = vMARKER_WHS; //"wh.svg";
+              break;
+         case "WHN":
+              icono = vMARKER_WHN; //"wh5.svg";
+              break;
+         default:
+              msg('default');break;
+      }
+      return icono;
+}
+
+
+
+function pruebaOrden(){
+  calcularVecPonderadoDistancia3(false);
+  cargarJsonPuntos(false);
+
+}
+
+
+
+function modificarPedidoEnElMapa(pedido){
+  var encontre = false;
+  for (i = 0; ((i < vecMarkersPedidos.length) && (!encontre)) ; i++){
+      if (vecMarkersPedidos[i].labelContent == pedido.PedidoId ){
+        vecMarkersPedidos[i].position     = new google.maps.LatLng({lat: pedido.PedidoLat, lng: pedido.PedidoLong});
+        vecMarkersPedidos[i].title        = pedido.PedidoNombreCliente + " " + pedido.PedidoDireccion;
+        vecMarkersPedidos[i].labelContent = pedido.PedidoId;
+        vecMarkersPedidos[i].labelAnchor  = new google.maps.Point(vANCHOLABEL_1, vANCHOLABEL_2);
+        vecMarkersPedidos[i].setIcon({ url: iconBase + pedido.Icon, scaledSize: new google.maps.Size(vSIZE_SVG, vSIZE_SVG) });
+        vecMarkersPedidos[i].labelClass   = vCLASE_CSS_LABELMARKER; // the CSS class for the label
+        encontre = true;
+      }
+  }
+  return encontre;
+}
+
+
+function existePedidoEnVectorDePedidos(PedidoId){
+    var existe = false;
+    for (i=0; ((i < vectorDePedidosJSON.length) && (!existe));i++){
+        if (vectorDePedidosJSON[i].PedidoId == PedidoId){
+            existe = true;
+        }
+    }
+    return existe;
+}
+
+
+function getZonaLatLong(latLong){
+  //Obtiene el polígono que contiene a una latitud longitud.
+  //prioriza el polígono seleccinado y luego evalua segun el orden de creación
+  var encontre = false;
+  var ZonaId = 0;
+  if (vecPoligonos.length==0){return;}
+
+  //Primero dar prioridad al poligono vecMarkersPedidoseleccionado
+  if (google.maps.geometry.poly.containsLocation(latLong, selectedShape)){
+    ZonaId   = selectedShape.tag;
+    encontre = true;
+  }
+  if (!encontre){
+    //si no es pruebo con los demas
+    for ( i = vecPoligonos.length - 1; ((i > 0) && (!encontre)); i-- ) {
+      var poligono = vecPoligonos[i];
+      if (selectedShape.tag != poligono.tag){
+        if (google.maps.geometry.poly.containsLocation(latLong, poligono)){
+          ZonaId   = poligono.tag;
+          encontre = true;
+        }
+      }
+    }
+  }
+  return ZonaId;
+}
+
+function modificarZonaAunPedido(PedidoId, ZonaId){
+    msg("**modificarZonaAunPedido**");
+    var encuentra = false;
+    var i_anterior = -1;
+    var PedidoId_Anterior;
+    if (vectorDePedidosJSON.length==0){return;}
+
+    for (i=0; ((i<vectorDePedidosJSON.length) && (!encuentra)); i++){
+      if (i == i_anterior){
+        return;
+      }
+      if (PedidoId_Anterior == vectorDePedidosJSON[i].PedidoId){
+        return;
+      }
+
+      if (vectorDePedidosJSON[i].PedidoId == PedidoId){
+        vectorDePedidosJSON[i].ZonaId = ZonaId;
+        encuentra = true;
+      }
+      i_anterior = i;
+      PedidoId_Anterior = vectorDePedidosJSON[i].PedidoId;
+    }
+}
+
+
+function actualizarPuntosEnPantalla(){
+  msg("**actualizarPuntosEnPantalla**");
+  cargarPuntos(false);  //Actualizar los puntos en pantalla
+}
+
+function actualizarCenterYZoomParaTodosLosPuntos(){
+  msg("***actualizarCenterYZoomParaTodosLosPuntos***");
+  //centra y hace zoom en el mapa en funcion a los Marcadores existentes
+  var bounds = new google.maps.LatLngBounds();
+  if (vecMarkersPedidos.length == 0){return};
+  for(i=0;i<vecMarkersPedidos.length;i++) {
+     bounds.extend(vecMarkersPedidos[i].getPosition());
+  }
+  map.setCenter(bounds.getCenter());
+  map.fitBounds(bounds);
+  //remove one zoom level to ensure no marker is on the edge.
+  map.setZoom(map.getZoom());
+  // set a minimum zoom
+  // if you got only 1 marker or all vecMarkersPedidos are on the same address map will be zoomed too much.
+  if(map.getZoom()> vZoom){
+    map.setZoom(vZoom);
+  }
+}
+
+
+
+
+function initMap() {
+  //INICIALIZAR EL MAPA
+  map = new google.maps.Map(document.getElementById('map'), {
+    zoom: vZoom,
+    center: {lat: vLatInicio, lng: vLongInicio},
+    mapTypeId: google.maps.MapTypeId.TERRAIN
+  });
+  inicializarOverlays();
+  inicializarDrawingManager();
+  ocultarWait();
+  addListeners();
+  conlapsables();
+
+
+  if (EXT_CARGAR_ZONAS_AL_INICIO){
+      getJSONZonasCreacionManual();
+  }
+
+  if (EXT_VAR_CARGAR_ORIGENES){
+    cargarOrigenes();
+  }
+
+  if (EXT_VAR_CARGAR_PUNTOS){
+    cargarPuntos(true);
+  }
+
+}
+
+function limpiarVector(vec){
+  msg("***limpiarVector***");
+  //QUITA ELEMENTOS DE UN VECTOR PARA AHORRAR MEMORIA
+  vec.splice( 0, vec.length - 1 );
+  vec = [];
+  return vec;
+}
+
+function desAsociarMapaDeLosvecMarkersPedidos(){
+  //QUITA MAKER DEL MAPA
+  msg("***desAsociarMapaDeLosvecMarkersPedidos***");
+  for(i = 0; i < vecMarkersPedidos.length; i++){
+    var m = vecMarkersPedidos[i];
+    m.setMap(null);
+    msg("Quitando marker ");
+  }
+}
+
+function cargarPuntos(carcardesdeweb){
+  msg("***cargarPuntos***");
+  if (carcardesdeweb){
+    desAsociarMapaDeLosvecMarkersPedidos();
+    vecMarkersPedidos = limpiarVector(vecMarkersPedidos);
+  }
+  cargarJsonPuntos(carcardesdeweb);
+  if (carcardesdeweb){
+    actualizarCenterYZoomParaTodosLosPuntos();
+  }
+}
+
+
+
+
+function actualizarEnvioEnVectorDePedidos(vMarker){
+  msg("***actualizarEnvioEnVectorDePedidos***");
+  var contenido = vMarker.labelContent;
+  var latLng = vMarker.getPosition();
+  for (i=0; i < vectorDePedidosJSON.length; i++){
+      if (vectorDePedidosJSON[i].PedidoId == contenido){ //Si el elemento del Vector de pedidos == contenido del marker
+          //Actualizar las coordenadas en el vector de envío
+          vectorDePedidosJSON[i].PedidoLat  = latLng.lat;
+          vectorDePedidosJSON[i].PedidoLong = latLng.lng;
+          //aplicar geocoder para obtener nueva direccion
+          //actualizar direccion
+      }
+  }
+}
+
+
+function getLatLongWareHouse(){
+  var encontre = false;
+  var latlng;
+  msg("***getLatLongHareHouse***");
+  for(i=0; ((i<vectorOrigenes.length) && (!encontre)); i++){
+    if (vectorOrigenes[i].OrigenDefault == "S"){
+      o = vectorOrigenes[i];
+      latlng  =new google.maps.LatLng({lat: o.OrigenLat, lng: o.OrigenLong});
+      encontre = true;
+    }
+  }
+  return latlng;
+}
+
+
+function rutaCerradaEnOrigen(){
+  return (rutaCerradaWH || rutaCerradaUsuario);
+
+}
+
+
+
+function calcularRutaParcial(ds, dd, primerlatlng, ultimalatlng, waypts, vecPedPos, tandas, ultima){
+
+  var num = getNumero();
+  mostrarWait();
+  ds.route({
+    origin: primerlatlng,
+    destination: ultimalatlng,
+    waypoints: waypts,
+    optimizeWaypoints: modoOptimizacion,
+    avoidTolls: false,
+    travelMode: vTRAVEL_MODE, //'DRIVING',
+  }, function(response, status) {
+
+    if (status === 'OK') {
+      dd.setDirections(response);
+      dd.setMap(map);
+
+      vVRRutaDirServiceData = response;
+      var route = response.routes[0];
+      var waypoint_order = route.waypoint_order;
+      var n = num;
+
+      for (var i = 0; i < route.legs.length; i++) {
+          msg("waypoint_order " + JSON.stringify(waypoint_order) + " vecPedPos " + JSON.stringify(vecPedPos) + " i = " + i);
+          var PedidoId = obtenerPedidoId(waypoint_order, vecPedPos, i);
+          if (PedidoId != 0){
+            var orden = i + (n * 100);
+            asignarOrdenAPedido(PedidoId,  orden );
+            var Pedido = obtenerObjPedido(PedidoId);
+            if (Pedido != undefined){
+              asignarDistanciaYTiempoAPedido(route.legs[i].start_address,
+                                              route.legs[i].end_address,
+                                              PedidoId,route.legs[i].distance.value,
+                                              route.legs[i].distance.text,
+                                              route.legs[i].duration.value,
+                                              route.legs[i].duration.text);
+            }else{
+              msg("No encontro el pedido ");
+            }
+          }else{
+            alerta("No esta en el waypoint waypoint_order[i] " + vecPedPos);
+            msg("Pedido = 0");
+          }
+      }
+      cant    = 0;
+      OrdenarVector();
+      ocultarWait();
+      var div_pedidos = document.getElementById("listapedidos");
+      div_pedidos.innerHTML =  mostrarRegistrosRuta(selectedShape);
+    }
+    else {
+      ocultarWait();
+      alerta('Error al obtener direcciones ' + status);
+    }
+  });
+}
+
+
+
+
+
+function SuperaElTopeDePuntosParaElServDeRuta(ZonaId){
+  //retorna true si la cantidad de puntos de la ruta supera el maximo de google
+  msg("***SuperaElTopeDePuntosParaElServDeRuta***");
+  var supera = false;
+  var cont = 0;
+  for(i = 0; (i < vectorDePedidosJSON.length && !supera); i++){
+    if (vectorDePedidosJSON[i].ZonaId == ZonaId){
+      cont ++;
+      if (cont > TOPE_PUNTOS_SERV_RUTA){
+        supera = true;
+      }
+    }
+  }
+  return supera;
+}
+
+
+function calcularYDesplegarLaRuta(polyARutear, rutaNumero) {
+    msg("***calcularYDesplegarLaRuta***")
+    var vecPedPos = [];
+    var waypts = [];
+
+    var primerlatlng  = null;
+    var ultimalatlng  = null;
+    var primerlatlngGeneral = null;
+    var ultimalatlngGeneral = null;
+    var color = "";
+    waypts.splice(0,waypts.length-1);
+    vecPedPos.splice(0,vecPedPos.length-1);
+
+    var cant  = 0;
+    tandas = 0;
+    if (selectedShape == undefined){
+      alerta("Debe seleccionar zona");
+      return
+    }
+    ContraerMapa();
+    var div = document.getElementById("listapedidos");
+    div.innerHTML = "";
+    //*** arma el vector de WAYPOINS para el calculo de la rura en base a la zona, origen y destino
+    numero = 0;
+
+    for (var i = 0; i < vectorDePedidosJSON.length; i++) {
+          if ((vectorDePedidosJSON[i].ZonaId == polyARutear) && (vectorDePedidosJSON[i].Ruta == rutaNumero)) {
+              color = vectorDePedidosJSON[i].Color;
+              cant = cant + 1;
+              //obtener las coordenadas del origen
+              if (primerlatlng  == null) {
+                  if (rutaAbiertaUsuario || rutaCerradaUsuario){
+                    if (vectorDePedidosJSON[i].Marca == vMarcaORIGEN){
+                      primerlatlng  = new google.maps.LatLng({lat: vectorDePedidosJSON[i].PedidoLat, lng: vectorDePedidosJSON[i].PedidoLong});
+                      primerlatlngGeneral  = primerlatlng;
+                    }
+                  }else {
+                    //defino el origen comoel warehuse
+                    primerlatlng = getLatLongWareHouse();
+                    primerlatlngGeneral = primerlatlng;
+                  }
+              }
+              //Obtener las coordenadas del destino
+              if (ultimalatlng==null){
+                if (rutaCerradaEnOrigen()){
+                  ultimalatlng        =   primerlatlng;
+                  ultimalatlngGeneral =   ultimalatlng;
+                }else{
+                  if (vectorDePedidosJSON[i].Marca == vMarcaDESTINO){
+                    ultimalatlngGeneral = new google.maps.LatLng({lat: vectorDePedidosJSON[i].PedidoLat, lng: vectorDePedidosJSON[i].PedidoLong});
+                  }
+                }
+              }
+              vecPedPos.push(vectorDePedidosJSON[i].PedidoId);
+              waypts.push({
+                location: new google.maps.LatLng({lat: vectorDePedidosJSON[i].PedidoLat, lng: vectorDePedidosJSON[i].PedidoLong}),
+                stopover: true
+              });
+              if (cant == TOPE_PUNTOS_SERV_RUTA){
+                  addNumero();
+                  if (tandas>1){
+                    primerlatlng = ultimalatlng;
+                  }
+                  tandas = tandas + 1;
+                  if  (primerlatlng  == null){
+                    alerta("Falta definir ORIGEN de la ruta");
+                    return;
+                  }
+                  ultimalatlng = new google.maps.LatLng({lat: vectorDePedidosJSON[i].PedidoLat, lng: vectorDePedidosJSON[i].PedidoLong});
+                  if (waypts.length == 0){
+                    alerta("No se han incluido puntos para rutear");
+                    return;
+                  }
+                  var directionsService = new google.maps.DirectionsService;
+
+				          var refletras = !(document.getElementById("chkletras").checked);
+                  var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: refletras, polylineOptions: { strokeColor: color } });
+                  vecDireccionServices.push(directionsService);
+                  vecDireccionDisplay.push(directionsDisplay);
+                  calcularRutaParcial(directionsService, directionsDisplay, primerlatlng, ultimalatlng, waypts, vecPedPos, false);
+                  primerlatlng = ultimalatlng;
+                  ultimalatlng = null;
+                  waypts  = [];
+                  waypts.splice(0, waypts.length - 1);
+                  cant    = 0;
+                  vecPedPos =[];
+                  vecPedPos.splice(0, vecPedPos.length - 1);
+              }
+          }
+
+    }
+
+    if (cant < TOPE_PUNTOS_SERV_RUTA){
+        tandas = tandas + 1;
+        addNumero();
+        if  (primerlatlng  == null){
+          alerta("Falta dedinir ORIGEN de la ruta");
+          return;
+        }
+        ultimalatlng = ultimalatlngGeneral;
+        if (waypts.length == 0){
+          alerta("No se han incluido puntos para rutear");
+          return;
+    }
+		//polylineOptions: { strokeColor: vecColor[((tandas + 10) % 5)]
+    var directionsService = new google.maps.DirectionsService;
+		var refletras = !(document.getElementById("chkletras").checked);
+        var directionsDisplay = new google.maps.DirectionsRenderer({suppressMarkers: refletras, polylineOptions: { strokeColor: color } });
+        vecDireccionServices.push(directionsService);
+        vecDireccionDisplay.push(directionsDisplay);
+        calcularRutaParcial(directionsService, directionsDisplay, primerlatlng, ultimalatlng, waypts, vecPedPos, true);
+    }
+
+
+
+}
+
+function hayMasPuntos(posicion, ZonaId){
+  //Dado una posicion retorna si hay mas puntos en la zona
+  msg("***hayMasPuntos***");
+  var encontre = false;
+  for(i = posicion+1; (i < vectorDePedidosJSON.length && !encontre); i++){
+    if (vectorDePedidosJSON[i].ZonaId == ZonaId){
+      encontre = true;
+    }
+  }
+}
+
+
+function toggleListaRutaCollapse(numdiv){
+  var div = document.getElementById("listaruta_" + numdiv);
+  var img = document.getElementById("imgtogle_" + numdiv);
+  if (div.style.display == "none"){
+    div.style.display = "block";
+    img.src=PATHIMAGES + "/up-arrow.svg";
+
+  }else{
+    div.style.display = "none";
+    img.src=PATHIMAGES + "/down-arrow.svg";
+  }
+
+
+
+}
+
+function mostrarRegistrosRuta(poly){
+  //Muestra registros de ruta de una zona/poligono dada
+  msg("***mostrarRegistrosRuta***");
+
+  var vHtml = "";
+
+
+  for (ruta = 0; ruta <= CANT_RUTAS; ruta ++){
+    cabezal = true;
+
+    for (i=0; i < vectorDePedidosJSON.length; i++){
+      var p = vectorDePedidosJSON[i];
+
+        if ((p.ZonaId == poly.tag) && (p.Ruta == ruta)){
+
+          if (cabezal){
+            var color = vectorDePedidosJSON[i].Color;
+            vHtml += "<div class='enmarcar enter'><div class = 'container-fluid'>";
+            vHtml += '<div class="row enmarcar">';
+            vHtml += '<div class="col-sm-8 col-md-8"><img id ="imgtogle_'+ vectorDePedidosJSON[i].Ruta + '" +  class="imgTogle" src="' + PATHIMAGES +'/up-arrow.svg" onclick="toggleListaRutaCollapse(' +  "'" + vectorDePedidosJSON[i].Ruta + "')" + '"/><span>' + "[=&&1=]&nbsp&nbsp[=&&2=]" + '<div class="divcolor"  style = "background-color: ' + color + '">&nbsp&nbsp</div></span></div>';
+            vHtml += '<div class="col-sm-1 col-md-1"></div>';
+          //  vHtml += '      <div class = "divcolor " style = "background-color: ' + color + '"/>';
+          //  vHtml += "      </div>";
+            vHtml += '<div class="col-sm-1 col-md-1">' + '<input type ="button"  class="btn btn-default ButtonAccSoloBorderLarge" onclick="armarRutas2Server();" title = "Confirmar Ruta Seleccionada" value = "Confirmar Ruta Seleccionada">';
+            //vHtml += '      <div class="col-sm-2 col-md-2">' + '<img src="' + PATHIMAGES + '/ok.svg" class = "imagesearch" onclick="armarRutas2Server()"/>&nbsp&nbsp<a onclick="armarRutas2Server();"><span>Confirmar Ruta</span></a></div>';
+            vHtml += "</div>";
+            vHtml += "</div></div>";
+            var minutosdelta = 0;
+            var cntpuntos = 0;
+            var horaDeInicio = null;
+            var distanciatotal=0;
+            var tiempototal = 0;
+            vHtml += '<div id ="listaruta_' + vectorDePedidosJSON[i].Ruta + '" class = "container-fluid mygrid-wrapper-div grilla" >';
+            cabezal = false;
+          }
+          cntpuntos ++;
+          vHtml += '<div  class="row"  ' + getClassColorRowEvenOdd(cntpuntos) + '>';
+          vHtml += '<div class="col-sm-1 col-md-1"><span>';
+          vHtml += '<img  id="imgUP" class = "imgGrid" src="' + PATHIMAGES + '/arriba.svg" onclick = "upGrid('+ p.PedidoId +')"/> ';
+          vHtml += '<img  id="imgDown" class = "imgGrid" src="' + PATHIMAGES + '/abajo.svg" onclick = "downGrid('+ p.PedidoId +')"/> </span></div>';
+          vHtml += '<div class="col-sm-1 col-md-1"><strong> #' + p.Ruta + "-" + p.Orden + '/' + p.PedidoId + '</strong></div>';
+          vHtml += '<div class="col-sm-2 col-md-2"><strong>' + p.PedidoNombreCliente + '</strong></div>';
+
+          vHtml += '<div class="col-sm-3 col-md-3"> ' + p.end_address + '</div>';
+          vHtml += '<div class="col-sm-1 col-md-1"><span><strong> ' + p.Dtxt  + '/' + p.Ttxt + '</strong></span></div>';
+
+
+          minutosdelta += p.DeltaVisita;
+          var fecha_hora;
+          var minutosASumar =0;
+          if (p.Tnumero != undefined){
+            minutosASumar = minutosdelta  + Math.round(p.Tnumero / 60);
+            fecha_hora = sumar_horas(DTFechaHoraInicioRuta, minutosASumar);
+            vectorDePedidosJSON[i].fechaHora = fecha_hora;
+            vHtml += '<div class = "col-sm-1 col-md-1"><strong> ' + getFormatoDeFechaHora(new Date(fecha_hora))  + '</strong></div>';
+          }else{
+              vHtml += '<div class = "col-sm-1 col-md-1">**</div>';
+          }
+          tiempototal = tiempototal + minutosdelta + p.Tnumero ;
+          distanciatotal = distanciatotal + p.Dnumero ;
+          msg("Numero " + p.Dtxt + " " + p.Dnumero + " p.Tnumero" + p.Tnumero + " " + p.Ttxt );
+          if (horaDeInicio == null){
+            horaDeInicio = getFormatoDeFechaHora(new Date(fecha_hora));
+          }
+          vHtml += '<div class="col-sm-1 col-md-1"><span>';
+          vHtml += '<img  id="imgCancelar" class = "imgGrid2" src="' + PATHIMAGES + '/eliminar.svg" onclick = "noIncluirRuta('+ p.PedidoId +')"/> ';
+          vHtml += '<img  id="imgChange" class = "imgGrid2" src="' + PATHIMAGES + '/cambiar.svg" onclick = "cambiarDeRuta('+ p.PedidoId +')"/></span></div>';
+
+
+          vHtml += '</div>';
+
+
+
+      }
+    }
+    if (!cabezal){
+      vHtml += '</div>';
+      vHtml = vHtml.replace("[=&&1=]", "Cantidad&nbspde&nbsppuntos:&nbsp&nbsp<strong>" + cntpuntos+ "</strong>");
+      vHtml = vHtml.replace("[=&&2=]", "Inicio&nbsp<strong>" + getFormatoDeFechaHora(new Date(DTFechaHoraInicioRuta)) + "</strong>,&nbspfin&nbsp<strong>" + getFormatoDeFechaHora(new Date(fecha_hora)) + "</strong>&nbspTotal&nbsprecorrido&nbsp <strong>" + Math.round(distanciatotal /1000) + "</strong>&nbspkmtrs&nbspDuración&nbspestimada&nbsp&nbsp<strong>" + Math.round(tiempototal/60)  + "&nbspmin&nbsp</strong>" );
+    }
+  }
+  ContraerMapa();
+  return vHtml;
+}
+
+function noIncluirRuta(PedidoId){
+
+}
+function cambiarDeRuta(PedidoId){
+
+}
+
+function addZero(i) {
+  msg("**addZero***");
+  //agrega un 0 adelante si es menor que 10, se usa para formatear por ej 9 => 09
+  if (i < 10) {
+    i = "0" + i;
+  }
+  return i;
+}
+
+function getFormatoDeFechaHora(fecha){
+  //formatea la fecha y la hora
+  msg("***getFormatoDeFechaHora***");
+  var s = "<span>" + addZero(fecha.getDay()) + "/" + addZero(fecha.getMonth()) + "/" + addZero(fecha.getFullYear()) + "&nbsp" + addZero(fecha.getHours()) + ":" + addZero(fecha.getMinutes()) + "</span>";
+  return s;
+}
+
+function getClassColorRowEvenOdd(i){
+  //alterna el coolor de la grilla de ruta segun par impar
+
+  msg("***getClassColorRowEvenOdd**");
+  var v="";
+  if (i % 2==0){
+    v= 'style=" height: 40px; background-color:' + vCOLOR_GRILLA_PAR + ';"';
+  }else{
+    v = 'style=" height: 40px;background-color:' + vCOLOR_GRILLA_IMPPAR + ';"';
+  }
+  return v;
+}
+
+function OrdenarVectorXDistancia(){
+    //ordena el vector de pedidos segun el atributo orden
+    msg("***OrdenarVectorXDistancia***");
+    vectorDePedidosJSON.sort(function (a, b)
+    {
+        return a.distancia_aux-b.distancia_aux;
+    });
+
+
+}
+
+function OrdenarVector(){
+    //ordena el vector de pedidos segun el atributo orden
+    msg("***OrdenarVector***");
+    vectorDePedidosJSON.sort(function (a, b)
+    {
+        return a.Orden-b.Orden;
+    });
+}
+
+
+function moverOrdenPedido(direccion, PedidoId){
+  selectedShape = selecteShapeRuteada;
+  //Mueve el pedido arriba o abajo segun el orden que establesca el usuario
+  msg("***moverOrdenPedido***");
+  var encontre = false;
+  var ruta = 0;
+  for (i=0;  ((i < vectorDePedidosJSON.length) && (!encontre)); i++){
+    if (vectorDePedidosJSON[i].ZonaId == selectedShape.tag){
+      if (vectorDePedidosJSON[i].PedidoId == PedidoId){
+
+        ruta = vectorDePedidosJSON[i].ruta; //obtiene la ruta del pedidp
+
+        if (direccion == "D"){ //Si se mueve hacia abajo (incrementa la posición)
+          if (i< (vectorDePedidosJSON.length - 1)){
+            // Swap con el siguiente
+            encontre = true;
+            var posicionSiguiente = 0;
+            var posinicial = i + 1;
+            posicionSiguiente = posinicial;
+            for (j=posinicial; ((vectorDePedidosJSON[j].ZonaId !=selectedShape.tag) && (vectorDePedidosJSON[j].Ruta == Ruta) && (j < vectorDePedidosJSON.length)); j++){
+              posicionSiguiente = j + 1;
+            }
+            var PedidoOrdenSigiente = vectorDePedidosJSON[posicionSiguiente].Orden;
+            vectorDePedidosJSON[posicionSiguiente].Orden = vectorDePedidosJSON[i].Orden;
+            vectorDePedidosJSON[i].Orden = PedidoOrdenSigiente;
+          }
+        }else if (direccion == "U"){ //Si se mueve hacia arriba (decrementa la posicion)
+          if (i > 0){
+            //Swap con el anterior
+            encontre = true;
+            var posicionAnterior = 0;
+            var posinicial = i - 1;
+            posicionAnterior = posinicial;
+            for (j=posinicial; ((vectorDePedidosJSON[j].ZonaId != selectedShape.tag) && (vectorDePedidosJSON[j].Ruta == Ruta) && (j > 0)); j--) {
+              posicionAnterior = j - 1;
+            }
+            var PedidoOrdenAnterior = vectorDePedidosJSON[posicionAnterior].Orden;
+            vectorDePedidosJSON[posicionAnterior].Orden = vectorDePedidosJSON[i].Orden;
+            vectorDePedidosJSON[i].Orden = PedidoOrdenAnterior;
+
+          }
+        }
+      }
+    }
+  }
+  OrdenarVector();
+  if (rutaAbiertaWH || rutaAbiertaUsuario){
+    MarcarOrigen(vectorDePedidosJSON[0].PedidoId);
+  }
+  var posfin = vectorDePedidosJSON.length - 1;
+  for (j=vectorDePedidosJSON.length - 1; ((vectorDePedidosJSON[j].ZonaId !=selectedShape.tag) && (j > 0));j--){
+    posfin = j - 1;
+  }
+  MarcarDestino(vectorDePedidosJSON[posfin].PedidoId);
+  return ruta;
+}
+
+
+
+
+
+function upGrid(PedidoId){
+    msg("***upGrid " + PedidoId + "***");
+  //  limpiarRuta();
+    var ruta = moverOrdenPedido("U",PedidoId);
+    modoOptimizacion= false;
+    calcularYDesplegarLaRuta(selectedShape.tag,ruta);
+}
+
+function downGrid(PedidoId){
+  msg("***downGrid" + PedidoId + "***");
+  //limpiarRuta();
+  var ruta = moverOrdenPedido("D",PedidoId);
+  modoOptimizacion = false;
+  calcularYDesplegarLaRuta(selectedShape.tag,ruta);
+}
+
+
+function inicializarInfoRutas(ZonaId){
+  for (i=0; ((i<vectorDePedidosJSON.length) && (!ZonaId));i++){
+    if (vectorDePedidosJSON[i].ZonaId == ZonaId){
+      vectorDePedidosJSON[i].Dnumero  = 0;
+      vectorDePedidosJSON[i].Dtxt     = "";
+      vectorDePedidosJSON[i].Tnumero  = 0;
+      vectorDePedidosJSON[i].Ttxt     = "";
+      vectorDePedidosJSON[i].start_address  = "";
+      vectorDePedidosJSON[i].end_address    = "";
+    }
+  }
+}
+
+function asignarDistanciaYTiempoAPedido(start_address, end_address, PedidoId, dnumero, dtxt, tnumero, ttxt){
+
+  var encontre = false;
+  for (i=0; ((i<vectorDePedidosJSON.length) && (!encontre));i++){
+    if (vectorDePedidosJSON[i].PedidoId == PedidoId){
+      encontre = true;
+      vectorDePedidosJSON[i].Dnumero  = dnumero;
+      vectorDePedidosJSON[i].Dtxt     =  dtxt;
+      vectorDePedidosJSON[i].Tnumero  = tnumero;
+      vectorDePedidosJSON[i].Ttxt     = ttxt;
+      vectorDePedidosJSON[i].start_address  = start_address;
+      vectorDePedidosJSON[i].end_address    = end_address;
+    }
+  }
+}
+
+
+function asignarOrdenAPedido(PedidoId, orden){
+  msg("***obtenerObjPedido***");
+  var encontre = false;
+  for (i=0; ((i<vectorDePedidosJSON.length) && (!encontre));i++){
+    if (vectorDePedidosJSON[i].PedidoId == PedidoId){
+      encontre = true;
+      vectorDePedidosJSON[i].Orden = orden;
+    }
+  }
+}
+
+function obtenerObjPedido(PedidoId){
+  msg("***obtenerObjPedido***");
+  var encontre = false;
+  var Pedido = undefined;
+  for (i=0; ((i<vectorDePedidosJSON.length) && (!encontre));i++){
+    if (vectorDePedidosJSON[i].PedidoId == PedidoId){
+      encontre = true;
+      Pedido = vectorDePedidosJSON[i];
+    }
+  }
+  return Pedido;
+}
+
+function obtenerPedidoId(vecDiccionario, vecPedidos, i){
+  msg("***obtenerPedidoId***");
+  var PedidoId;
+  if (i > vecDiccionario.length) {
+    return 0;
+  }
+
+  var posPedido = vecDiccionario[i];
+  PedidoId = vecPedidos[posPedido];
+
+  return PedidoId
+
+}
+
+
+
+function MarcarOrigen(PedidoId){
+  var Pedido = obtenerObjPedido(PedidoId);
+  for (i = 0; i < vectorDePedidosJSON.length; i++ ){
+      if (vectorDePedidosJSON[i].ZonaId == Pedido.ZonaId){
+        if (vectorDePedidosJSON[i].PedidoId == PedidoId){
+            vectorDePedidosJSON[i].Marca = vMarcaORIGEN;
+            vectorDePedidosJSON[i].Icon = getIcono(vMarcaORIGEN);
+
+        }else{
+
+          if (vectorDePedidosJSON[i].Marca == vMarcaORIGEN) {
+            vectorDePedidosJSON[i].Icon = getIcono("");
+            vectorDePedidosJSON[i].Marca = "";
+          }
+        }
+      }
+  }
+}
+
+
+function MarcarOrigenDesdeMarker(){
+  msg("***MarcarOrigen***")
+  if (selMarker == undefined){
+    alerta("Debe seleccionar un punto de origen");
+  }
+  var PedidoId = selMarker.labelContent;
+  MarcarOrigen(PedidoId);
+  cargarPuntos(false);
+}
+
+
+
+
+
+
+
+function MarcarDestino(PedidoId){
+  var Pedido = obtenerObjPedido(PedidoId);
+  for (i = 0; i < vectorDePedidosJSON.length; i++ ){
+      if (vectorDePedidosJSON[i].ZonaId == Pedido.ZonaId){
+          if (vectorDePedidosJSON[i].PedidoId == PedidoId){
+              vectorDePedidosJSON[i].Marca = vMarcaDESTINO;
+                vectorDePedidosJSON[i].Icon = getIcono(vMarcaDESTINO);
+          }else{
+            if (vectorDePedidosJSON[i].Marca == vMarcaDESTINO) {
+              vectorDePedidosJSON[i].Icon = getIcono("");
+              vectorDePedidosJSON[i].Marca = "";
+            }
+          }
+      }
+  }
+}
+
+
+
+function MarcarDestinoDesdeMarker(){
+  msg("***MarcarDestino***")
+  if (selMarker==undefined){
+    alerta("Debe seleccionar un punto de destino");
+  }
+  var PedidoId = selMarker.labelContent;
+  MarcarDestino(PedidoId);
+  cargarPuntos(false);
+}
+
+
+function getParmPoligonosFromServer(_PoligonoId, _PoligonoNombre,_PoligonoUsuario,_Modo){
+
+  var parm = {
+    PoligonoId: _PoligonoId,
+    PoligonoNegocioId:  EXT_VAR_NEGOCIOID,
+    PoligonoSucursalId: EXT_VAR_NEGOCIOSUCURSALID,
+    PoligonoNombre:   _PoligonoNombre,
+    PoligonoUsuario:  _PoligonoUsuario,
+    Modo: _Modo
+  }
+  return parm;
+
+}
+
+function cargarpoly(_PoligonoId){
+  var p = getParmPoligonosFromServer(_PoligonoId, "","","CON_PUNTOS");
+  getPoligonosFromServer(p);
+
+}
+
+
+//JS para buscar polygonos
+function buscarpoly(){
+
+  var ele = document.getElementById('txtbuscarpoly').value;
+  if (ele.length >= MINCHARSSUGEST){
+    var p = getParmPoligonosFromServer("",ele,"","SIN_PUNTOS");
+    getPoligonosFromServer(p);
+
+  }
+}
+
+
+
+function presentarPoligonosEnDiv(vPoly){
+  //Mestra los nombres de poligonos en el div flotante
+  msg("***presentarPoligonosEnDiv***");
+  var buffer = "";
+  var div = document.getElementById("poligonosdisponibles");
+  var cantitems = 0;
+  buffer = "<ul>";
+  for(i=0; (i < vPoly.length); i++){
+      var p = vPoly[i];
+      buffer += "<li class = 'lista' ";
+      buffer += ' onclick="cargarpoly(' + "'" + p.PoligonoId + "'" +') " ';
+      buffer += ">";
+      buffer += p.PoligonoNombre;
+      buffer += "</li>";
+      cantitems ++;
+  }
+  buffer += "</ul>";
+  div.innerHTML = buffer;
+  if (cantitems > 0){
+    refrescarMenuPoly(cantitems);
+  }
+}
+
+function convertirPuntosAnumericos(vec){
+  msg("***convertirPuntosAnumericos***");
+  /* convierte puntos del ws de poligonos a puntos del googlemaps */
+  var puntos = [];
+  for(i=0; (i < vec.length); i++){
+    var x = vec[i];
+    var p = new google.maps.LatLng({lat: x.PoliPuntoLat  ,lng:  x.PoliPuntoLong});
+    puntos.push(p);
+  }
+  return puntos;
+}
+
+function cargarPligonoObtenido(vPoly){
+  //Muestra el poligono en el mapa
+  msg("***cargarPligonoObtenido***");
+  for(i=0; (i < vPoly.length); i++){
+      var p = vPoly[i];
+      if (!extistePolyAlArray(p.PoligonoId)){
+        var puntos = convertirPuntosAnumericos(p.puntos);
+        polyFromTheScratch(p.PoligonoId, p.PoligonoNombre, puntos);
+      }
+  }
+
+}
+
+function setPolyModificado(id,mod){
+  var p = getPolyById(id);
+  p.estadosalvado = mod;
+  if (mod == SALVADO){
+    p.jsonpoly.PoligonoMode = "UPD";
+  }
+
+  var nomcampo =  "campo_" + id;
+  setEdit(id);
+  restaurar(id,nomcampo);
+
+}
+
+
+function cerrarInfoPoly(idpoly){
+  var p = getPolyById(idpoly);
+  p.ov.setMap(null);
+}
+
+function polyFromTheScratch(id,desc,puntos){
+
+  var newShape = new google.maps.Polygon({
+    paths:          puntos,
+    strokeColor:    vPoligonoColor,
+    strokeOpacity:  vOPACIDADPOLYBORDE,
+    strokeWeight:   vAnchoLinea,
+    fillColor:      vPoligonoFillColor,
+    fillOpacity:    vOPACIDADPOLY,
+    editable: true,
+    tag:      id,
+    caption:  desc,
+    ov: undefined,
+    jsonpoly: "",
+    estadosalvado: "1"
+  });
+
+
+  var latlngcenter  = polygonCenter(newShape);
+
+  var textoDeLaZona = '<div nowrap class="labelzonas" id = "'  +  newShape.tag + '" >' ;
+
+  textoDeLaZona += ' <table width = "100%">';
+  textoDeLaZona += '    <tr width = "100% height = "20px">';
+  textoDeLaZona += '      <td width = "15%">';
+  textoDeLaZona += '        <a class="cerrarleft" onclick="cerrarInfoPoly(' + "'" + newShape.tag + "'" + ');" >x</a> '
+  textoDeLaZona += '      </td> ';
+  textoDeLaZona += '      <td width = "80%" align="right">';
+  textoDeLaZona += '        <img class = "topbarsave" src="' + PATHIMAGES + "/guardar.svg" + '" height="' + ALTOIMGSAVE + '" width="'+ ANCHOIMGSAVE +'" onclick="salvandoPoly()"/>';
+  textoDeLaZona += '      </td> ';
+  textoDeLaZona += '    </tr> ';
+  textoDeLaZona += ' </table> ';
+
+
+  textoDeLaZona = textoDeLaZona + ' <input readonly type = "text" id = "' + "" +  newShape.tag + '_txt" onclick="setEdit(' + "'" + newShape.tag +  "'" + ')" ';
+  textoDeLaZona = textoDeLaZona + " value ='" + newShape.caption  + "'</input></div>";
+
+  newShape.ov = new TxtOverlay(latlngcenter, textoDeLaZona, "labelzonas", map);
+  var _PoligonoId = id;
+  var _PoligonoNegocioId = EXT_VAR_NEGOCIOID;
+  var _PoligonoSucursalId = EXT_VAR_NEGOCIOSUCURSALID;
+  var _PoligonoNombre = desc;
+  var _PoligonoUsuario = EXT_VAR_USUARIO;
+  var _PoligonoMode = "UPD";
+
+  newShape.jsonpoly = newPoly(_PoligonoId, _PoligonoNegocioId, _PoligonoSucursalId, _PoligonoNombre, _PoligonoUsuario, _PoligonoMode);
+
+
+
+  google.maps.event.addListener(newShape, 'click', function() {
+      setSelection(newShape);
+  });
+
+  google.maps.event.addListener(newShape, 'rightclick', function() {
+      newShape.ov.setMap(map);
+  });
+
+  google.maps.event.addListener(newShape.getPath(), 'insert_at', function() {
+      setPolyModificado(newShape.tag, EDITADO);
+  });
+  google.maps.event.addListener(newShape.getPath(), 'remove_at', function() {
+      setPolyModificado(newShape.tag, EDITADO);
+  });
+  google.maps.event.addListener(newShape.getPath(), 'set_at', function() {
+      setPolyModificado(newShape.tag, EDITADO);
+  });
+  newShape.setMap(map);
+
+  setSelection(newShape);
+  agregarPolyAlArray(newShape);
+  cargarPoligonosEnLista();
+  //return newShape;
+}
+
+
+function getPolyById(id){
+  msg("***getPolyById***");
+  var encontre  = false;
+  var poly      = undefined;
+  for (i = 0; ((i< vecPoligonos.length) && (!encontre)); i++){
+	msg("====> " + vecPoligonos[i].tag + " <-> " +  id);
+    if (vecPoligonos[i].tag == id){
+
+      encontre = true;
+      poly = vecPoligonos[i];
+    }
+  }
+  return poly;
+}
+
+
+function inconoEstadoSalavadoPoly(id){
+  msg("***inconoEstadoSalavadoPoly***");
+  //Get estado poly
+  var poly= getPolyById(id);
+  var icono = "";
+  if (poly==undefined){
+    icono = "editar.svg";
+  }else{
+    switch(poly.estadosalvado){
+       case "0":
+            icono = "editar.svg";
+            break;
+       case "1":
+            icono = "guardar.svg";
+            break;
+       default:
+            msg('default');break;
+    }
+  }
+  return PATHIMAGES + "/" + icono;
+
+}
+
+function restaurar(id, nomcampo){
+  var div = document.getElementById(id);
+  var txt = document.getElementById(nomcampo);
+  var p = getPolyById(id);
+
+  if (p.jsonpoly.PoligonoNombre !=txt.value){
+    p.jsonpoly.PoligonoNombre = txt.value;
+    p.caption = txt.value;
+    setPolyModificado(id, EDITADO);
+  }
+
+  //var textoDeLaZona = '<div class ="derecha"><img class = "topbarsave" src="' + inconoEstadoSalavadoPoly(id) + '" height="' + ALTOIMGSAVE + '" width="'+ ANCHOIMGSAVE +'" onclick="salvandoPoly()"/></div>';
+  //textoDeLaZona = textoDeLaZona + ' <input readonly id = "' + id + '_txt" ' +  ' value = "' + txt.value + '" onclick="setEdit(' + "'" + id + "'" + ')"/>';
+
+
+
+  var textoDeLaZona = ' <table width = "100%">';
+  textoDeLaZona += '    <tr width = "100% height = "20px">';
+  textoDeLaZona += '      <td width = "15%">';
+  textoDeLaZona += '        <a class="cerrarleft" onclick="cerrarInfoPoly(' + "'" + id + "'" + ');" >x</a> '
+  textoDeLaZona += '      </td> ';
+  textoDeLaZona += '      <td width = "80%" align="right">';
+  textoDeLaZona += '        <img class = "topbarsave" src="' + inconoEstadoSalavadoPoly(id)  + '" height="' + ALTOIMGSAVE + '" width="'+ ANCHOIMGSAVE +'" onclick="salvandoPoly()"/>';
+  textoDeLaZona += '      </td> ';
+  textoDeLaZona += '    </tr> ';
+  textoDeLaZona += '  </table> ';
+
+
+  textoDeLaZona = textoDeLaZona + ' <input readonly id = "' + id + '_txt" ' +  ' value = "' + txt.value + '" onclick="setEdit(' + "'" + id + "'" + ')"/>';
+
+
+
+
+
+
+
+  div.innerHTML = textoDeLaZona;
+  actualizarJSONPoly(txt.value, id);
+  editando  = false;
+  cargarPoligonosEnLista();
+  //TODO CAMBIAR TEXTO A ZONA
+}
+
+function actualizarJSONPoly(valor, id){
+  var p  = getPolyById(id);
+  if (p == undefined){return};
+  if (p.jsonpoly.PoligonoId == "0"){
+    var _PoligonoId = valor.replace(" ","_");
+    var _PoligonoNegocioId = EXT_VAR_NEGOCIOID;
+    var _PoligonoSucursalId = EXT_VAR_NEGOCIOSUCURSALID;
+    var _PoligonoNombre = valor;
+    var _PoligonoUsuario = EXT_VAR_USUARIO;
+    var _PoligonoMode = "INS";
+    p.jsonpoly = newPoly(_PoligonoId, _PoligonoNegocioId, _PoligonoSucursalId, _PoligonoNombre, _PoligonoUsuario, _PoligonoMode);
+  }else{
+    p.jsonpoly.PoligonoNombre = valor;
+  }
+}
+function limpiarRuta(){
+  for (i=0; (i < vecDireccionDisplay.length); i++){
+    d = vecDireccionDisplay[i];
+    d.setMap(null);
+  }
+  ExpandirMapa();
+  var div_pedidos = document.getElementById("listapedidos");
+  div_pedidos.innerHTML = "";
+
+}
+
+function listaDePoligonos(){
+  msg("***listaDePoligonos***");
+  var bufferHtml = '';
+  for (i=0; i < vecPoligonos.length; i++){
+      var idckh = 'chk_poly' + vecPoligonos[i].tag;
+      bufferHtml += '<div class="checkbox">';
+      bufferHtml += '<label for="'+ idckh +'"> ';
+      bufferHtml += '<input name="' + idckh + '" id="' + idckh + '" type="checkbox" checked  onclick="AccionPoligonos(' + "'" + vecPoligonos[i].tag + "'" +')">';
+      bufferHtml += vecPoligonos[i].caption;
+      bufferHtml += '</label>';
+      bufferHtml += '</div>';
+  }
+  return bufferHtml;
+}
+
+function AccionPoligonos(tag){
+    msg("***AcccionZonas***");
+    var p = getPolyById(tag);
+
+	var idckh = 'chk_poly' + tag;
+    var chk = document.getElementById(idckh);
+	if (chk==null){
+		p.ov.setMap(null);
+		p.setMap(null);
+	}else{
+		if (chk.checked){
+		  p.ov.setMap(map);
+		  p.setMap(map);
+		}else{
+		  p.ov.setMap(null);
+		  p.setMap(null);
+		}
+	}
+}
+
+
+
+function setDatosPoly(e){
+  var newShape = e.overlay;
+  newShape.type = e.type;
+
+  newShape.tag      = newShapeUltId = newShapeUltId + 1;
+  newShape.caption  = newShapeUltTxt = "[Zona Nueva ] " + newShapeUltId;
+  var latlngcenter  = polygonCenter(newShape);
+
+  var textoDeLaZona = '<div nowrap class="labelzonas" id = "' + "" +  newShape.tag + '" >' ;
+  textoDeLaZona = textoDeLaZona + '<div class ="derecha"><img class = "topbarsave" src="' + inconoEstadoSalavadoPoly(newShape.tag) + '" height="' + ALTOIMGSAVE + '" width="'+ ANCHOIMGSAVE +'" onclick="salvandoPoly()"/></div>';
+
+  textoDeLaZona = textoDeLaZona + ' <input readonly type = "text" id = "' + "" +  newShape.tag + '_txt" onclick="setEdit(' + "'" + newShape.tag +  "'" + ')" ';
+  textoDeLaZona = textoDeLaZona + " value ='" + newShape.caption + ':' + newShape.tag + "'</input></div>";
+
+  newShape.ov = new TxtOverlay(latlngcenter, textoDeLaZona, "labelzonas", map);
+  var _PoligonoId = "0";
+  var _PoligonoNegocioId = EXT_VAR_NEGOCIOID;
+  var _PoligonoSucursalId = EXT_VAR_NEGOCIOSUCURSALID;
+  var _PoligonoNombre = "";
+  var _PoligonoUsuario = EXT_VAR_USUARIO;
+  var _PoligonoMode = "INS";
+  newShape.jsonpoly = newPoly(_PoligonoId, _PoligonoNegocioId, _PoligonoSucursalId, _PoligonoNombre, _PoligonoUsuario, _PoligonoMode);
+
+  google.maps.event.addListener(newShape, 'click', function() {
+      setSelection(newShape);
+  });
+  setSelection(newShape);
+  agregarPolyAlArray(newShape);
+  google.maps.event.addListener(newShape.getPath(), 'insert_at', function() {
+      setPolyModificado(newShape.tag, EDITADO);
+  });
+  google.maps.event.addListener(newShape.getPath(), 'remove_at', function() {
+      setPolyModificado(newShape.tag, EDITADO);
+  });
+  google.maps.event.addListener(newShape.getPath(), 'set_at', function() {
+      setPolyModificado(newShape.tag, EDITADO);
+  });
+  cargarPoligonosEnLista();
+}
+
+function inicializarDrawingManager(){
+    //INICIALIZA EL DRAWING MANAGER
+    var drawingManager = showDrawingManager();
+    google.maps.event.addListener(drawingManager, 'overlaycomplete', function(e) {
+		if (e.type != google.maps.drawing.OverlayType.MARKER) {
+		    // Switch back to non-drawing mode after drawing a shape.
+            drawingManager.setDrawingMode(null);
+            // Add an event listener that selects the newly-drawn shape when the user
+            // mouses down on it.
+			if (e.type == google.maps.drawing.OverlayType.POLYGON){
+				setDatosPoly(e);
+			}else{
+				if (e.type == google.maps.drawing.OverlayType.CIRCLE){
+					setDatosClicle(e);
+				}
+			}
+
+        }
+    });
+}
+
+function setDatosClicle(e){
+	currentOverlay= e.overlay
+	currentOverlay.addListener('rightclick', overlayClickListener);
+	currentOverlay.addListener('radius_changed', showRadius);
+	currentOverlay.addListener('center_changed', showRadius);
+	showRadius();
+
+
+}
+
+
+
+
+  function showRadius(){
+      console.log('showRadius');
+      if(infoWindow != null){
+          infoWindow.setMap(null);
+      }
+      $("#map").unbind("mousemove");
+      $("#distanceSign SPAN.radiusValue").text((currentOverlay.getRadius()/1000.0).toFixed(3));
+      var content = $("#distanceSign").html();
+      infoWindow = new google.maps.InfoWindow({
+          content:content,
+          position:currentOverlay.getCenter()
+      });
+      infoWindow.open(map);
+      $("#map").mousemove(function (e) {
+          infoWindow.setMap(null);
+      });
+
+  }
+
+  // remove the overlay
+  function overlayClickListener() {
+    console.log('overlayClickListener');
+      //if (typeof event.path === 'undefined') { // ignore clicks on polygon paths
+	 // drawingManager.setDrawingMode(nextOverlayType());
+	  currentOverlay.setMap(null);
+	  google.maps.event.clearInstanceListeners(currentOverlay);
+	  currentOverlay = null;
+//	}
+  }
+
+
+
+function setEdit(id){
+  if (!editando){
+    editando  = true;
+    var div = document.getElementById(id);
+    var nomcampo =  "campo_" + id;
+    var restaurar = ' restaurar("' + id + '","' + nomcampo + '")';
+    var valor = document.getElementById(id + "_txt").value;
+    var txt =  '<input nowrap type="text" class = "' + CLASEEDITARZONA + '" id="' + nomcampo + '" value = "' +  valor + '" placeholder="' + PLACEHOLDERZONA + '"  onblur=' + restaurar +' />';
+    div.innerHTML = txt;
+    var c = document.getElementById(nomcampo);
+    c.focus();
+  }
+}
+
+
+
+
+
+
+
+function cargarPoligonosEnLista(){
+    var d = document.getElementById("divlistazonas");
+    d.innerHTML =  listaDePoligonos();
+}
+
+
+
+function polygonCenter(poly) {
+    msg("***polygonCenter***");
+    //DATO UN POLIGONO RETORNA LAS COORDENAS DEL CENTRO
+    var latitudes = [];
+    var longitudes = [];
+    var vertices = poly.getPath();
+    // put all latitudes and longitudes in arrays
+    for (var i = 0; i < vertices.length; i++) {
+        longitudes.push(vertices.getAt(i).lng());
+        latitudes.push(vertices.getAt(i).lat());
+    }
+    // sort the arrays low to high
+    latitudes.sort();
+    longitudes.sort();
+    // get the min and max of each
+    var lowX = latitudes[0];
+    var highX = latitudes[latitudes.length - 1];
+    var lowy = longitudes[0];
+    var highy = longitudes[latitudes.length - 1];
+    // center of the polygon is the starting point plus the midpoint
+    var centerX = lowX + ((highX - lowX) / 2);
+    var centerY = lowy + ((highy - lowy) / 2);
+    return (new google.maps.LatLng(centerX, centerY));
+}
+
+
+
+function repintarPoligono(_zona ,poly, _vPoligonoFillColor, _vPoligonoColor, _vAnchoLinea){
+    msg("***repintarPoligono***");
+    //PINTA EL POLIGONO EN EL MAPA
+    var poligono = new google.maps.Polygon({
+      paths:          poly,
+      strokeColor:    _vPoligonoColor,
+      strokeOpacity:  vOPACIDADPOLYBORDE,
+      strokeWeight:   _vAnchoLinea,
+      fillColor:      _vPoligonoFillColor,
+      fillOpacity:    vOPACIDADPOLY,
+      editable: true,
+      tag:      _zona.ZonaId,
+      caption:  _zona.ZonaDsc,
+      ov:"",
+      jsonpoly: "",
+      estadosalvado: "0"
+    });
+
+    google.maps.event.addListener(poligono, 'click', function() {
+        setSelection(poligono);
+        //TODO setSelection(newShape);
+    });
+    poligono.setMap(map);
+
+    var latlngcenter = polygonCenter(poligono);
+    var textoDeLaZona = '<div nowrap class="labelzonas" id = "' + "" +  _zona.ZonaId +  "" + '" onclick="setEdit(' + "'" + _zona.ZonaId +  "'" + ')";>Zona:' + _zona.ZonaId + '</div>';
+    poligono.ov = new TxtOverlay(latlngcenter, textoDeLaZona, "labelzonas", map);
+
+
+
+    agregarPolyAlArray(poligono);
+    //asignarZonaDadoUnPolyAlosMarcadores(poligono);
+}
+
+function removeOverlay(o){
+  o.setMap(null);
+}
+
+
+
+function extistePolyAlArray(tag){
+  msg("***extistePolyAlArray***");
+  //infica si existe el poligono en el vetor de vecPoligonos
+  var existe = false;
+  for (i=0; ((i<vecPoligonos.length) && (!existe)); i++){
+    if (vecPoligonos[i].tag == tag){
+      existe = true;
+    }else{
+      if (vecPoligonos[i].jsonpoly != undefined){
+        if (vecPoligonos[i].jsonpoly.PoligonoId == tag){
+          existe = true;
+        }
+      }
+    }
+  }
+  return existe;
+}
+
+function listaPoligonos(){
+    msg("***listaPoligonos****");
+    vecPoligonos.forEach(function (v) {
+        msg(v.tag);
+
+    });
+}
+
+
+
+
+function agregarPolyAlArray(p){
+  msg("***agregarPolyAlArray****");
+  //agrega poligono y array si no existe
+  if (!extistePolyAlArray(p.tag)){
+    vecPoligonos.push(p);
+  }
+}
+
+
+
+
+function eliminarPoly(){
+  msg("Eliminado zona " + selectedShape.tag);
+  limpiarPoligono(selectedShape);
+}
+
+function limpiarPoligono(poly){
+  var encontro=false;
+  removeOverlay(poly.ov);
+    //quita el poligono del mapa
+  for (i=0; ((i < vecPoligonos.length) && (!encontro)); i++){
+    if (vecPoligonos[i].tag == poly.tag){
+      encontro = true;
+      vecPoligonos[i].setMap(null);
+      vecPoligonos.splice( i, 1);
+    }
+  }
+}
+
+
+function calcularElAreaDelPoligono(v){
+  var area = google.maps.geometry.spherical.computeArea(v);
+}
+
+function calcularElPerimetroDelPoligono(v){
+  var p = google.maps.geometry.spherical.computeLength(v);
+}
+
+
+function showDrawingManager(){
+    var managerOptions = {
+        drawingControl: true,
+        drawingControlOptions: {
+            position: google.maps.ControlPosition.TOP_CENTER,
+			drawingModes: ['circle', 'polygon']
+            //drawingModes: [google.maps.drawing.OverlayType.POLYGON]
+		},
+        markerOptions: {
+            editable: true
+
+        },
+        polygonOptions: {
+            fillColor:  vCOLORFONOSPOLY_X_DEFECTO ,
+            strokeColor: vCOLORBORDEPOLY_X_DEFECTO,
+            tag: newShapeUltId,
+            strokeOpacity:  vOPACIDADPOLYBORDE,
+            fillOpacity:    vOPACIDADPOLY,
+            caption: newShapeUltTxt,
+            ov:null,
+            jsonpoly:"",
+            estadosalvado: "0"
+        },
+		circleOptions: {
+			editable: true,
+			fillColor:  vCOLORCIRCLE_X_DEFECTO ,
+            strokeColor: vCOLORBORDECIRCLE_X_DEFECTO,
+            tag: newShapeUltId,
+            strokeOpacity:  vOPACIDADPOLYBORDE,
+            fillOpacity:    vOPACIDADPOLY,
+            caption: newShapeUltTxt,
+            ov:null,
+            jsonpoly:"",
+            estadosalvado: "0"
+		},
+        polylineOptions: {
+            strokeColor: vCOLORBORDEPOLY_X_DEFECTO
+        }
+    }
+
+    var drawingManager = new google.maps.drawing.DrawingManager(managerOptions);
+    drawingManager.setMap(map);
+    return drawingManager;
+}
+
+function clearSelection() {
+    //DESMarca LA FIGURA COMO editable
+    if (selectedShape) {
+        msg("clearSelection");
+        selectedShape.setEditable(false);
+        selectedShape = null;
+        numberOfShapes--;
+    }
+}
+
+function setSelection(shape) {
+   //Marca LA FIGURA COMO EDITABLE
+   selectedZona = shape.tag;
+   msg("seleccionar zona " + selectedZona);
+   clearSelection();
+   selectedShape = shape;
+   shape.setEditable(true);
+   numberOfShapes++;
+}
+
+
+function getZonasCreacionKML(){
+  msg("***getZonasCreacionKML***");
+  var src = URLZONAS;
+  kmlLayer = new google.maps.KmlLayer(src, {
+    suppressInfoWindows: true,
+    preserveViewport: false,
+    map: map
+  });
+}
+
+
+function NewZona(){
+  msg("***NewZona***");
+  var Zona = {
+    ZonaId: 0,
+    ZonaDsc: "",
+    ZonaColorFondo : "",
+    ZonaColorBorde : "",
+    ZonaPoly : [] ,
+    getVector: function(){
+          return this.ZonaPoly;
+    }
+  };
+  return Zona;
+}
+
+
+function getParametrosZonas(){
+    msg("***getParametrosZonas***");
+    var parametro = {
+      fNegocioId: 10,
+      fNegocioSucursalId: 0,
+      fNegocioSucursalZonaId: 0,
+      fZonaId: 0,
+      fZonaPaisId: 0,
+      fZonaPaisCiudadId: 0,
+      fZonaTipoId: 0
+    }
+    return JSON.stringify(parametro);
+}
+
+//***** TEXTOS OVERLAS PARA LOS MAPAS ******//
+function TxtOverlay(pos, txt, cls, map) {
+  // Now initialize all properties.
+  this.pos = pos;
+  this.txt_ = txt;
+  this.cls_ = cls;
+  this.map_ = map;
+  // We define a property to hold the image's
+  // div. We'll actually create this div
+  // upon receipt of the add() method so we'll
+  // leave it null for now.
+  this.div_ = null;
+  // Explicitly call setMap() on this overlay
+  this.setMap(map);
+}
+
+
+function inicializarOverlays(){
+    TxtOverlay.prototype = new google.maps.OverlayView();
+
+    TxtOverlay.prototype.onAdd = function() {
+    // Note: an overlay's receipt of onAdd() indicates that
+    // the map's panes are now available for attaching
+    // the overlay to the map via the DOM.
+    // Create the DIV and set some basic attributes.
+    var div = document.createElement('DIV');
+    div.className = this.cls_;
+    div.innerHTML = this.txt_;
+
+    // Set the overlay's div_ property to this DIV
+    this.div_ = div;
+    var overlayProjection = this.getProjection();
+    var position = overlayProjection.fromLatLngToDivPixel(this.pos);
+    div.style.left = position.x - largoEstimadoLabel + 'px';
+    div.style.top = position.y - alturaEstimadaLabel + 'px';
+    // We add an overlay to a map via one of the map's panes.
+
+    var panes = this.getPanes();
+    panes.floatPane.appendChild(div);
+  }
+
+  TxtOverlay.prototype.draw = function() {
+    var overlayProjection = this.getProjection();
+    // Retrieve the southwest and northeast coordinates of this overlay
+    // in latlngs and convert them to pixels coordinates.
+    // We'll use these coordinates to resize the DIV.
+    var position = overlayProjection.fromLatLngToDivPixel(this.pos);
+    var div = this.div_;
+    div.style.left = position.x - largoEstimadoLabel + 'px';
+    div.style.top = position.y - alturaEstimadaLabel + 'px';
+  }
+    //Optional: helper methods for removing and toggling the text overlay.
+  TxtOverlay.prototype.onRemove = function() {
+    this.div_.parentNode.removeChild(this.div_);
+    this.div_ = null;
+  }
+
+  TxtOverlay.prototype.hide = function() {
+    if (this.div_) {
+      this.div_.style.visibility = "hidden";
+    }
+  }
+
+  TxtOverlay.prototype.show = function() {
+    if (this.div_) {
+      this.div_.style.visibility = "visible";
+    }
+  }
+
+  TxtOverlay.prototype.toggle = function() {
+    if (this.div_) {
+      if (this.div_.style.visibility == "hidden") {
+        this.show();
+      } else {
+        this.hide();
+      }
+    }
+  }
+
+  TxtOverlay.prototype.toggleDOM = function() {
+    if (this.getMap()) {
+      this.setMap(null);
+    } else {
+      this.setMap(this.map_);
+    }
+  }
+}
+
+//*******************//
+
+
+
+
+
+function addNumero(){
+  numero = numero + 1;
+}
+
+function getNumero(){
+  return numero;
+}
+
+function alerta(m){
+  alert(m)
+}
+
+function msg(m){
+  if (vVERBOSE){
+    console.log(m);
+  }
+}
+
+
+function ExpandirMapa(){
+  var divmapa = document.getElementById("map");
+  divmapa.style.maxHeight = "100%";
+  var divruta = document.getElementById("listapedidos");
+  divruta.style.maxHeight = "0px";
+//  divruta.style.display = "none";
+
+}
+
+
+function ContraerMapa(){
+  var divmapa = document.getElementById("map");
+  divmapa.style.maxHeight = vMAXHEIGHT_MAPA;
+  var divruta = document.getElementById("listapedidos");
+  divruta.style.maxHeight = vMAXHEIGHT_RUTA;
+}
+
+function readTextFile(file, callback) {
+    var rawFile = new XMLHttpRequest();
+    rawFile.overrideMimeType("application/json");
+    rawFile.open("GET", file, true);
+    rawFile.onreadystatechange = function() {
+        if (rawFile.readyState === 4 && rawFile.status == "200") {
+            callback(rawFile.responseText);
+        }
+    }
+    rawFile.send(null);
+}
+
+
+function alibaba(){
+  var ds = new google.maps.DirectionsService;
+  var dd = new google.maps.DirectionsRenderer({ polylineOptions: { strokeColor: vecColor[((tandas + 10) % 5)] } });
+  //usage:
+  readTextFile("js/pruebajson.json", function(text){
+      var data = JSON.parse(text);
+      dd.setDirections(data);
+      dd.setMap(map);
+  });
+
+
+}
+
+function sumar_horas(fecha, minutos)
+{
+	fecha = new Date(fecha);
+	fecha.setMinutes(fecha.getMinutes()+ Number(minutos));
+  fecha =  fecha.toISOString();
+  var fecha_date = fecha.split('T');
+  var fecha_time = fecha_date[1].split('.');
+  var fecha_time = fecha_date[1].split(':');
+  fecha_date = fecha_date[0];
+	fecha = fecha_date+'T'+fecha_time[0]+':'+fecha_time[1]+':00';
+	return fecha;
+}
+
+//ELEMENTOS COLAPSABLES
+function conlapsables(){
+  var coll = document.getElementsByClassName("collapsibleX");
+  var i;
+  for (i = 0; i < coll.length; i++) {
+
+    coll[i].addEventListener("click", function() {
+
+      this.classList.toggle("activeX");
+      var content = this.nextElementSibling;
+      if (content.style.maxHeight){
+        content.style.maxHeight = null;
+      } else {
+        content.style.maxHeight = content.scrollHeight + "px";
+      }
+    });
+  }
+}
+
+//JS para hacer flotante el DIV
+function addListeners(){
+    document.getElementById('dvbuscarpoly').addEventListener('mousedown', mouseDown, false);
+    window.addEventListener('mouseup', mouseUp, false);
+}
+function mouseUp()
+{
+    window.removeEventListener('mousemove', divMove, true);
+}
+function mouseDown(e){
+    window.addEventListener('mousemove', divMove, true);
+}
+function divMove(e){
+
+    var div = document.getElementById('dvbuscarpoly');
+    div.style.position = 'absolute';
+    div.style.top = e.clientY - 60 + 'px';
+    div.style.left = e.clientX - 280 + 'px';
+}
+
+
+function refrescarMenuPoly(cantitems) {
+  //Actualiza el div flotante segun cuantos nombres de pligonos se carguen
+  var elemento = document.getElementById("botonbusqueda");
+  elemento.classList.toggle("activeX");
+  var content = document.getElementById("contenidopoly");
+  content.style.maxHeight = (cantitems * 80) + "px";
+}
+
+
+function compoTipoRutaSelect(){
+  var combo = document.getElementById("compoTipoRuta");
+  switch(combo.value){
+     case "RCWH":
+          rutaCerradaWH = true;
+          rutaAbiertaWH = false;
+          rutaCerradaUsuario = false;
+          rutaAbiertaUsuario = false;
+          break;
+     case "RAWH":
+           rutaCerradaWH = false;
+           rutaAbiertaWH = true;
+           rutaCerradaUsuario = false;
+           rutaAbiertaUsuario = false;
+          break;
+     case "RCU":
+          rutaCerradaWH = false;
+          rutaAbiertaWH = false;
+          rutaCerradaUsuario = true;
+          rutaAbiertaUsuario = false;
+          break;
+     case "RAU":
+          rutaCerradaWH = false;
+          rutaAbiertaWH = false;
+          rutaCerradaUsuario = false;
+          rutaAbiertaUsuario = true;
+          break;
+     default:
+          msg('default');break;
+  }
+
+
+}
+
+
+
+function calcdistancia(latlng0,latlng1){
+  var distancia = google.maps.geometry.spherical.computeDistanceBetween(latlng0, latlng1);
+  //var distancia = Math.sqrt((latlng0.lat - latlng1.lat) ^2 + (latlng0.lng - latlng1.lng) ^2);
+  //msg(JSON.stringify(latlng0));
+  //msg(latlng0.lat());
+  //var distancia = distanciaEntre2Puntos(latlng0.lat(),latlng0.lng(),latlng1.lat(),latlng1.lng());
+  msg("DISTANCIA: " + distancia);
+  return distancia;
+}
+
+
+
+
+function getParametrosSetPoligono(poly, puntos){
+  msg("puntos " + JSON.stringify(puntos));
+  var parametro = {
+    PoligonoId : poly.PoligonoId,
+    PoligonoNegocioId :poly.PoligonoNegocioId,
+    PoligonoSucursalId : poly.PoligonoSucursalId,
+    PoligonoNombre :  poly.PoligonoNombre,
+    PoligonoUsuario : poly.PoligonoUsuario,
+    PoligonoFechaULTMod :"0000-00-00T00:00:00",
+    PoligonoMode: poly.PoligonoMode,
+    puntos: puntos
+  }
+  return parametro;
+}
+
+
+function newPoly(_PoligonoId, _PoligonoNegocioId, _PoligonoSucursalId, _PoligonoNombre, _PoligonoUsuario, _PoligonoMode){
+  var poly ={
+    PoligonoId : _PoligonoId ,
+    PoligonoNegocioId : _PoligonoNegocioId,
+    PoligonoSucursalId :  _PoligonoSucursalId,
+    PoligonoNombre : _PoligonoNombre ,
+    PoligonoUsuario : _PoligonoUsuario,
+    PoligonoMode: _PoligonoMode,
+  }
+  return poly;
+}
+
+
+function salvandoPoly(){
+
+  var poly = selectedShape;
+  if (poly == undefined){return;}
+
+  if (!poligonoValido(poly)) {return;}
+
+  /**  PUNTOS **/
+  var vecpuntos=[];
+  var paths = poly.getPath();
+  for (var i =0; i < paths.getLength(); i++) {
+
+     var xy = paths.getAt(i);
+     var punto ={
+       PoliPuntoId: i,
+       PoliPuntoLat: xy.lat(),
+       PoliPuntoLong: xy.lng()
+     }
+     vecpuntos.push(punto);
+   }
+
+  //** ARMAR PARAMETORS POST ***/
+  var jsonpoligono = getParametrosSetPoligono(poly.jsonpoly,vecpuntos );
+  var vecp = [];
+  vecp.push(jsonpoligono);
+
+  //** enviar poligono al server ***/
+  setPoligonos2Server(vecp, poly.tag);
+}
+
+function poligonoValido(poly){
+  //Valido datos jsonpoly
+
+  if (poly.jsonpoly.PoligonoId == "0"){
+    alerta("Debe indicar un identificador para el polígono");
+    return false;
+  }
+
+  if (poly.jsonpoly.PoligonoNombre == 0){
+    alerta("Debe indicar un nombre para el polígono");
+    return false;
+  }
+
+  return true;
+}
+
+
+/**
+ * Displays overlay with "Please wait" text. Based on bootstrap modal. Contains animated progress bar.
+ */
+
+function mostrarWait(){
+
+
+}
+
+function ocultarWait(){
+
+}
+
+
+
+function armarListaOrdenada(poly, posPrimerElemento, listaDesordenada){
+    msg("***armarListaOrdenada***");
+    var listaposiciones = [];
+    var fin = false;
+    posele = posPrimerElemento;
+    var ele = listaDesordenada[posele];
+    listaDesordenada.splice(posele, 1);
+    listaposiciones.push(ele.PedidoId);
+    while((listaDesordenada.length>0) && (!fin)){
+      var possig = 0;
+      msg("***listaDesordenada length " + listaDesordenada.length);
+      possig = sigDeMenorDist(poly, ele, listaDesordenada);
+
+      if (possig == -1){
+        fin = true;
+      }else{
+        msg("Va a agregar " +possig);
+        ele = listaDesordenada[possig];
+        listaposiciones.push(ele.PedidoId);
+        listaDesordenada.splice(possig, 1);
+
+      }
+    }
+    return listaposiciones;
+}
+
+
+function maxOrdenDelaZona(){
+  msg("***maxOrdenDelaZona***");
+  var orden = 0;
+  for (i = 0; (i < vectorDePedidosJSON.length); i++){
+    if (vectorDePedidosJSON[i].Orden > orden){
+      orden = vectorDePedidosJSON[i].Orden;
+    }
+  }
+  return orden;
+}
+
+
+function sigDeMenorDist(poly,ele,lista){
+  var mindistancia = MAXVALUE;
+  var posicion = -1;
+  for (i=0; i < lista.length; i++){
+    var p = lista[i];
+    if ((ele.PedidoId != p.PedidoId) && (p.ZonaId  == poly.tag)){
+      var distancia =  calcdistancia(new google.maps.LatLng({lat: ele.PedidoLat, lng: ele.PedidoLong}) , new google.maps.LatLng({lat: p.PedidoLat, lng: p.PedidoLong}));//distanciaEntre2Puntos(ele.PedidoLat, ele.PedidoLong, p.PedidoLat, p.PedidoLong);
+      if (distancia < mindistancia){
+        mindistancia = distancia;
+        posicion = i;
+      }
+    }
+  }
+  return posicion;
+}
+
+
+function getCabezalRutaJSON(visitas){
+
+  var rutaCabezal = {
+    VRutaId:0,
+    VRutaNom:"",
+    VRZonaDesc:"",
+    VRZonaId:1,
+    VRutaNegocioSucursalId: EXT_VAR_NEGOCIOSUCURSALID,
+    VRutaNegocioId: EXT_VAR_NEGOCIOID,
+    VRutaFecha:"0000-00-00",
+    VRutaDeliveryTelefono:"099228245",
+    VRutaHoraFin:"0000-00-00T00:00:00",
+    VRutaHoraComienzo:"0000-00-00T00:00:00",
+    VRRutaDirServiceData: "", //vVRRutaDirServiceData,
+    VRutaHabilitada:0,"visitas":visitas
+  }
+  //return JSON.stringify(rutaCabezal);
+  return rutaCabezal;
+}
+
+
+function getVisitasRutaJSON(vecVisitas,p){
+  var visita = {
+      VRutaId:            0,        //se da de alta en web service
+      VRutaVisitaId:      0,  //se da de alta en el web service
+      VRutaVisitaObsBE:   "Pedido nro " + p.PedidoId, //x ahora se deja vacio
+      VRutaVisitaObsDri:    "Pedido nro " + p.PedidoId, //x ahora se deja vacio
+      VRutaVisitaEstadoId:    0, // x defecto va en 0
+      VRutaVisitaHoraPlan:    p.fechaHora,
+      VRutaVisitaOrden:       p.Orden,
+      VRutaVisitaCalificacion:    0,
+      VRutaVisitaFchHorEntrada:   "0000-00-00T00:00:00", //Inicialmente vacio
+      VRutaVisitaFchSalida:       "0000-00-00T00:00:00",//Inicialmente vacio
+      VRutaVisitaDistancia:       p.Dnumero,
+      VRutaVisitaDistanciaTxt:    p.Dtxt,
+      VRutaVisitaDuracion:        p.Tnumero,
+      VRutaVisitaDuracionTxt:     p.Ttxt,
+      VRutaTiempoEstimadoEntrega: p.fechaHora,
+      VRutaVisitaDireccion:       p.end_address,
+      VRutaVistaGeolocation:      p.PedidoLat + "," + p.PedidoLong,
+      VRutaTelefonoContacto:      p.contacto
+    }
+    vecVisitas.push(visita);
+}
+
+function armarJSONRuta(ZonaId){
+    msg("***armarJSONRuta***");
+    var vecVisitas =[];
+    for (i=0; i < vectorDePedidosJSON.length; i++){
+        x = vectorDePedidosJSON[i];
+        if (x.ZonaId == ZonaId){
+          getVisitasRutaJSON(vecVisitas,x);
+        }
+    }
+    var r = getCabezalRutaJSON(vecVisitas);
+    return r;
+
+}
+
+function armarRutas2Server(){
+    msg("***armarRutas2Server***");
+    var vecrutas = [];
+
+    var r = armarJSONRuta(selectedShape.tag);
+    vecrutas.push(r);
+
+    setRutas2Server(JSON.stringify(vecrutas));
+}
+
+
+function getPoligonosFromServer(_parametros){
+  msg("***getPoligonosFromServer***");
+  var parm = JSON.stringify(_parametros);
+  mostrarWait();
+  $.ajax({
+        url: URLGETPOLIGONOS,
+        type: "POST",
+        dataType: "json",
+        crossDomain: true,
+        data: parm,
+        success: function(respuesta) {
+          ocultarWait();
+          msg("respuesta " + JSON.stringify(respuesta));
+          if (respuesta.sdtRespuestaWS.ok == "S"){
+            if (_parametros.Modo == "CON_PUNTOS" ){
+                //Muestor el poligono en el mapa
+                cargarPligonoObtenido(respuesta.sdtWsPoligonos);
+
+            }else{
+                //Muestro los resultados en un div
+                if (respuesta.sdtWsPoligonos != undefined){
+                  presentarPoligonosEnDiv(respuesta.sdtWsPoligonos);
+                }
+            }
+          }else{
+            alerta(respuesta.sdtRespuestaWS.errordesc)
+          }
+          ocultarWait();
+        },
+        error:
+            function() {
+              ocultarWait();
+              alerta('Falló la actualización del polígono');
+            }
+    });
+}
+
+
+function setPoligonos2Server(jsonpolygono,id){
+  msg("***setPoligonos2Server***");
+  var parm = JSON.stringify(jsonpolygono);
+  mostrarWait();
+  $.ajax({
+        url: URLSETPOLIGONOS,
+        type: "POST",
+        dataType: "json",
+        crossDomain: true,
+        data: parm,
+        success: function(respuesta) {
+          msg("respuesta " + JSON.stringify(respuesta));
+          if (respuesta.ok == "S"){
+            setPolyModificado(id, SALVADO);
+          }else{
+            alerta(respuesta.errordesc);
+          }
+          ocultarWait();
+        },
+        error:
+            function() {
+              ocultarWait();
+              alerta('Falló la actualización del polígono');
+
+            }
+    });
+
+}
+
+
+function setRutas2Server(jsonrutas){
+  msg("***setRutas2Server***");
+  mostrarWait();
+  $.ajax({
+        url: URLSETRUTAS,
+        type: "POST",
+        dataType: "json",
+        crossDomain: true,
+        data: jsonrutas,
+        success: function(respuesta) {
+          msg(JSON.stringify(respuesta));
+          ocultarWait();
+        },
+        error:
+            function(a) {
+              ocultarWait();
+              alerta('Falló la actualización de la ruta:' + JSON.stringify(a));
+            }
+    });
+}
+
+function cargarOrigenes(){
+  msg("***cargarOrigenes***");
+  mostrarWait();
+  $.ajax({
+        url: URLGETORIGENES,
+        type: "POST",
+        dataType: "json",
+        crossDomain: true,
+        success: function(origenes ) {
+
+          $.each(origenes, function(i, origen) {
+              vectorOrigenes.push(origen);
+
+          });
+          desplegarOrigenesEnElMapa();
+          ocultarWait();
+        },
+        error:
+            function() {
+              ocultarWait();
+              alerta('Falló la carga de Pedidos');
+
+            }
+    });
+
+}
+
+function marcoWarehouseEnMapa(o){
+  marker= new google.maps.Marker({
+    position: new google.maps.LatLng({lat: o.OrigenLat, lng: o.OrigenLong}),
+    title: o.OrigenNombre + " " + o.OrigenDireccion,
+    labelContent: o.OrigenNombre,
+    labelAnchor: new google.maps.Point(vANCHOLABEL_1, vANCHOLABEL_2),
+    icon: { url: iconBase + o.Icon, scaledSize: new google.maps.Size(vSIZE_SVG, vSIZE_SVG) },
+    labelClass: vCLASE_CSS_LABELMARKER, // the CSS class for the label
+    map: map
+  });
+}
+
+function desplegarOrigenesEnElMapa(){
+    msg("***desplegarOrigenesEnElMapa***")
+    for(i=0; (i<vectorOrigenes.length); i++){
+      var o = vectorOrigenes[i];
+      o.Icon = getIcono("WH"+o.OrigenDefault);
+      marcoWarehouseEnMapa(o);
+    }
+}
+function cargarJsonPuntos(cargarDesdeWEB){
+    //Lee un JSON de puntos y los inserta en el mapa
+    msg("***getJsonPuntos***");
+    if (cargarDesdeWEB){
+      vecMarkersPedidos = limpiarVector(vecMarkersPedidos);
+      vectorDePedidosJSON = limpiarVector(vectorDePedidosJSON);
+    }
+
+
+    if (cargarDesdeWEB){
+          var parms = getParametrosJsonPuntos();
+          msg("Consumiendo WS parms " + URLGETPEDIDOS + "\n parámetros " + parms);
+          mostrarWait();
+          $.ajax({
+                url: URLGETPEDIDOS,
+                type: "POST",
+                dataType: "json",
+                crossDomain: true,
+                data: parms ,
+                success: function(pedidos ) {
+
+                  $.each(pedidos, function(i, pedido) {
+                    if (!existePedidoEnVectorDePedidos(pedido.PedidoId )){
+                        var myLatLng = new google.maps.LatLng({lat: pedido.PedidoLat, lng: pedido.PedidoLong});
+                      //  pedido.ZonaId = getZonaLatLong(myLatLng);
+                        pedido.Icon = getIcono("");
+                        pedido.distancia_aux = 0;
+                        pedido.Ruta = 0;
+                        pedido.Color = "#000000";
+                        agregaPedidoEnElMapa(pedido);
+                        vectorDePedidosJSON.push(pedido);
+                    }
+                  });
+                  ocultarWait();
+                },
+                error: function() { alerta('Falló la carga de Pedidos');}
+            });
+    }else{
+
+      $.each(vectorDePedidosJSON, function(i, pedido) {
+          //  var myLatLng = new google.maps.LatLng({lat: pedido.PedidoLat, lng: pedido.PedidoLong});
+          //  pedido.ZonaId = getZonaLatLong(myLatLng);
+            if (!modificarPedidoEnElMapa(pedido)){
+              agregaPedidoEnElMapa(pedido);
+            }
+      });
+      ocultarWait();
+  }
+}
+
+function getJSONZonasCreacionManual(){
+  msg("***getJSONZonasCreacionManual***");
+  ZonasSistema = limpiarVector(ZonasSistema);
+  var parms = getParametrosZonas();
+  msg("Consumiendo WS " + URLZONASMANUAL + "\n Parámetros: " + parms)
+  mostrarWait();
+  $.ajax({
+        url: URLZONASMANUAL,
+        type: "POST",
+        dataType: "json",
+        crossDomain: true,
+        data: parms,
+        success: function( data ) {
+              $.each(data, function(i, zonaitem) {
+                  //OBTENER PROPIEDADES DE LA ZONA
+                  if (!extistePolyAlArray(zonaitem.ZonaId)){
+                    Zona = NewZona();
+                    Zona.ZonaId = zonaitem.ZonaId;
+                    if (zonaitem.ZonaDesc.trim() == ""){
+                      Zona.ZonaDsc = "Zona " + zonaitem.ZonaId;
+                    }else{
+                      Zona.ZonaDsc = zonaitem.ZonaDesc;
+                    }
+                    Zona.ZonaColorFondo = zonaitem.ZonaColor;
+                    Zona.ZonaColorBorde = zonaitem.ZonaColorBorder;
+                    $.each(zonaitem.Puntos, function(i, punto) {
+                        //OBTENER PROPIEDADES DEL PUNTO
+                         var l = new google.maps.LatLng({lat: punto.lat, lng: punto.lng});
+                         Zona.ZonaPoly.push(l);
+                    });
+                    repintarPoligono(Zona, Zona.ZonaPoly, Zona.ZonaColorFondo, Zona.ZonaColorBorde, vAnchoLinea);
+                    ZonasSistema.push(Zona);
+                  }
+                });
+
+                cargarPoligonosEnLista();
+
+                ocultarWait();
+
+
+        },
+        error: function() {
+          ocultarWait();
+          alert('Falló la carga de Zonas');
+      }
+    });
+}

@@ -1,0 +1,11 @@
+- Eliminar ruta, volver los pedidos pendientes OK
+- Franja horaria y detalle de pedido en el grid
+- Agregar estado en ruta OK
+- Si esta el retiro solo que no agregue ninguno de los dos
+
+
+
+
+
+iif(PedidoFranjaHorariaFin.isnull(), ymdhmstot(year(now()), month(now()), 	day(now()),	8, 0, 0),	PedidoFranjaHorariaInicio)
+iif(PedidoFranjaHorariaFin.isnull(), ymdhmstot(year(now()), month(now()), 	day(now()),	20, 0, 0),	PedidoFranjaHorariaInicio)
