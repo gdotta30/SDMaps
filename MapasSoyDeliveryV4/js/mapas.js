@@ -3409,9 +3409,9 @@ function getVisitasRutaJSON(vecVisitas,p){
       VRutaVisitaDireccion:       p.PuntoDireccion,
       VRutaVisitaGeolocation:      p.PuntoLat + "," + p.PuntoLong,
       VRutaVisitaTelefonoContacto:      p.PuntoTelefonoCliente,
-	  VRutaVisitaNombreContacto: p.PuntoNombreCliente,
-	  VRutaVisitaPrecedencia:	p.Precedencia,
-	  VRutaVisitaPedidoId: p.PedidoId
+	  	VRutaVisitaNombreContacto: p.PuntoNombreCliente,
+	  	VRutaVisitaPrecedencia:	p.Precedencia,
+	  	VRutaVisitaPedidoId: p.PedidoId
     }
     vecVisitas.push(visita);
 }
