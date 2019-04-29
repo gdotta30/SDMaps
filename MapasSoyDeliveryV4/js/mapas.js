@@ -246,14 +246,14 @@ function recalcularRuta(){
 	modoOptimizacion = false;
 	limpiarRuta();
 	iniFlagruteo();
-	rutear(rutear);
+	rutear(true);
 
 }
 
 function rutearBoton(){
   modoOptimizacion = false;
 	iniFlagruteo();
-	rutear(rutear);
+	rutear(true);
 
 }
 
@@ -400,23 +400,25 @@ function rutear(rutear){
               msg("No encontró el origen al rutear ");
             }
             //ORDENAR SEGUN LISTA
-            for (i=0; i < vectorDePuntosJSON.length; i++){
-                vectorDePuntosJSON[i].PuntoOrden = 0;
-                for (j=0; j < listaOrdenada.length; j++){
-                  if ( vectorDePuntosJSON[i].PuntoId == listaOrdenada[j].PuntoId){
-                    vectorDePuntosJSON[i].Ruta = 1;
-                    vectorDePuntosJSON[i].PuntoOrden = j;
-                  }
-                }
-            }
+			if (rutear){
+				for (i=0; i < vectorDePuntosJSON.length; i++){
+					vectorDePuntosJSON[i].PuntoOrden = 0;
+					for (j=0; j < listaOrdenada.length; j++){
+					  if ( vectorDePuntosJSON[i].PuntoId == listaOrdenada[j].PuntoId){
+						vectorDePuntosJSON[i].Ruta = 1;
+						vectorDePuntosJSON[i].PuntoOrden = j;
+					  }
+					}
+				}
+			}
             OrdenarVector();
-
+	
 			var pos = maxOrdenDelaZona(getZonaEnUso());
 			MarcarDestino(vectorDePuntosJSON[pos.pos].PuntoId);
 
             cargarPuntos(false);
 			ocultarWait();
-			if (rutear && origenYDestinoValidos(getZonaEnUso())){
+			if (origenYDestinoValidos(getZonaEnUso())){
 				calcularYDesplegarLaRuta();
 			}
 			selecteShapeRuteada = selectedShape;
@@ -504,7 +506,7 @@ function recalcularRuta(){
 		 }
 	 }
 	limpiarRuta();
-	rutear(rutear);
+	rutear(true);
 
 
 
@@ -551,9 +553,9 @@ function agregaPuntoEnElMapa(Punto){
 		var contentString = "";
 		//CREAR EL MAKER
 		var icono = "";
-
+		
+		
 		if (Punto.PuntoHabilitado){
-
 			if (Punto.Marca == vMarcaORIGEN || Punto.Marca == vMarcaDESTINO){
 				icono  = iconBase + getIcono(Punto.Marca);
 			}else{
@@ -563,7 +565,6 @@ function agregaPuntoEnElMapa(Punto){
 					icono  = iconBase + getIcono("PEND" + Punto.Precedencia);
 				}
 			}
-
 		}else{
 			icono  = iconBase + getIcono("NOHAB" + Punto.Precedencia);
 		}
@@ -580,7 +581,8 @@ function agregaPuntoEnElMapa(Punto){
 			draggable:      false,
 			map: map
 		});
-		google.maps.event.addListener(marker, 'rightclick', function(e){
+		
+	/*	google.maps.event.addListener(marker, 'rightclick', function(e){
 		var menucontextualmapa = '<div id="menucontextualmapa" class="menucontextualmapa" onclick="this.style.display=' + "'" + 'none' + "'" + '">' +
                                   "<div class = 'topbar' ><a class='cerrar' onclick='cerrarMenuContextOD();'>x</a></div> " +
                                   '<p class = "enmarcar" id="pOrigen" onclick="MarcarOrigenDesdeMarker()">Marcar Origen</p>' +
@@ -589,10 +591,11 @@ function agregaPuntoEnElMapa(Punto){
         selMarker = marker;
         var latLng = e.latLng;
         var v = new TxtOverlay(latLng, menucontextualmapa, "labelzonas", map);
+		
         return false;
 
-     });
-
+		});
+	*/
 
 	google.maps.event.addListener(marker, 'dblclick', function(e){
 	    var fichaPunto = muestroInformacionPunto(marker.labelContent);
@@ -943,14 +946,14 @@ function initMap() {
 	if (EXT_VAR_CARGAR_ORIGENES){
 		cargarOrigenes();
 	}
-	if (EXT_VAR_CARGAR_PUNTOS){
-		cargarPuntos(true);
-	}
+	//if (EXT_VAR_CARGAR_PUNTOS){
+	cargarPuntos(true);
+//	}
 	$("body").toggleClass("sidebar-collapse");
 
-	 if (esModRuta()){
-		  rutear(rutear);
-	  }
+	// if (esModRuta()){
+	//	  rutear(rutear);
+	//  }
 
 
 
@@ -1774,7 +1777,7 @@ function noIncluirRuta(PuntoId){
 	p.PuntoDuracionVisita		=		""
 	p.Marca = "-";
 
- for (i=0; i < vectorDePuntosJSON.length; i++ ){
+	for (i=0; i < vectorDePuntosJSON.length; i++ ){
 	  if (vectorDePuntosJSON[i].PedidoId == p.PedidoId &&  vectorDePuntosJSON[i].PuntoId != p.PuntoId){
 		vectorDePuntosJSON[i].FlagRuteo =  p.FlagRuteo;
 		vectorDePuntosJSON[i].PuntoOrden			=	""
@@ -1786,13 +1789,13 @@ function noIncluirRuta(PuntoId){
 		vectorDePuntosJSON[i].Marca = "-";
 
 	  }
-  }
+	}
 
 
-  limpiarRuta();
-  modoOptimizacion = false;
-  //calcularYDesplegarLaRuta();
-  rutear(rutear);
+	limpiarRuta();
+	modoOptimizacion = false;
+	//calcularYDesplegarLaRuta();
+	rutear(true);
 }
 
 
@@ -1945,13 +1948,10 @@ function moverOrdenPunto(direccion, PuntoId){
             for (j=posinicial; ((!vectorDePuntosJSON[j].FlagRuteo) || (vectorDePuntosJSON[j].PuntoZonaId !=getZonaEnUso()) && (j < vectorDePuntosJSON.length)); j++){
               posicionSiguiente = j + 1;
             }
-		//	marca = PuntoOrdenSigiente = vectorDePuntosJSON[posicionSiguiente].Marca;
 			var PuntoOrdenSigiente = vectorDePuntosJSON[posicionSiguiente].PuntoOrden;
 			if (movimientoValido(vectorDePuntosJSON[i],PuntoOrdenSigiente)){
-
 				vectorDePuntosJSON[posicionSiguiente].PuntoOrden = vectorDePuntosJSON[i].PuntoOrden;
 				vectorDePuntosJSON[i].PuntoOrden = PuntoOrdenSigiente;
-		//		vectorDePuntosJSON[i].Marca = marca;
 			}else{
 				mensajeError("No se puede mover el punto, verifique la precedencia");
 				return;
@@ -1967,12 +1967,10 @@ function moverOrdenPunto(direccion, PuntoId){
             for (j=posinicial; ((!vectorDePuntosJSON[j].FlagRuteo) || (vectorDePuntosJSON[j].PuntoZonaId != getZonaEnUso()) && (j > 0)); j--) {
               posicionAnterior = j - 1;
             }
-		//	marca = PuntoOrdenSigiente = vectorDePuntosJSON[posicionAnterior].Marca;
 			var PuntoOrdenAnterior = vectorDePuntosJSON[posicionAnterior].PuntoOrden;
 			if (movimientoValido(vectorDePuntosJSON[i],PuntoOrdenAnterior)){
 				vectorDePuntosJSON[posicionAnterior].PuntoOrden = vectorDePuntosJSON[i].PuntoOrden;
 				vectorDePuntosJSON[i].PuntoOrden = PuntoOrdenAnterior;
-		//		vectorDePuntosJSON[i].Marca = marca;
 			}else{
 
 				mensajeError("No se puede mover el punto, verifique la precedencia");
@@ -1985,20 +1983,16 @@ function moverOrdenPunto(direccion, PuntoId){
     }
   }
 
+  OrdenarVector();
+  var pos = minOrdenDelaZona(getZonaEnUso());
+  MarcarOrigen(vectorDePuntosJSON[pos.pos].PuntoId)
 
-var pos = maxOrdenDelaZona(getZonaEnUso());
-MarcarDestino(vectorDePuntosJSON[pos.pos].PuntoId);
-cargarPuntos(false);
-OrdenarVector();
-//    if (rutaAbiertaWH || rutaAbiertaUsuario){
-//      MarcarOrigen(vectorDePuntosJSON[0].PuntoId);
-//    }
-//    var posfin = vectorDePuntosJSON.length - 1;
-//    for (j=vectorDePuntosJSON.length - 1; ((vectorDePuntosJSON[j].PuntoZonaId !=getZonaEnUso()) && (j > 0));j--){
-//      posfin = j - 1;
-//    }
-//    MarcarDestino(vectorDePuntosJSON[posfin].PuntoId);
-//  }
+  pos = maxOrdenDelaZona(getZonaEnUso());
+  MarcarDestino(vectorDePuntosJSON[pos.pos].PuntoId);
+
+  cargarPuntos(false);
+
+
 
 }
 
@@ -3263,6 +3257,20 @@ function armarListaOrdenada(posPrimerElemento, listaDesordenada){
 
 
 
+function minOrdenDelaZona(ZonaId){
+  msg("***maxOrdenDelaZona***");
+  var orden = 0;
+  var pos = 0;
+  for (i = 0; (i < vectorDePuntosJSON.length); i++){
+	if  (vectorDePuntosJSON[i].PuntoZonaId == ZonaId && vectorDePuntosJSON[i].FlagRuteo && vectorDePuntosJSON[i].PuntoHabilitado){
+		if (vectorDePuntosJSON[i].PuntoOrden <= orden){
+			pos = i;
+			orden = vectorDePuntosJSON[i].PuntoOrden;
+		}
+	}
+  }
+  return {order: orden, pos: pos};
+}
 
 function maxOrdenDelaZona(ZonaId){
   msg("***maxOrdenDelaZona***");
@@ -3636,7 +3644,7 @@ function cargarJsonPunto(PedidoId){
 		  });
 		  if (document.getElementById("listaPuntos") != undefined){
 			  if ( document.getElementById("listaPuntos").innerHTML != ""){
-				rutear(rutear);
+				rutear(true);
 			  }
 		  }
 		  ocultarWait();
@@ -3669,6 +3677,7 @@ function cargarJsonPuntos(cargarDesdeWEB){
 					if (esModRuta()){
 						vRUTA = Puntos.sdtCabezalRuta;
 					}
+					msg("PIPIRIPI: " + JSON.stringify(Puntos));
 					$.each(Puntos.sdtGetPuntos, function(i, Punto) {
                     if (!existePuntoEnVectorDePuntos(Punto.PuntoId )){
                         var myLatLng = new google.maps.LatLng({lat: Punto.PuntoLat, lng: Punto.PuntoLong});
@@ -3684,7 +3693,7 @@ function cargarJsonPuntos(cargarDesdeWEB){
                     }
                   });
 				  if (esModRuta()){
-					rutear(rutear);
+					rutear(false)
 				  }
                   ocultarWait();
                 },
