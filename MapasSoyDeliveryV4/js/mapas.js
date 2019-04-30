@@ -251,7 +251,8 @@ function recalcularRuta(){
 }
 
 function rutearBoton(){
-  modoOptimizacion = false;
+	modoOptimizacion = false;
+	limpiarRutaBoton();
 	iniFlagruteo();
 	rutear(true);
 
@@ -582,7 +583,7 @@ function agregaPuntoEnElMapa(Punto){
 			map: map
 		});
 		
-	/*	google.maps.event.addListener(marker, 'rightclick', function(e){
+		google.maps.event.addListener(marker, 'rightclick', function(e){
 		var menucontextualmapa = '<div id="menucontextualmapa" class="menucontextualmapa" onclick="this.style.display=' + "'" + 'none' + "'" + '">' +
                                   "<div class = 'topbar' ><a class='cerrar' onclick='cerrarMenuContextOD();'>x</a></div> " +
                                   '<p class = "enmarcar" id="pOrigen" onclick="MarcarOrigenDesdeMarker()">Marcar Origen</p>' +
@@ -595,7 +596,7 @@ function agregaPuntoEnElMapa(Punto){
         return false;
 
 		});
-	*/
+	
 
 	google.maps.event.addListener(marker, 'dblclick', function(e){
 	    var fichaPunto = muestroInformacionPunto(marker.labelContent);
@@ -611,9 +612,14 @@ function agregaPuntoEnElMapa(Punto){
      google.maps.event.addListener(marker, 'click', function(e){
 		for (i=0; i < vecMarkersPuntos.length; i++){
 			var m2 = vecMarkersPuntos[i];
+			if (marker != undefined){
+					toggleBounce(marker);
+				}
 			if (m2.PedidoId == marker.PedidoId && m2.labelContent != marker.labelContent){
-				toggleBounce(marker);
-				toggleBounce(m2);
+				
+				if (m2 != undefined){
+					toggleBounce(m2);
+				}
 			}
 		}
 
@@ -1119,6 +1125,20 @@ function SuperaElTopeDePuntosParaElServDeRuta(ZonaId){
 }
 
 
+
+function cantPuntosEnZona(ZonaId){
+  //retorna true si la cantidad de puntos de la ruta supera el maximo de google
+  msg("***cantPuntosEnZona***");
+  var cont = 0;
+  for(i = 0; (i < vectorDePuntosJSON.length); i++){
+    if (vectorDePuntosJSON[i].PuntoZonaId == ZonaId){
+      cont ++;      
+    }
+  }
+  return cont;
+}
+
+
 function mensajeNotificacion(msg){
 				alertify.log(msg);
 				return false;
@@ -1135,8 +1155,6 @@ function calcularYDesplegarLaRuta() {
     var ultimalatlngGeneral = null;
 	cantsemaforo	=	0;
 	semaforo		=	0;
-   // vVRRutaDirServiceData.splice(0, vVRRutaDirServiceData.length -1);
-   // vVRRutaDirServiceData = [];
     waypts.splice(0,waypts.length-1);
     vecPedPos.splice(0,vecPedPos.length-1);
 
@@ -1152,23 +1170,23 @@ function calcularYDesplegarLaRuta() {
     div.innerHTML = "";
     //*** arma el vector de WAYPOINS para el calculo de la rura en base a la zona, origen y destino
     numero = 0;
-
+	var c = cantPuntosEnZona(getZonaEnUso());
     for (var i = 0; i < vectorDePuntosJSON.length; i++) {
 
           if ((vectorDePuntosJSON[i].PuntoZonaId == getZonaEnUso()) && (vectorDePuntosJSON[i].FlagRuteo == true)) {
 
 			  cant = cant + 1;
               //obtener las coordenadas del origen
-              if (primerlatlng  == null) {
-                    if (vectorDePuntosJSON[i].Marca == vMarcaORIGEN){
+              if (primerlatlng  == null ) {
+                    if (vectorDePuntosJSON[i].Marca == vMarcaORIGEN || c == 1){
                       primerlatlng  = new google.maps.LatLng({lat: vectorDePuntosJSON[i].PuntoLat, lng: vectorDePuntosJSON[i].PuntoLong});
                       primerlatlngGeneral  = primerlatlng;
                     }
               }
               //Obtener las coordenadas del destino
-              if (ultimalatlng==null){
+              if (ultimalatlng==null ){
 
-                  if (vectorDePuntosJSON[i].Marca == vMarcaDESTINO){
+                  if (vectorDePuntosJSON[i].Marca == vMarcaDESTINO || c == 1){
                     ultimalatlngGeneral = new google.maps.LatLng({lat: vectorDePuntosJSON[i].PuntoLat, lng: vectorDePuntosJSON[i].PuntoLong});
                   }
               }
@@ -1903,8 +1921,6 @@ function movimientoValido(PuntoAMover, PuntoOrdenQueOcuparia){
 	for (ii=0; ii< vectorDePuntosJSON.length; ii++){
 		if ((vectorDePuntosJSON[ii].PedidoId == PuntoAMover.PedidoId) && (vectorDePuntosJSON[ii].PuntoId != PuntoAMover.PuntoId)) {
 
-			msg("vectorDePuntosJSON[ii].PedidoId:" + vectorDePuntosJSON[ii].PedidoId + " PuntoAMover.PedidoId: " + PuntoAMover.PedidoId + " PuntoAMover.PuntoId:" + PuntoAMover.PuntoId +
-			"vectorDePuntosJSON[ii].Precedencia: " + vectorDePuntosJSON[ii].Precedencia + " PuntoAMover.Precedencia:  " +  PuntoAMover.Precedencia + " PuntoOrdenQueOcuparia: " + PuntoOrdenQueOcuparia + " vectorDePuntosJSON[ii].PuntoOrden: " + vectorDePuntosJSON[ii].PuntoOrden);
 
 			if (vectorDePuntosJSON[ii].Precedencia > PuntoAMover.Precedencia){
 				if (PuntoOrdenQueOcuparia >= vectorDePuntosJSON[ii].PuntoOrden){
@@ -1918,8 +1934,6 @@ function movimientoValido(PuntoAMover, PuntoOrdenQueOcuparia){
 
 
 
-
-			msg("vectorDePuntosJSON[ii].PedidoId " + vectorDePuntosJSON[ii].PedidoId + " PuntoAMover.PedidoId " + vectorDePuntosJSON[ii].PuntoId + " " + PuntoAMover.PuntoId);
 
 		}
 	}
@@ -1987,8 +2001,11 @@ function moverOrdenPunto(direccion, PuntoId){
   var pos = minOrdenDelaZona(getZonaEnUso());
   MarcarOrigen(vectorDePuntosJSON[pos.pos].PuntoId)
 
+  msg("Posicion origen : " + pos.pos + " punto " + vectorDePuntosJSON[pos.pos].PuntoId);
+  
   pos = maxOrdenDelaZona(getZonaEnUso());
   MarcarDestino(vectorDePuntosJSON[pos.pos].PuntoId);
+  msg("Posicion destino : " + pos.pos + " punto " + vectorDePuntosJSON[pos.pos].PuntoId);
 
   cargarPuntos(false);
 
@@ -3125,11 +3142,8 @@ function compoTipoRutaSelect(){
 
 function calcdistancia(latlng0,latlng1){
   var distancia = google.maps.geometry.spherical.computeDistanceBetween(latlng0, latlng1);
-  //var distancia = Math.sqrt((latlng0.lat - latlng1.lat) ^2 + (latlng0.lng - latlng1.lng) ^2);
-  //msg(JSON.stringify(latlng0));
-  //msg(latlng0.lat());
-  //var distancia = distanciaEntre2Puntos(latlng0.lat(),latlng0.lng(),latlng1.lat(),latlng1.lng());
-  msg("DISTANCIA: " + distancia);
+ 
+ // msg("VA PA I ÑERI =>" + JSON.stringify(latlng0) + " " +  JSON.stringify(latlng1) + " => " + distancia);
   return distancia;
 }
 
@@ -3259,11 +3273,11 @@ function armarListaOrdenada(posPrimerElemento, listaDesordenada){
 
 function minOrdenDelaZona(ZonaId){
   msg("***maxOrdenDelaZona***");
-  var orden = 0;
+  var orden = 99999;
   var pos = 0;
   for (i = 0; (i < vectorDePuntosJSON.length); i++){
 	if  (vectorDePuntosJSON[i].PuntoZonaId == ZonaId && vectorDePuntosJSON[i].FlagRuteo && vectorDePuntosJSON[i].PuntoHabilitado){
-		if (vectorDePuntosJSON[i].PuntoOrden <= orden){
+		if (vectorDePuntosJSON[i].PuntoOrden < orden){
 			pos = i;
 			orden = vectorDePuntosJSON[i].PuntoOrden;
 		}
