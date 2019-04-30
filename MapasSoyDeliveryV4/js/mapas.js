@@ -390,18 +390,19 @@ function rutear(rutear){
 			}
 
 
-			calcularOrigenTentativo();
-            inicializarInfoRutas(getZonaEnUso());
-            var posOrigen = getPosOrigen(getZonaEnUso());
-            var listaOrdenada = [];
-            if (posOrigen != -1){
-              var vecaux = vectorDePuntosJSON.slice(0);
-              listaOrdenada = armarListaOrdenada(posOrigen, vecaux);
-            }else{
-              msg("No encontró el origen al rutear ");
-            }
-            //ORDENAR SEGUN LISTA
 			if (rutear){
+				calcularOrigenTentativo();
+				inicializarInfoRutas(getZonaEnUso());
+				var posOrigen = getPosOrigen(getZonaEnUso());
+				var listaOrdenada = [];
+				if (posOrigen != -1){
+				  var vecaux = vectorDePuntosJSON.slice(0);
+				  listaOrdenada = armarListaOrdenada(posOrigen, vecaux);
+				}else{
+				  msg("No encontró el origen al rutear ");
+				}
+            //ORDENAR SEGUN LISTA
+			
 				for (i=0; i < vectorDePuntosJSON.length; i++){
 					vectorDePuntosJSON[i].PuntoOrden = 0;
 					for (j=0; j < listaOrdenada.length; j++){
@@ -411,6 +412,18 @@ function rutear(rutear){
 					  }
 					}
 				}
+			}else{
+				//OOOOOO
+				  OrdenarVector();
+				  var pos = minOrdenDelaZona(getZonaEnUso());
+				  MarcarOrigen(vectorDePuntosJSON[pos.pos].PuntoId)
+
+				  msg("Posicion origen : " + pos.pos + " punto " + vectorDePuntosJSON[pos.pos].PuntoId);
+				  
+				  pos = maxOrdenDelaZona(getZonaEnUso());
+				  MarcarDestino(vectorDePuntosJSON[pos.pos].PuntoId);
+				  msg("Posicion destino : " + pos.pos + " punto " + vectorDePuntosJSON[pos.pos].PuntoId);
+
 			}
             OrdenarVector();
 	
