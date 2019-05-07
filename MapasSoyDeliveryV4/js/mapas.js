@@ -148,7 +148,11 @@ function getZonaEnUso(){
 	if (EXT_VAR_RUTAID != 0){
 		return EXT_VAR_RUTAID;
 	}else{
-		return selectedShape.tag;
+		if (selectedShape != undefined){
+			return selectedShape.tag;
+		}else{
+			return 0;
+		}
 	}
 }
 
@@ -306,7 +310,7 @@ function generarMenuLateral(){
 			buffer += '	   <span> ';
 			buffer += '				<img src = "MapasSoyDeliveryV4/images/lupa.png" class = "imgLupa"> ';
 			buffer += '				<input type="text" class="form-control AttributeCheckBox" maxlength = "20" style = "width:170px" placeholder="buscar poligono..." id = "txtbuscarpoly" onkeyup="buscarpoly()"> ';
-			buffer += '		</span> ';
+			buffer += '	   </span> ';
 
 			buffer += '	<div class = "listaexpand" id = "poligonosdisponibles"> ';
 			buffer += '	</div> ';
@@ -402,7 +406,7 @@ function rutear(rutear){
 				  msg("No encontró el origen al rutear ");
 				}
             //ORDENAR SEGUN LISTA
-			
+
 				for (i=0; i < vectorDePuntosJSON.length; i++){
 					vectorDePuntosJSON[i].PuntoOrden = 0;
 					for (j=0; j < listaOrdenada.length; j++){
@@ -419,14 +423,14 @@ function rutear(rutear){
 				  MarcarOrigen(vectorDePuntosJSON[pos.pos].PuntoId)
 
 				  msg("Posicion origen : " + pos.pos + " punto " + vectorDePuntosJSON[pos.pos].PuntoId);
-				  
+
 				  pos = maxOrdenDelaZona(getZonaEnUso());
 				  MarcarDestino(vectorDePuntosJSON[pos.pos].PuntoId);
 				  msg("Posicion destino : " + pos.pos + " punto " + vectorDePuntosJSON[pos.pos].PuntoId);
 
 			}
             OrdenarVector();
-	
+
 			var pos = maxOrdenDelaZona(getZonaEnUso());
 			MarcarDestino(vectorDePuntosJSON[pos.pos].PuntoId);
 
@@ -567,8 +571,8 @@ function agregaPuntoEnElMapa(Punto){
 		var contentString = "";
 		//CREAR EL MAKER
 		var icono = "";
-		
-		
+
+
 		if (Punto.PuntoHabilitado){
 			if (Punto.Marca == vMarcaORIGEN || Punto.Marca == vMarcaDESTINO){
 				icono  = iconBase + getIcono(Punto.Marca);
@@ -595,7 +599,7 @@ function agregaPuntoEnElMapa(Punto){
 			draggable:      false,
 			map: map
 		});
-		
+
 		google.maps.event.addListener(marker, 'rightclick', function(e){
 		var menucontextualmapa = '<div id="menucontextualmapa" class="menucontextualmapa" onclick="this.style.display=' + "'" + 'none' + "'" + '">' +
                                   "<div class = 'topbar' ><a class='cerrar' onclick='cerrarMenuContextOD();'>x</a></div> " +
@@ -605,11 +609,11 @@ function agregaPuntoEnElMapa(Punto){
         selMarker = marker;
         var latLng = e.latLng;
         var v = new TxtOverlay(latLng, menucontextualmapa, "labelzonas", map);
-		
+
         return false;
 
 		});
-	
+
 
 	google.maps.event.addListener(marker, 'dblclick', function(e){
 	    var fichaPunto = muestroInformacionPunto(marker.labelContent);
@@ -629,7 +633,7 @@ function agregaPuntoEnElMapa(Punto){
 					toggleBounce(marker);
 				}
 			if (m2.PedidoId == marker.PedidoId && m2.labelContent != marker.labelContent){
-				
+
 				if (m2 != undefined){
 					toggleBounce(m2);
 				}
@@ -642,6 +646,9 @@ function agregaPuntoEnElMapa(Punto){
 
       vecMarkersPuntos.push(marker);
 
+	  if (Punto.Forzado){
+		toggleBounce(marker);
+	  }
 
 }
 
@@ -1145,7 +1152,7 @@ function cantPuntosEnZona(ZonaId){
   var cont = 0;
   for(i = 0; (i < vectorDePuntosJSON.length); i++){
     if (vectorDePuntosJSON[i].PuntoZonaId == ZonaId){
-      cont ++;      
+      cont ++;
     }
   }
   return cont;
@@ -2015,7 +2022,7 @@ function moverOrdenPunto(direccion, PuntoId){
   MarcarOrigen(vectorDePuntosJSON[pos.pos].PuntoId)
 
   msg("Posicion origen : " + pos.pos + " punto " + vectorDePuntosJSON[pos.pos].PuntoId);
-  
+
   pos = maxOrdenDelaZona(getZonaEnUso());
   MarcarDestino(vectorDePuntosJSON[pos.pos].PuntoId);
   msg("Posicion destino : " + pos.pos + " punto " + vectorDePuntosJSON[pos.pos].PuntoId);
@@ -3155,7 +3162,7 @@ function compoTipoRutaSelect(){
 
 function calcdistancia(latlng0,latlng1){
   var distancia = google.maps.geometry.spherical.computeDistanceBetween(latlng0, latlng1);
- 
+
  // msg("VA PA I ÑERI =>" + JSON.stringify(latlng0) + " " +  JSON.stringify(latlng1) + " => " + distancia);
   return distancia;
 }
@@ -3642,6 +3649,7 @@ function desplegarOrigenesEnElMapa(){
 }
 
 function cargarJsonPunto(PedidoId){
+	msg("HAY 1");
 	  var parms = getParametrosJsonPuntos(PedidoId);
 	  mostrarWait();
 	  $.ajax({
@@ -3651,29 +3659,37 @@ function cargarJsonPunto(PedidoId){
 		crossDomain: true,
 		data: parms ,
 		success: function(Puntos ) {
-			$.each(Puntos.sdtGetPuntos, function(i, Punto) {
-			if (!existePuntoEnVectorDePuntos(Punto.PuntoId )){
-				var myLatLng = new google.maps.LatLng({lat: Punto.PuntoLat, lng: Punto.PuntoLong});
-				if (esModRuta()){
-					Punto.PuntoZonaId = getZonaEnUso();
-				}
-				Punto.FlagRuteo = true;
-				Punto.Forzado = true;
-				Punto.distancia_aux = 0;
-				agregaPuntoEnElMapa(Punto);
-				vectorDePuntosJSON.push(Punto);
+			msg("HAY 2");
+			msg("HAY QUE VER: " + Puntos.sdtGetPuntos.length);
+			if (Puntos.sdtGetPuntos.length == 0){
+				mensajeNotificacion("No se incluyó el pedido, verifique el nro. de pedido o detalles como el estado, etc.");
 			}else{
-				var p = getPUntoById(Punto.PuntoId);
-				p.Forzado = true;
-				p.PuntoZonaId = getZonaEnUso();
+				$.each(Puntos.sdtGetPuntos, function(i, Punto) {
+				if (!existePuntoEnVectorDePuntos(Punto.PuntoId )){
+					var myLatLng = new google.maps.LatLng({lat: Punto.PuntoLat, lng: Punto.PuntoLong});
+					if (esModRuta()){
+						Punto.PuntoZonaId = getZonaEnUso();
+					}
+					Punto.FlagRuteo = true;
+					Punto.Forzado = true;
+					Punto.distancia_aux = 0;
+					agregaPuntoEnElMapa(Punto);
+					vectorDePuntosJSON.push(Punto);
+				}else{
+					var p = getPUntoById(Punto.PuntoId);
+					p.Forzado = true;
+					p.PuntoZonaId = getZonaEnUso();
 
-			}
-		  });
-		  if (document.getElementById("listaPuntos") != undefined){
-			  if ( document.getElementById("listaPuntos").innerHTML != ""){
-				rutear(true);
+				}
+			  });
+			  if (esModRuta()){
+				  if (document.getElementById("listaPuntos") != undefined){
+					  if ( document.getElementById("listaPuntos").innerHTML != ""){
+						rutear(true);
+					  }
+				  }
 			  }
-		  }
+			}
 		  ocultarWait();
 		},
 		error: function() { alert('Falló la carga de Puntos');}
