@@ -229,11 +229,9 @@ function calcularOrigenTentativo(){
 
     if (posSiguiente  != -1){
 		msg("MARCAR VEC ORI " + posSiguiente);
-      vectorDePuntosJSON[posSiguiente].PuntoOrden = 0;
-
-      MarcarOrigen(vectorDePuntosJSON[posSiguiente].PuntoId);
-      OrdenarVector(); //Deja el origen al princio
-
+		vectorDePuntosJSON[posSiguiente].PuntoOrden = 0;
+		MarcarOrigen(vectorDePuntosJSON[posSiguiente].PuntoId);
+		OrdenarVector(); //Deja el origen al princio
 	}else{
 		 mensajeError("No se encontro marca origen");
     }
@@ -272,6 +270,7 @@ function buscarpedido(){
 function generarMenuLateral(){
 		var buffer = "";
 		if (esModRuta()){
+
 			buffer += ' <div class="collapsibleX">Buscar Pedido</div> ';
 			buffer += ' <div id = "divbuscarpedido" class="contentX class_zonas" style="background-color: rgb(234, 91, 11)"> ';
 			buffer += '	   <span> ';
@@ -1198,10 +1197,15 @@ function calcularYDesplegarLaRuta() {
 			  cant = cant + 1;
               //obtener las coordenadas del origen
               if (primerlatlng  == null ) {
-                    if (vectorDePuntosJSON[i].Marca == vMarcaORIGEN || c == 1){
-                      primerlatlng  = new google.maps.LatLng({lat: vectorDePuntosJSON[i].PuntoLat, lng: vectorDePuntosJSON[i].PuntoLong});
-                      primerlatlngGeneral  = primerlatlng;
-                    }
+
+					primerlatlng	=	getLatLongWareHouse();
+				    //primerlatlng =
+                    /*
+						if (vectorDePuntosJSON[i].Marca == vMarcaORIGEN || c == 1){
+							primerlatlng  = new google.maps.LatLng({lat: vectorDePuntosJSON[i].PuntoLat, lng: vectorDePuntosJSON[i].PuntoLong});
+							primerlatlngGeneral  = primerlatlng;
+						}
+					*/
               }
               //Obtener las coordenadas del destino
               if (ultimalatlng==null ){
