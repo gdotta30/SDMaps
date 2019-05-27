@@ -27,6 +27,10 @@ var vCOLOR_GRILLA_PAR       =     "snow";
 var vCOLOR_GRILLA_IMPPAR    =     "white";
 var vecDetalles				=		[];
 
+var VAR_TIEMPOS_Y_DISTANCIAS   = EXT_VAR_TIEMPOS_Y_DISTANCIAS;
+var VAR_PROVEEDOR_RUTAS   	= EXT_VAR_PROVEEDOR_RUTAS;
+
+
 var iconBase = EXT_VAR_ICONBASE; //'file:///Users/pablogeymonat/Documents/MapasSoyDelivery/images/';
 
 var TOPE_PUNTOS_SERV_RUTA     = 23;
@@ -1159,12 +1163,88 @@ function cantPuntosEnZona(ZonaId){
 
 
 function mensajeNotificacion(msg){
-				alertify.log(msg);
-				return false;
+	alertify.log(msg);
+	return false;
+}
+
+
+function procesarTiemposYDistancias(sdtWsRutas){
+
+	msg("AAAA--1 " + JSON.stringify(sdtWsRutas));
+	for (j=0; j < sdtWsRutas.length; j++){
+		var r = sdtWsRutas[j];
+		msg("AAAA--2");
+		for (i=0; i < r.visitas.length; i++){
+			var v = r.visitas[i];
+			msg("ELEMENCTO RUTEADO: " + JSON.stringify(sdtWsRutas));
+
+			for (k=0; k < vectorDePuntosJSON.length; k++){
+				var p = vectorDePuntosJSON[k];
+				if (p.PedidoId == v.VRutaVisitaPedidoId && p.PuntoOrden == v.VRutaVisitaOrden){
+					p.fechaHora 			= v.VRutaVisitaHoraPlan;
+					p.fecha_hora_llegada 	= v.VRutaVisitaFchHorEntrada;
+					p.fecha_hora_salida 	= v.VRutaVisitaFchSalida;
+					p.PuntoDistanciaArribo 	= v.VRutaVisitaDistancia;
+					p.PuntoDistanciaArriboTxt = v.VRutaVisitaDistanciaTxt;
+					p.PuntoTiempoArribo 		= v.VRutaVisitaDuracion;
+					p.PuntoTiempoArriboTxt 		= v.VRutaVisitaDuracionTxt;
+					p.PuntoDuracionVisita 		= v.VRutaTiempoEstimadoEntrega;
+					p.Precedencia 				= v.VRutaVisitaPrecedencia;
+					p.PedidoId 					= v.VRutaVisitaPedidoId;
+				}
 			}
+		}
+	}
+
+}
+
+function calcularTiemposYDistanciaXSoyDelivery(){
+
+	//Cargar vistias
+	var vecVisitas = armarJSONSoloDeVisitas(getZonaEnUso());
+	msg("PARAMETROS A ENVIAR: " + JSON.stringify(vecVisitas));
+	//Enviar
+	$.ajax({
+        url: VAR_TIEMPOS_Y_DISTANCIAS,
+        type: "POST",
+        dataType: "json",
+        crossDomain: true,
+        data: JSON.stringify(vecVisitas),
+        success: function(respuesta) {
+			ocultarWait();
+			msg("respuesta " + JSON.stringify(respuesta));
+			if (respuesta.sdtRespuestaWS.ok == "S"){
+				procesarTiemposYDistancias(respuesta.sdtWsRutas);
+				refrescarGrillaruta();
+			}else{
+				mensajeError(respuesta.sdtRespuestaWS.errordesc)
+			}
+			ocultarWait();
+        },
+        error:
+            function() {
+              ocultarWait();
+              mensajeError('Falló el ws de distancias y tiempos');
+            }
+    });
+
+	//Obtener y procesar
+
+	//Desplegar la ruta
+
+
+}
+
+
 
 function calcularYDesplegarLaRuta() {
     msg("***calcularYDesplegarLaRuta***")
+
+
+	if (VAR_PROVEEDOR_RUTAS == "SD"){
+		calcularTiemposYDistanciaXSoyDelivery();
+		return;
+	}
     var vecPedPos = [];
     var waypts = [];
 
@@ -1480,6 +1560,40 @@ function horaANumero(hora){
 }
 
 
+function  getColorDelPin(p){
+	 var  color = "";
+	 switch(p.precedencia){
+       case "2":
+            color = "8ffc92";
+            break;
+       case "1":
+            color = "f57151";
+            break;
+       default:
+            color = "f37460";
+            break;
+    }
+	return color;
+
+
+}
+function cambiarPin(p){
+	var urlpin = "";
+
+	var color = getColorDelPin(p);
+
+
+	urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=1|0|" + color + "|20|b|" + p.PuntoOrden;
+	for (var ii=0; (ii < vecMarkersPuntos.length); ii++){
+		var m = vecMarkersPuntos[ii];
+		if (m.labelContent == p.PuntoId ){
+			m.setIcon(urlpin);
+		}
+
+	}
+
+}
+
 
 function mostrarRegistrosRuta(poly){
     msg("***mostrarRegistrosRuta***");
@@ -1524,7 +1638,9 @@ function mostrarRegistrosRuta(poly){
 		  cantruteados ++;
 		  if (p.FlagRuteo){
 			cntpuntos ++;
+
 		  }
+
           vHtml += '<tr  data-gxrendering_row="" data-gxrow="0001" class="WorkWithOdd" ' + getClassColorRowEvenOdd(cntpuntos,p.FlagRuteo) + '>';
 		      vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '">';
           vHtml += '	<div class="col-sm-1 col-md-1 "> ';
@@ -1565,6 +1681,7 @@ function mostrarRegistrosRuta(poly){
 
 		      vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;">';
 		if (p.FlagRuteo && p.PuntoHabilitado){
+			cambiarPin(p);
 			vHtml +=  p.PuntoDistanciaArriboTxt ;
 		}
 			  vHtml += ' </td>';
@@ -1743,14 +1860,7 @@ function reasignarFechaHoraInicio(){
 	refrescarGrillaruta();
 
 }
-/*function convertfechahora(fecha){
-	if (esHoraUTC){
-		fecha =  fecha.toISOString();
-	}else{
-		fecha =  fecha.toString();
-	}
-	return new Date(fecha);
-}*/
+
 
 function refrescarGrillaruta(){
 	var div_Puntos = document.getElementById("listaPuntos");
@@ -1779,8 +1889,7 @@ function esEntero(numero){
     } else {
         if (numero % 1 == 0) {
             valido = true;
-       // } else {
-       //     alerta ("Es un numero decimal");
+
         }
     }
 	return valido;
@@ -1836,7 +1945,7 @@ function noIncluirRuta(PuntoId){
 
 	limpiarRuta();
 	modoOptimizacion = false;
-	//calcularYDesplegarLaRuta();
+
 	rutear(true);
 }
 
@@ -3382,6 +3491,9 @@ function sigDeMenorDist(ele,lista, listaposiciones){
 
 function getRutaNombre(){
   var nomruta = document.getElementById("nombreruta");
+  if (nomruta == undefined){
+	  return "";
+  }
   return myTrim(nomruta.value);
 }
 
@@ -3415,6 +3527,7 @@ function getRutaId(){
 }
 
 function getCabezalRutaJSON(visitas){
+  var hh =	getLatLongWareHouse();
 
   var rutaCabezal = {
     VRutaId: getRutaId(),
@@ -3428,7 +3541,9 @@ function getCabezalRutaJSON(visitas){
     VRutaHoraFin:vVRutaVisitaFchSalida,
     VRutaHoraComienzo:vVRutaVisitaFchHorEntrada,
     VRRutaDirServiceData: "", //JSON.stringify(vVRRutaDirServiceData), SE COMENTA POR PROBLEMAS DE TRAFICO
+	VRutaOrigenLocation: hh.lat() + ", " + hh.lng(),
     VRutaHabilitada:0,"visitas":visitas
+
   }
   //return JSON.stringify(rutaCabezal);
   return rutaCabezal;
@@ -3461,6 +3576,16 @@ function getVisitasRutaJSON(vecVisitas,p){
     }
     vecVisitas.push(visita);
 }
+
+function armarJSONSoloDeVisitas(ZonaId){
+	msg("***armarRutas2Server***");
+    var vecrutas = [];
+    var r = armarJSONRuta(getZonaEnUso());
+    vecrutas.push(r);
+   return vecrutas;
+}
+
+
 
 function armarJSONRuta(ZonaId){
     msg("***armarJSONRuta***");
@@ -3730,7 +3855,7 @@ function cargarJsonPuntos(cargarDesdeWEB){
                         var myLatLng = new google.maps.LatLng({lat: Punto.PuntoLat, lng: Punto.PuntoLong});
                         Punto.Icon = "";
 						if (esModRuta()){
-							Punto.PuntoZonaId = getZonaEnUso()
+							Punto.PuntoZonaId = getZonaEnUso();
 						}
 						Punto.Forzado = false;
                         Punto.FlagRuteo = true;
