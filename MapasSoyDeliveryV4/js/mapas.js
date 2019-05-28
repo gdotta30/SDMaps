@@ -126,14 +126,12 @@ var vTIEMPOINFOWINDOW = 150000;
 var varincluirentregasfueraderutas = false;
 
 
-//var EXT_VAR_RUTAID = 20041; //20034;
-//var EXT_VAR_URLCALL_CONF_RUTA = "http://localhost/SoyDeliveryU11_New1.NetEnvironment/wwvruta.aspx";
-
-
 var vRUTA;
 
 var semaforo = 0;
 var cantsemaforo = 0;
+
+
 
 
 //var asignarZonaDadoUnPolyAlosMarcadores_sem = true;
@@ -1416,15 +1414,37 @@ function toggleListaRutaCollapse(numdiv){
 
 function getDtControl(){
 	var buffer = '';
-	buffer += ' <div class="dp_container " id="vDD_dp_container" data-gx-tpl-applied-datepicker=""> ';
-	buffer += ' <div class="input-group"><input type="text" id="vDD" style = "width: auto;" name="vDD" value="'+   getFormatoDeFechaHora(new Date(DTFechaHoraInicioRuta)) +'" size="16" spellcheck="false" maxlength="16" ';
-	buffer += ' class="form-control AttributeCheckBox" style="text-align:right" ';
-	buffer += ' onfocus="gx.evt.onfocus(this, 11,\'\',false,\'\',0)" ';
-	buffer += ' onchange="gx.evt.onchange(this, event)" ';
-	buffer += ' onblur="gx.date.valid_date(this, 10,\'DMY\',5,24,\'spa\',false,0);;gx.evt.onblur(this,11);parcearDTFechaHoraInicio(this);" ';
-	buffer += ' data-gx-context="[&quot;&quot;,false]">';
-	buffer += ' </div></div>';
-	console.log("====>" + buffer);
+
+	if (esModRuta()){
+		if (vRUTA.VRutaEstado == "P"){
+				buffer += ' <div class="dp_container " id="vDD_dp_container" data-gx-tpl-applied-datepicker=""> ';
+			buffer += ' <div class="input-group"><input type="text" id="vDD" style = "width: auto;" name="vDD" value="'+   getFormatoDeFechaHora(new Date(DTFechaHoraInicioRuta)) +'" size="16" spellcheck="false" maxlength="16" ';
+			buffer += ' class="form-control AttributeCheckBox" style="text-align:right" ';
+			buffer += ' onfocus="gx.evt.onfocus(this, 11,\'\',false,\'\',0)" ';
+			buffer += ' onchange="gx.evt.onchange(this, event)" ';
+			buffer += ' onblur="gx.date.valid_date(this, 10,\'DMY\',5,24,\'spa\',false,0);;gx.evt.onblur(this,11);parcearDTFechaHoraInicio(this);" ';
+			buffer += ' data-gx-context="[&quot;&quot;,false]">';
+			buffer += ' </div></div>';
+			console.log("====>" + buffer);
+		}else{
+				buffer += ' <div class="dp_container " id="vDD_dp_container" data-gx-tpl-applied-datepicker=""> ';
+				buffer += ' <div class="input-group"><input type="text" id="vDD" style = "width: auto;" name="vDD" disabled value="'+   getFormatoDeFechaHora(new Date(DTFechaHoraInicioRuta)) +'" size="16" spellcheck="false" maxlength="16" ';
+				buffer += ' class="form-control AttributeCheckBox" style="text-align:right" ';
+				buffer += ' data-gx-context="[&quot;&quot;,false]">';
+				buffer += ' </div></div>';
+				console.log("====>" + buffer);
+		}
+	}else{
+		buffer += ' <div class="dp_container " id="vDD_dp_container" data-gx-tpl-applied-datepicker=""> ';
+		buffer += ' <div class="input-group"><input type="text" id="vDD" style = "width: auto;" name="vDD" value="'+   getFormatoDeFechaHora(new Date(DTFechaHoraInicioRuta)) +'" size="16" spellcheck="false" maxlength="16" ';
+		buffer += ' class="form-control AttributeCheckBox" style="text-align:right" ';
+		buffer += ' onfocus="gx.evt.onfocus(this, 11,\'\',false,\'\',0)" ';
+		buffer += ' onchange="gx.evt.onchange(this, event)" ';
+		buffer += ' onblur="gx.date.valid_date(this, 10,\'DMY\',5,24,\'spa\',false,0);;gx.evt.onblur(this,11);parcearDTFechaHoraInicio(this);" ';
+		buffer += ' data-gx-context="[&quot;&quot;,false]">';
+		buffer += ' </div></div>';
+		console.log("====>" + buffer);
+	}
 	return buffer;
 }
 
@@ -1562,17 +1582,27 @@ function horaANumero(hora){
 
 function  getColorDelPin(p){
 	 var  color = "";
-	 switch(p.precedencia){
-       case "2":
-            color = "8ffc92";
-            break;
-       case "1":
-            color = "f57151";
-            break;
-       default:
-            color = "f37460";
-            break;
-    }
+
+	 if (p.FlagRuteo){
+		 if (p.PuntoHabilitado){
+			 switch(p.precedencia){
+			   case "2":
+					color = "8ffc92";
+					break;
+			   case "1":
+					color = "f57151";
+					break;
+			   default:
+					color = "f37460";
+					break;
+			}
+		 }else{
+			color = "d4e6f1";
+
+		 }
+	 }else{
+		 color = "9c9c9c";
+	 }
 	return color;
 
 
@@ -1582,8 +1612,11 @@ function cambiarPin(p){
 
 	var color = getColorDelPin(p);
 
-
-	urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=1|0|" + color + "|20|b|" + p.PuntoOrden;
+	if (p.FlagRuteo){
+		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=1|0|" + color + "|20|b|" + p.PuntoOrden;
+	}else{
+		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=1|0|" + color + "|20|b|X"
+	}
 	for (var ii=0; (ii < vecMarkersPuntos.length); ii++){
 		var m = vecMarkersPuntos[ii];
 		if (m.labelContent == p.PuntoId ){
@@ -1617,8 +1650,13 @@ function mostrarRegistrosRuta(poly){
 			if (!esModRuta()){
 				vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..."></input></span></td>';
 			}else{
-				DTFechaHoraInicioRuta = vRUTA.VRutaHoraComienzo;
-				vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta"  value ="' + vRUTA.VRutaNom + '" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..."></input></span></td>';
+
+				if (vRUTA.VRutaEstado == "P"){
+					vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta"  value ="' + vRUTA.VRutaNom + '" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..."></input></span></td>';
+				}else{
+					vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta"  value ="' + vRUTA.VRutaNom + '" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..." disabled></input></span></td>';
+
+				}
 			}
             vHtml += '<td class = "celdaGrid" >' + '<input type ="button"  class="btn btn-default ButtonAccSoloBorderLarge" style = "min-width:100px" onclick="armarRutas2Server();" title = "Confirmar" value = "Confirmar">';
             vHtml += "</td>";
@@ -1680,8 +1718,9 @@ function mostrarRegistrosRuta(poly){
 			  vHtml += ' </td>';
 
 		      vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;">';
+			  cambiarPin(p);
 		if (p.FlagRuteo && p.PuntoHabilitado){
-			cambiarPin(p);
+
 			vHtml +=  p.PuntoDistanciaArriboTxt ;
 		}
 			  vHtml += ' </td>';
@@ -1917,36 +1956,62 @@ function getPUntoById(PuntoId){
 function noIncluirRuta(PuntoId){
 	msg("***noIncluirRuta***");
 	var p = getPUntoById(PuntoId);
-	p.Ruta = 0;
+
 	p.FlagRuteo = !p.FlagRuteo;
 
-	p.PuntoOrden			=	0
-	p.PuntoTiempoArribo		=	""
-	p.PuntoTiempoArriboTxt		=		""
-	p.PuntoDistanciaArribo		=		""
-	p.PuntoDistanciaArriboTxt	=		""
-	p.PuntoDuracionVisita		=		""
+	if (!esModRuta()){
+		p.PuntoOrden			=	0;
+		p.Ruta = 0;
+
+	}else{
+		if (vRUTA.VRutaEstado == "P"){
+			p.PuntoOrden			=	0;
+			p.Ruta = 0;
+		}
+	}
+	p.PuntoTiempoArribo		=	0;
+	p.PuntoTiempoArriboTxt		=		"";
+	p.PuntoDistanciaArribo		=		0;
+	p.PuntoDistanciaArriboTxt	=		"";
+
 	p.Marca = "-";
 
 	for (i=0; i < vectorDePuntosJSON.length; i++ ){
 	  if (vectorDePuntosJSON[i].PedidoId == p.PedidoId &&  vectorDePuntosJSON[i].PuntoId != p.PuntoId){
 		vectorDePuntosJSON[i].FlagRuteo =  p.FlagRuteo;
-		vectorDePuntosJSON[i].PuntoOrden			=	""
-		vectorDePuntosJSON[i].PuntoTiempoArribo		=	""
-		vectorDePuntosJSON[i].PuntoTiempoArriboTxt		=		""
-		vectorDePuntosJSON[i].PuntoDistanciaArribo		=		""
-		vectorDePuntosJSON[i].PuntoDistanciaArriboTxt	=		""
-		vectorDePuntosJSON[i].PuntoDuracionVisita		=		""
+		if (!esModRuta()){
+			vectorDePuntosJSON[i].PuntoOrden			=	0;
+		}else{
+			if (vRUTA.VRutaEstado == "P"){
+				vectorDePuntosJSON[i].PuntoOrden			=	0;
+			}
+		}
+
+		vectorDePuntosJSON[i].PuntoTiempoArribo		=	0;
+		vectorDePuntosJSON[i].PuntoTiempoArriboTxt		=		"";
+		vectorDePuntosJSON[i].PuntoDistanciaArribo		=		0;
+		vectorDePuntosJSON[i].PuntoDistanciaArriboTxt	=		"";
+	//	vectorDePuntosJSON[i].PuntoDuracionVisita		=		0;
 		vectorDePuntosJSON[i].Marca = "-";
 
 	  }
 	}
 
 
-	limpiarRuta();
-	modoOptimizacion = false;
-
-	rutear(true);
+	if (!esModRuta){
+		limpiarRuta();
+		modoOptimizacion = false;
+		rutear(true);
+	}else{
+		if (vRUTA.VRutaEstado == "P"){
+			limpiarRuta();
+			modoOptimizacion = false;
+			rutear(true);
+		}else{
+			modoOptimizacion = false;
+			rutear(false);
+		}
+	}
 }
 
 
@@ -2064,15 +2129,15 @@ function movimientoValido(PuntoAMover, PuntoOrdenQueOcuparia){
 					return false;
 				}
 			}
-
-
-
-
 		}
 	}
 
 	return true;
 }
+
+
+
+
 
 
 
@@ -2097,8 +2162,10 @@ function moverOrdenPunto(direccion, PuntoId){
             }
 			var PuntoOrdenSigiente = vectorDePuntosJSON[posicionSiguiente].PuntoOrden;
 			if (movimientoValido(vectorDePuntosJSON[i],PuntoOrdenSigiente)){
-				vectorDePuntosJSON[posicionSiguiente].PuntoOrden = vectorDePuntosJSON[i].PuntoOrden;
-				vectorDePuntosJSON[i].PuntoOrden = PuntoOrdenSigiente;
+				if (vectorDePuntosJSON[posicionSiguiente].PuntoHabilitado){
+					vectorDePuntosJSON[posicionSiguiente].PuntoOrden = vectorDePuntosJSON[i].PuntoOrden;
+					vectorDePuntosJSON[i].PuntoOrden = PuntoOrdenSigiente;
+				}
 			}else{
 				mensajeError("No se puede mover el punto, verifique la precedencia");
 				return;
@@ -2116,8 +2183,10 @@ function moverOrdenPunto(direccion, PuntoId){
             }
 			var PuntoOrdenAnterior = vectorDePuntosJSON[posicionAnterior].PuntoOrden;
 			if (movimientoValido(vectorDePuntosJSON[i],PuntoOrdenAnterior)){
-				vectorDePuntosJSON[posicionAnterior].PuntoOrden = vectorDePuntosJSON[i].PuntoOrden;
-				vectorDePuntosJSON[i].PuntoOrden = PuntoOrdenAnterior;
+				if (vectorDePuntosJSON[posicionAnterior].PuntoHabilitado){
+					vectorDePuntosJSON[posicionAnterior].PuntoOrden = vectorDePuntosJSON[i].PuntoOrden;
+					vectorDePuntosJSON[i].PuntoOrden = PuntoOrdenAnterior;
+				}
 			}else{
 
 				mensajeError("No se puede mover el punto, verifique la precedencia");
@@ -3848,6 +3917,8 @@ function cargarJsonPuntos(cargarDesdeWEB){
                 success: function(Puntos ) {
 					if (esModRuta()){
 						vRUTA = Puntos.sdtCabezalRuta;
+						DTFechaHoraInicioRuta = vRUTA.VRutaHoraComienzo;
+
 					}
 					msg("PIPIRIPI: " + JSON.stringify(Puntos));
 					$.each(Puntos.sdtGetPuntos, function(i, Punto) {
