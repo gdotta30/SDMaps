@@ -2,7 +2,7 @@
 //DEL BRANCH V5
 
 // VARIABLES PARA PARAMETRIZAR
-
+//ppp
 var INDICE_CONTROL_Punto	=	  0;
 var MINCHARSSUGEST          =     2;
 var vAnchoLinea             =     3;
