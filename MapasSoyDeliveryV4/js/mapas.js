@@ -406,7 +406,7 @@ function rutear(rutear){
 				}else{
 				  msg("No encontró el origen al rutear ");
 				}
-            //ORDENAR SEGUN LISTA
+				//ORDENAR SEGUN LISTA
 
 				for (i=0; i < vectorDePuntosJSON.length; i++){
 					vectorDePuntosJSON[i].PuntoOrden = 0;
@@ -458,8 +458,15 @@ function origenYDestinoValidos(ZonaId){
   var _hayori = hayOrigen(ZonaId);
   if (_hayori==-1){
 	valido = false;
-	mensajeError("Debe indicar el punto origen de la ruta en la zona o polígono seleccionado");
+	if (esModRuta()){
+		OrdenarVector();
+		vectorDePuntosJSON[0].Marca = vMarcaORIGEN;
+		valido = true;
+	}else{
+		mensajeError("Debe indicar el punto origen de la ruta en la zona o polígono seleccionado");
+	}
   }
+
   return valido;
 
 }
@@ -685,25 +692,25 @@ function muestroInformacionPunto(PuntoId){
    		html = html + '<div class = "container-fluid mygrid-wrapper-div">';
    		html += '    <div class="row enmarcar" ">';
     	if (p.PuntoId != undefined){
-          html = html + '<div class="col-sm-8 col-md-8">';
+          //html = html + '<div class="col-sm-8 col-md-8">';
           html = html + '<p class = "titulocampoficha">#Punto</p>';
           html = html + '<div><span>' + p.PedidoId + '</div></span>';
           html = html + '</div>';
           html = html + '<div class="col-sm-1 col-md-1">';
-          html = html + '<img class ="imgInfo" src="' + PATHIMAGES + '/info.svg">';
-          html = html + '</div>';
+      //    html = html + '<img class ="imgInfo" src="' + PATHIMAGES + '/info.svg">';
+     //     html = html + '</div>';
     	}
    		html = html + '</div>';
         html += '    <div class="row enmarcar">';
         if (p.PuntoDireccion != undefined){
-          html = html + '<div class="col-sm-12 col-md-12">';
+         // html = html + '<div class="col-sm-12 col-md-12">';
           html = html + '<p class = "titulocampoficha">Direccion</p>';
 		  if (p.Precedencia == 1){
 				html = html + '<div class = "palabra"><span>' + "Retiro" + '</span></div>';
 		  }else if (p.Precedencia == 2) {
 				html = html + '<div class = "palabra"><span>' + "Entrega" + '</span></div>';
 		  }
-          html = html + '</div>';
+       //   html = html + '</div>';
           html = html + '<div class = "palabra"><span>' + p.PuntoDireccion + '</span></div>';
           html = html + '</div>';
 
@@ -720,14 +727,15 @@ function muestroInformacionPunto(PuntoId){
    		html += '    <div class="row enmarcar">';
         if (p.PuntoTelefonoCliente != undefined){
     			html = html + '<div class="col-sm-12 col-md-12">';
-    			html = html +'<p = "titulocampoficha">Telefono</p>';
+    			html = html +'<p class = "titulocampoficha">Telefono</p>';
     			html = html +'<div><span>' + p.PuntoTelefonoCliente + '</span></div>';
     			html = html + '</div>';
         }
-
+		html = html + '</div>';
+		html += '    <div class="row enmarcar">';
 		 if (p.PuntoDetalle != undefined){
     			html = html + '<div class="col-sm-12 col-md-12">';
-    			html = html +'<p = "titulocampoficha">Detalle del Pedido</p>';
+    			html = html +'<p class = "titulocampoficha">Detalle del Pedido</p>';
     			html = html +'<div><span>' + p.PuntoDetalle + '</span></div>';
     			html = html + '</div>';
         }
@@ -1613,9 +1621,9 @@ function cambiarPin(p){
 	var color = getColorDelPin(p);
 
 	if (p.FlagRuteo){
-		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=1|0|" + color + "|20|b|" + p.PuntoOrden;
+		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=1|0|" + color + "|10|b|" + p.PuntoOrden;
 	}else{
-		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=1|0|" + color + "|20|b|X"
+		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=1|0|" + color + "|10|b|X"
 	}
 	for (var ii=0; (ii < vecMarkersPuntos.length); ii++){
 		var m = vecMarkersPuntos[ii];
@@ -2162,10 +2170,10 @@ function moverOrdenPunto(direccion, PuntoId){
             }
 			var PuntoOrdenSigiente = vectorDePuntosJSON[posicionSiguiente].PuntoOrden;
 			if (movimientoValido(vectorDePuntosJSON[i],PuntoOrdenSigiente)){
-				if (vectorDePuntosJSON[posicionSiguiente].PuntoHabilitado){
+			//	if (vectorDePuntosJSON[posicionSiguiente].PuntoHabilitado){
 					vectorDePuntosJSON[posicionSiguiente].PuntoOrden = vectorDePuntosJSON[i].PuntoOrden;
 					vectorDePuntosJSON[i].PuntoOrden = PuntoOrdenSigiente;
-				}
+			//	}
 			}else{
 				mensajeError("No se puede mover el punto, verifique la precedencia");
 				return;
@@ -2183,10 +2191,10 @@ function moverOrdenPunto(direccion, PuntoId){
             }
 			var PuntoOrdenAnterior = vectorDePuntosJSON[posicionAnterior].PuntoOrden;
 			if (movimientoValido(vectorDePuntosJSON[i],PuntoOrdenAnterior)){
-				if (vectorDePuntosJSON[posicionAnterior].PuntoHabilitado){
+		//		if (vectorDePuntosJSON[posicionAnterior].PuntoHabilitado){
 					vectorDePuntosJSON[posicionAnterior].PuntoOrden = vectorDePuntosJSON[i].PuntoOrden;
 					vectorDePuntosJSON[i].PuntoOrden = PuntoOrdenAnterior;
-				}
+		//		}
 			}else{
 
 				mensajeError("No se puede mover el punto, verifique la precedencia");
