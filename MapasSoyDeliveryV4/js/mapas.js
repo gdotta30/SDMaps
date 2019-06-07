@@ -461,6 +461,7 @@ function origenYDestinoValidos(ZonaId){
 	if (esModRuta()){
 		OrdenarVector();
 		vectorDePuntosJSON[0].Marca = vMarcaORIGEN;
+		valido = true;
 	}else{
 		mensajeError("Debe indicar el punto origen de la ruta en la zona o polígono seleccionado");
 	}
