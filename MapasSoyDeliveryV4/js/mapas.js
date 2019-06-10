@@ -1595,21 +1595,21 @@ function  getColorDelPin(p){
 		 if (p.PuntoHabilitado){
 			 switch(p.precedencia){
 			   case "2":
-					color = "8ffc92";
+					color = "008000";
 					break;
 			   case "1":
-					color = "f57151";
+					color = "FF0000";
 					break;
 			   default:
-					color = "f37460";
+					color = "008000";
 					break;
 			}
 		 }else{
-			color = "d4e6f1";
+			color = "808080";
 
 		 }
 	 }else{
-		 color = "9c9c9c";
+		 color = "FF4500";
 	 }
 	return color;
 
@@ -1621,9 +1621,9 @@ function cambiarPin(p){
 	var color = getColorDelPin(p);
 
 	if (p.FlagRuteo){
-		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=1|0|" + color + "|10|b|" + p.PuntoOrden;
+		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|" + p.PuntoOrden;
 	}else{
-		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=1|0|" + color + "|10|b|X"
+		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|X"
 	}
 	for (var ii=0; (ii < vecMarkersPuntos.length); ii++){
 		var m = vecMarkersPuntos[ii];
