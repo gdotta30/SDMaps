@@ -2,9 +2,9 @@
 
 /* Tooltip */
   .test + .tooltip > .tooltip-inner {
-    background-color: #f7ecb5; 
-    color: black; 
-    border: 1px solid #999999; 
+    background-color: #f7ecb5;
+    color: black;
+    border: 1px solid #999999;
     padding: 5px;
     font-size: 12px;
   }
@@ -24,7 +24,11 @@
   .test + .tooltip.right > .tooltip-arrow {
     border-right: 5px solid black;
   }
-  
+
+  .tooltip-inner > h2 {
+      font-size: 12px;
+  }
+
 .titulocampoficha{
   margin-top: 2px;
   margin-bottom: 2px;
@@ -41,7 +45,7 @@
 	padding: 5px;
 	text-align: center;
 	font-weight: bold;
-	
+
 }
 
 .divgridentrega{
