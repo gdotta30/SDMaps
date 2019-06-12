@@ -448,26 +448,21 @@ function rutear(rutear){
 
 
 function origenYDestinoValidos(ZonaId){
-  var valido = true;
-  var _hayPuntos = hayPuntos(ZonaId);
-  if (!_hayPuntos){
-      valido = false;
-      mensajeError("No hay puntos en la zona o poligono seleccionado");
-  }
-  var _haydest = hayDestino(ZonaId);
-  var _hayori = hayOrigen(ZonaId);
-  if (_hayori==-1){
-	valido = false;
-	if (esModRuta()){
+	var valido = true;
+	var _hayPuntos = hayPuntos(ZonaId);
+	if (!_hayPuntos){
+		valido = false;
+		mensajeError("No hay puntos en la zona o poligono seleccionado");
+	}
+	var _haydest = hayDestino(ZonaId);
+	var _hayori = hayOrigen(ZonaId);
+ 	if (esModRuta()){
 		OrdenarVector();
 		vectorDePuntosJSON[0].Marca = vMarcaORIGEN;
-		valido = true;
-	}else{
-		mensajeError("Debe indicar el punto origen de la ruta en la zona o polígono seleccionado");
-	}
-  }
 
-  return valido;
+	}
+	valido = true;
+	return valido;
 
 }
 
@@ -2006,7 +2001,7 @@ function noIncluirRuta(PuntoId){
 	}
 
 
-	if (!esModRuta){
+	if (!esModRuta()){
 		limpiarRuta();
 		modoOptimizacion = false;
 		rutear(true);
