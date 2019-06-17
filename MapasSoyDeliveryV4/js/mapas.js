@@ -127,14 +127,12 @@ var varincluirentregasfueraderutas = false;
 
 
 var vRUTA;
+var vNombreRuta = "";
 
 var semaforo = 0;
 var cantsemaforo = 0;
 
 
-
-
-//var asignarZonaDadoUnPolyAlosMarcadores_sem = true;
 
 
 function esModRuta(){
@@ -183,8 +181,6 @@ function getLatLongOrigen(){
   }
   return latlng;
 }
-
-
 
 
 
@@ -453,15 +449,14 @@ function origenYDestinoValidos(ZonaId){
 	if (!_hayPuntos){
 		valido = false;
 		mensajeError("No hay puntos en la zona o poligono seleccionado");
+	}else{
+		var _haydest = hayDestino(ZonaId);
+		var _hayori = hayOrigen(ZonaId);
+		if (esModRuta()){
+			OrdenarVector();
+			vectorDePuntosJSON[0].Marca = vMarcaORIGEN;
+		}
 	}
-	var _haydest = hayDestino(ZonaId);
-	var _hayori = hayOrigen(ZonaId);
- 	if (esModRuta()){
-		OrdenarVector();
-		vectorDePuntosJSON[0].Marca = vMarcaORIGEN;
-
-	}
-	valido = true;
 	return valido;
 
 }
@@ -1631,6 +1626,11 @@ function cambiarPin(p){
 }
 
 
+function grabarNombreRuta(){
+	    vNombreRuta = document.getElementById("nombreruta").value;
+		alert(vNombreRuta);
+}
+
 function mostrarRegistrosRuta(poly){
     msg("***mostrarRegistrosRuta***");
 
@@ -1651,14 +1651,12 @@ function mostrarRegistrosRuta(poly){
             vHtml += '<td><img id ="imgtogle_1" +  class="imgTogle" src="' + PATHIMAGES +'/up-arrow.svg" onclick="toggleListaRutaCollapse(1)"/></td><span>' + "[=&&1=]&nbsp&nbsp[=&&2=]" + '</span></td>';
 
 			if (!esModRuta()){
-				vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..."></input></span></td>';
+				vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta" value ="' + vNombreRuta + '" onblur = "grabarNombreRuta()" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..."></input></span></td>';
 			}else{
-
 				if (vRUTA.VRutaEstado == "P"){
-					vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta"  value ="' + vRUTA.VRutaNom + '" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..."></input></span></td>';
+					vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta"  value ="' + vNombreRuta + '" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..." onblur = "grabarNombreRuta()"></input></span></td>';
 				}else{
 					vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta"  value ="' + vRUTA.VRutaNom + '" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..." disabled></input></span></td>';
-
 				}
 			}
             vHtml += '<td class = "celdaGrid" >' + '<input type ="button"  class="btn btn-default ButtonAccSoloBorderLarge" style = "min-width:100px" onclick="armarRutas2Server();" title = "Confirmar" value = "Confirmar">';
@@ -3921,6 +3919,7 @@ function cargarJsonPuntos(cargarDesdeWEB){
 					if (esModRuta()){
 						vRUTA = Puntos.sdtCabezalRuta;
 						DTFechaHoraInicioRuta = vRUTA.VRutaHoraComienzo;
+						vNombreRuta =  vRUTA.VRutaNom;
 
 					}
 					msg("PIPIRIPI: " + JSON.stringify(Puntos));
