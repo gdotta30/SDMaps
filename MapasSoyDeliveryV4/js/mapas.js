@@ -1628,7 +1628,7 @@ function cambiarPin(p){
 
 function grabarNombreRuta(){
 	    vNombreRuta = document.getElementById("nombreruta").value;
-		alert(vNombreRuta);
+	
 }
 
 function mostrarRegistrosRuta(poly){
