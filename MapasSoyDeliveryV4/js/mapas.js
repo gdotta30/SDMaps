@@ -1628,7 +1628,6 @@ function cambiarPin(p){
 
 function grabarNombreRuta(){
 	    vNombreRuta = document.getElementById("nombreruta").value;
-	
 }
 
 function mostrarRegistrosRuta(poly){
@@ -1643,188 +1642,171 @@ function mostrarRegistrosRuta(poly){
       var p = vectorDePuntosJSON[i];
 
         if (p.PuntoZonaId == poly){
+			if (cabezal){
+				var color = vectorDePuntosJSON[i].Color;
+				vHtml += '<table class = "tablaTopPaddingBottom" >';
+				vHtml += '<tr>';
+				vHtml += '<td><img id ="imgtogle_1" +  class="imgTogle" src="' + PATHIMAGES +'/up-arrow.svg" onclick="toggleListaRutaCollapse(1)"/></td><span>' + "[=&&1=]&nbsp&nbsp[=&&2=]" + '</span></td>';
 
-          if (cabezal){
-            var color = vectorDePuntosJSON[i].Color;
-            vHtml += '<table class = "tablaTopPaddingBottom" >';
-            vHtml += '<tr>';
-            vHtml += '<td><img id ="imgtogle_1" +  class="imgTogle" src="' + PATHIMAGES +'/up-arrow.svg" onclick="toggleListaRutaCollapse(1)"/></td><span>' + "[=&&1=]&nbsp&nbsp[=&&2=]" + '</span></td>';
-
-			if (!esModRuta()){
-				vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta" value ="' + vNombreRuta + '" onblur = "grabarNombreRuta()" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..."></input></span></td>';
-			}else{
-				if (vRUTA.VRutaEstado == "P"){
-					vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta"  value ="' + vNombreRuta + '" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..." onblur = "grabarNombreRuta()"></input></span></td>';
+				if (!esModRuta()){
+					vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta" value ="' + vNombreRuta + '" onblur = "grabarNombreRuta()" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..."></input></span></td>';
 				}else{
-					vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta"  value ="' + vRUTA.VRutaNom + '" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..." disabled></input></span></td>';
+					if (vRUTA.VRutaEstado == "P"){
+						vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta"  value ="' + vNombreRuta + '" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..." onblur = "grabarNombreRuta()"></input></span></td>';
+					}else{
+						vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta"  value ="' + vRUTA.VRutaNom + '" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..." disabled></input></span></td>';
+					}
 				}
+				vHtml += '<td class = "celdaGrid" >' + '<input type ="button"  class="btn btn-default ButtonAccSoloBorderLarge" style = "min-width:100px" onclick="armarRutas2Server();" title = "Confirmar" value = "Confirmar">';
+				vHtml += "</td>";
+				var minutosdelta = 0;
+				var minllegadas = 0;
+				cntpuntos = 0;
+				var horaDeInicio = null;
+				var distanciatotal=0;
+				var tiempototal = 0;
+				vHtml += '</tr>';
+				vHtml += '</table>';
+				vHtml += '<table id ="listaruta_1" style=";" class="gx-tab-spacing-fix-2 WorkWith" data-cellpadding="1" data-cellspacing="2">';
+				vHtml += getTableHeader();
+				cabezal = false;
+				var acumuladoMinutos = 0;
 			}
-            vHtml += '<td class = "celdaGrid" >' + '<input type ="button"  class="btn btn-default ButtonAccSoloBorderLarge" style = "min-width:100px" onclick="armarRutas2Server();" title = "Confirmar" value = "Confirmar">';
-            vHtml += "</td>";
-            var minutosdelta = 0;
-			var minllegadas = 0;
-            cntpuntos = 0;
-            var horaDeInicio = null;
-            var distanciatotal=0;
-            var tiempototal = 0;
-			vHtml += '</tr>';
-			vHtml += '</table>';
-            vHtml += '<table id ="listaruta_1" style=";" class="gx-tab-spacing-fix-2 WorkWith" data-cellpadding="1" data-cellspacing="2">';
-			vHtml += getTableHeader();
-            cabezal = false;
-			var acumuladoMinutos = 0;
-          }
-		  cantruteados ++;
-		  if (p.FlagRuteo){
+			cantruteados ++;
+			if (p.FlagRuteo){
 			cntpuntos ++;
 
-		  }
+			}
 
-          vHtml += '<tr  data-gxrendering_row="" data-gxrow="0001" class="WorkWithOdd" ' + getClassColorRowEvenOdd(cntpuntos,p.FlagRuteo) + '>';
-		      vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '">';
-          vHtml += '	<div class="col-sm-1 col-md-1 "> ';
-          if (p.FlagRuteo && p.PuntoHabilitado){
-            vHtml += '  		<span> <img  id="imgUP" class = "imgGrid" src="' + PATHIMAGES + '/up.png" onclick = "upGrid('+ p.PuntoId +')"/> ';
-            vHtml += '  		<img  id="imgDown" class = "imgGrid" src="' + PATHIMAGES + '/down.png" onclick = "downGrid('+ p.PuntoId +')"/> </span>';
-          }else{
+			vHtml += '<tr  data-gxrendering_row="" data-gxrow="0001" class="WorkWithOdd" ' + getClassColorRowEvenOdd(cntpuntos,p.FlagRuteo) + '>';
+			vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '">';
+			vHtml += '	<div class="col-sm-1 col-md-1 "> ';
+			if (p.FlagRuteo && p.PuntoHabilitado){
+				vHtml += '  		<span> <img  id="imgUP" class = "imgGrid" src="' + PATHIMAGES + '/up.png" onclick = "upGrid('+ p.PuntoId +')"/> ';
+				vHtml += '  		<img  id="imgDown" class = "imgGrid" src="' + PATHIMAGES + '/down.png" onclick = "downGrid('+ p.PuntoId +')"/> </span>';
+			}else{
 			  if (!p.PuntoHabilitado){
 				  vHtml += p.PuntoEstadoTxt;
 			  }
-		  }
-          p.PuntoOrden = cntpuntos;
-          vHtml += '	</div>';
-		  vHtml += ' </td>';
-		  vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;">';
+			}
+			p.PuntoOrden = cntpuntos;
+			vHtml += '	</div>';
+			vHtml += ' </td>';
+			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;">';
 
-          vHtml += '	<a class = "test" data-toggle="tooltip" data-placement="right" title="' + mostrarDetallesPedido(p.PedidoId ) + '" href="#"><strong> #' + p.PuntoOrden + '-' + p.PedidoId  +'</a></strong>';
-          vHtml += ' </td>';
-		  vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;">';
+			vHtml += '	<a class = "test" data-toggle="tooltip" data-placement="right" title="' + mostrarDetallesPedido(p.PedidoId ) + '" href="#"><strong> #' + p.PuntoOrden + '-' + p.PedidoId  +'</a></strong>';
+			vHtml += ' </td>';
+			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;">';
 
-		  vHtml +=  ' <img   class = "imgTogle" src = "' +  p.Icono + '" onclick = "indicarPunto(' + p.PedidoId  + ')"/>';
+			vHtml +=  ' <img   class = "imgTogle" src = "' +  p.Icono + '" onclick = "indicarPunto(' + p.PedidoId  + ')"/>';
 
-          vHtml += ' </td>';
-		      vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
-		      vHtml += '	<strong>' + p.PuntoNombreCliente + '</strong>';
-		      vHtml += ' </td>';
-		      vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
-          vHtml += p.PuntoDireccion ;
-		      vHtml += ' </td>';
+			vHtml += ' </td>';
+			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
+			vHtml += '	<strong>' + p.PuntoNombreCliente + '</strong>';
+			vHtml += ' </td>';
+			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
+			vHtml += p.PuntoDireccion ;
+			vHtml += ' </td>';
 
-			  vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
+			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
 
-			  vHtml +=  getFormatoDeHora(getFormatoDeFechaHora(new Date(p.PedidoHorarioIni)));
+			vHtml +=  getFormatoDeHora(getFormatoDeFechaHora(new Date(p.PedidoHorarioIni)));
+			vHtml += ' </td>';
+			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
+			vHtml +=  getFormatoDeHora(getFormatoDeFechaHora(new Date(p.PedidoHorarioFin)));
+			vHtml += ' </td>';
+
+			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;">';
+			cambiarPin(p);
+			if ((p.FlagRuteo && p.PuntoHabilitado) || p.VRutaVisitaEstado == "P"){
+
+				vHtml +=  p.PuntoDistanciaArriboTxt ;
+			}
+			vHtml += ' </td>';
+			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;">';
+			if ((p.FlagRuteo && p.PuntoHabilitado) || p.VRutaVisitaEstado == "P"){
+				vHtml +=  p.PuntoTiempoArriboTxt;
+			}
 			  vHtml += ' </td>';
-			  vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
-			  vHtml +=  getFormatoDeHora(getFormatoDeFechaHora(new Date(p.PedidoHorarioFin)));
-			  vHtml += ' </td>';
 
-		      vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;">';
-			  cambiarPin(p);
-		if (p.FlagRuteo && p.PuntoHabilitado){
+			var fecha_hora;
+			var horasalida = "";
+			var minutosASumar =0;
 
-			vHtml +=  p.PuntoDistanciaArriboTxt ;
-		}
-			  vHtml += ' </td>';
-		      vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;">';
-		if (p.FlagRuteo && p.PuntoHabilitado){
-			vHtml +=  p.PuntoTiempoArriboTxt;
-		}
-			  vHtml += ' </td>';
+			tiempototal = tiempototal + Number(p.PuntoDuracionVisita) + Math.round(Number(p.PuntoTiempoArribo) / 60) ;
+			distanciatotal = distanciatotal + p.PuntoDistanciaArribo ;
+			msg("Numero " + p.PuntoDistanciaArriboTxt + " " + p.PuntoDistanciaArribo + " p.PuntoTiempoArribo" + p.PuntoTiempoArribo + " " + p.PuntoTiempoArriboTxt );
+			if (horaDeInicio == null){
 
-		  var fecha_hora;
-		  var horasalida = "";
-          var minutosASumar =0;
-
-          tiempototal = tiempototal + Number(p.PuntoDuracionVisita) + Math.round(Number(p.PuntoTiempoArribo) / 60) ;
-          distanciatotal = distanciatotal + p.PuntoDistanciaArribo ;
-          msg("Numero " + p.PuntoDistanciaArriboTxt + " " + p.PuntoDistanciaArribo + " p.PuntoTiempoArribo" + p.PuntoTiempoArribo + " " + p.PuntoTiempoArriboTxt );
-          if (horaDeInicio == null){
-            horaDeInicio = getFormatoDeFechaHora(new Date(fecha_hora));
-          }
+				horaDeInicio = getFormatoDeFechaHora(new Date(fecha_hora));
+			}
 
 
-		var hora_visita0;
-		var hora_horario0;
-		var  hora_horario1;
-		var  hora_visita1;
+			var hora_visita0;
+			var hora_horario0;
+			var  hora_horario1;
+			var  hora_visita1;
 
-		if (p.PuntoTiempoArribo != undefined){
-			   acumuladoMinutos += 	Math.round(Number(p.PuntoTiempoArribo) / 60); // + minutosdelta;
-			    var fecha_hora_llegada = sumar_horas(DTFechaHoraInicioRuta, acumuladoMinutos);
-  			    if (p.PuntoTiempoArribo != undefined){
+			if (p.PuntoTiempoArribo != undefined){
+				acumuladoMinutos += 	Math.round(Number(p.PuntoTiempoArribo) / 60); // + minutosdelta;
+				var fecha_hora_llegada = sumar_horas(DTFechaHoraInicioRuta, acumuladoMinutos);
+				if (p.PuntoTiempoArribo != undefined){
 					acumuladoMinutos += Number(p.PuntoDuracionVisita); //  + Math.round(Number(p.PuntoTiempoArribo) / 60);
 					fecha_hora = sumar_horas(DTFechaHoraInicioRuta, acumuladoMinutos);
 					p.fecha_hora_salida = fecha_hora;
 					vectorDePuntosJSON[i].fechaHora = fecha_hora;
-					if (EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado){
+					if ((EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado) || p.VRutaVisitaEstado == "P"){
 					  horasalida =   getFormatoDeHora(getFormatoDeFechaHora(new Date(p.fecha_hora_salida )));
 
-					}else{
-
 					}
-				  }else{
-					if (EXT_MOSTRAR_HORA_EN_RUTA && p.PuntoHabilitado){
-				//      vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '">**</td>';
-					}
-				  }
+				}
 
-			    hora_visita0 = horaANumero(getFormatoDeHora(getFormatoDeFechaHora(new Date(fecha_hora_llegada))));
+				hora_visita0 = horaANumero(getFormatoDeHora(getFormatoDeFechaHora(new Date(fecha_hora_llegada))));
 				hora_horario0 = horaANumero(getFormatoDeHora(getFormatoDeFechaHora(new Date(p.PedidoHorarioIni))));
 				hora_horario1 = horaANumero(getFormatoDeHora(getFormatoDeFechaHora(new Date(p.PedidoHorarioFin))));
 				hora_visita1= horaANumero(getFormatoDeHora(getFormatoDeFechaHora(new Date(p.fecha_hora_salida))));
 				var estilo = getestilohorario(hora_horario0, hora_horario1, hora_visita0, hora_visita1);
-			   if (EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado){
+				if ((EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado)  || p.VRutaVisitaEstado == "P"){
 					vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" ' +  estilo + '><strong> ' + getFormatoDeHora(getFormatoDeFechaHora(new Date(fecha_hora_llegada)))  + '</strong>';
 
 					vHtml += ' </td> ';
-			   } else{
+				} else{
+
 					vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;"></strong></td>';
-			   }
-		  }
-
-		  p.fecha_hora_llegada = fecha_hora_llegada;
-		  vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" ' + estilo + '>';
-
-		  if (p.PuntoHabilitado){
-			  if (p.FlagRuteo){
-				vHtml += '	<Input type = "text" id ="dur_num_' + p.PuntoId + '" maxlength="3" value = "' + p.PuntoDuracionVisita + '" class = "form-control AttributeCheckBox" style = "max-width:50px" onblur = "validonumero(' + p.PuntoId + ')" placeholder = "5min" ></input>';
-			  }else{
-				vHtml += '	<Input type = "text" id ="dur_num_' + p.PuntoId + '" maxlength="3" value = "' + p.PuntoDuracionVisita + '" class = "form-control AttributeCheckBox" style = "max-width:50px" disabled></input>';
-			  }
-		  }
-		  vHtml += ' </td>';
-
-
-
-
-
-
-
-
-		  minutosdelta += Number(p.PuntoDuracionVisita);
-
-
-
-			if (EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado){
-
-			  vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" ' + estilo + '><strong>' +  horasalida + '</strong></td>';
-			}else{
-			   vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" ' + estilo +'><strong>' + horasalida + '</strong></td>';
-
+				}
 			}
 
+			p.fecha_hora_llegada = fecha_hora_llegada;
+			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" ' + estilo + '>';
 
+			if ((EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado)  || p.VRutaVisitaEstado == "P"){
+				vHtml += '	<Input type = "text" id ="dur_num_' + p.PuntoId + '" maxlength="3" value = "' + p.PuntoDuracionVisita + '" class = "form-control AttributeCheckBox" style = "max-width:50px" onblur = "validonumero(' + p.PuntoId + ')" placeholder = "5min" ></input>';
+			}else{
+				//vHtml += '	<Input type = "text" id ="dur_num_' + p.PuntoId + '" maxlength="3" value = "' + p.PuntoDuracionVisita + '" class = "form-control AttributeCheckBox" style = "max-width:50px" disabled></input>';
+				vHtml += '	';
+			}
 
-          vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p) + '" ' +  estilo + '  >';
-		  if (p.PuntoHabilitado){
-			  if (p.FlagRuteo){
-				vHtml += '	<img  id="imgCancelar" class = "imgGrid2" src="' + PATHIMAGES + '/cruz.png" onclick = "noIncluirRuta('+ p.PuntoId +')"/> ';
-			  }else{
-				vHtml += '	<img  id="imgCancelar" class = "imgGridMuerto" src="' + PATHIMAGES + '/approve.png" onclick = "noIncluirRuta('+ p.PuntoId +')"/> ';
-			  }
-		  }
-          vHtml += '</td>';
-          vHtml += '</tr>';
+			vHtml += ' </td>';
+
+			minutosdelta += Number(p.PuntoDuracionVisita);
+			if ((EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado) || p.VRutaVisitaEstado == "P"){
+				vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" ' + estilo + '><strong>' +  horasalida + '</strong></td>';
+			}else{
+				vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" ' + estilo + '><strong></strong></td>';
+			}
+			vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p) + '" ' +  estilo + '  >';
+
+			if (p.PuntoHabilitado){
+				if (EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo){
+					vHtml += '	<img  id="imgCancelar" class = "imgGrid2" src="' + PATHIMAGES + '/cruz.png" onclick = "noIncluirRuta('+ p.PuntoId +')"/> ';
+				}else{
+					vHtml += '	<img  id="imgCancelar" class = "imgGridMuerto" src="' + PATHIMAGES + '/approve.png" onclick = "noIncluirRuta('+ p.PuntoId +')"/> ';
+
+				}
+
+			}
+			vHtml += '</td>';
+			vHtml += '</tr>';
 
       }
     }
@@ -1843,10 +1825,7 @@ function mostrarRegistrosRuta(poly){
           //vHtml = vHtml.replace("[=&&2=]", "Inicio&nbsp<strong>" + getFormatoDeFechaHora(new Date(DTFechaHoraInicioRuta)) + "</strong>,&nbspfin&nbsp<strong>" + getFormatoDeFechaHora(new Date(fecha_hora))) ;
   		      vHtml = vHtml.replace("[=&&2=]", '<td class = "celdaGrid" ><span class="labeltablaruta">INICIO</td><td >' + getDtControl() + '</span></td><td class = "celdaGrid"><span class="labeltablaruta">FIN</span></td><td><span class = "valorescabezalruta">' + rellenarConNBSP(getFormatoDeFechaHora(new Date(fecha_hora)))) + "</span></td>" ;
   	    }
-
-
-
-    }
+	}
 
 
   vVRutaVisitaFchSalida = getFormatoDeFechaHoraISO(new Date(fecha_hora));
