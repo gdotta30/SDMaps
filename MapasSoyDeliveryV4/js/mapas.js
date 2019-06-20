@@ -19,7 +19,7 @@ var URLGETPuntoS           	=     EXT_VAR_URLGETPuntoS;     //"http://10.211.55.
 var URLGETORIGENES          =     EXT_VAR_URLGETORIGENES;   //"http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/awsgetorigenes.aspx";
 var URLSETRUTAS             =     EXT_VAR_URLSETRUTAS;      //"http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/awssetrutas.aspx";
 var URLSETPOLIGONOS         =     EXT_VAR_URLSETPOLIGONOS;  //"http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/awssetpoligono.aspx";
-//var URLGETPOLIGONOS         =     EXT_VAR_URLGETPOLIGONOS;  //"http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/awsgetpoligonos.aspx";
+var URLGETPOLIGONOS         =     EXT_VAR_URLGETPOLIGONOS;  //"http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/awsgetpoligonos.aspx";
 var CARGAR_ZONAS_AL_INICIO  =     EXT_CARGAR_ZONAS_AL_INICIO;
 var vMAXHEIGHT_RUTA         =     EXT_VAR_MAXHEIGHT_RUTA;
 var vMAXHEIGHT_MAPA         =     EXT_VAR_MAXHEIGHT_MAPA;
@@ -289,33 +289,34 @@ function generarMenuLateral(){
 		}
 		else {
 			buffer += ' <div id = "botonbusqueda2" class="collapsibleX">Buscar Pedido</div> ';
-			buffer += ' <div id = "contenidopoly2" class="contentX" style="background-color: rgb(234, 91, 11)"> ';
-			buffer += ' <div style = "height: 41px"> ';
-			buffer += '	<div class = "toolbarsearch" style="text-align:center "> ';
-			buffer += '	   <span> ';
-			buffer += '				<img src = "MapasSoyDeliveryV4/images/lupa.png" class = "imgLupa"> ';
-			buffer += '				<input type="text" class="form-control AttributeCheckBox" maxlength = "20" style = "width:170px" placeholder="buscar pedido..." id = "txtbuscarpedido" onblur="buscarpedido()"> ';
-			buffer += '		</span> ';
-			buffer += '	</div> '
-			buffer += '	</div> ';
+			buffer += ' 	<div id = "contenidopoly2" class="contentX" style="background-color: rgb(234, 91, 11)"> ';
+			buffer += ' 			<div style = "height: 41px"> ';
+			buffer += '				<div class = "toolbarsearch" style="text-align:center "> ';
+			buffer += '	   				<span> ';
+			buffer += '						<img src = "MapasSoyDeliveryV4/images/lupa.png" class = "imgLupa"> ';
+			buffer += '						<input type="text" class="form-control AttributeCheckBox" maxlength = "20" style = "width:170px" placeholder="buscar pedido..." id = "txtbuscarpedido" onblur="buscarpedido()"> ';
+			buffer += '					</span> ';
+			buffer += '				</div> '
+			buffer += '			</div> ';
 			buffer += '	</div> ';
 
 			buffer += ' <div id = "botonbusqueda" class="collapsibleX">Buscar Polígonos</div> ';
-			buffer += ' <div id = "contenidopoly" class="contentX" style="background-color: rgb(234, 91, 11)"> ';
-			buffer += ' <div style = "height: 41px"> ';
-			buffer += '	<div class = "toolbarsearch" style="text-align:center "> ';
-			buffer += '	   <span> ';
-			buffer += '				<img src = "MapasSoyDeliveryV4/images/lupa.png" class = "imgLupa"> ';
-			buffer += '				<input type="text" class="form-control AttributeCheckBox" maxlength = "20" style = "width:170px" placeholder="buscar poligono..." id = "txtbuscarpoly" onkeyup="buscarpoly()"> ';
-			buffer += '	   </span> ';
+			buffer += ' 	<div id = "contenidopoly" class="contentX" style="background-color: rgb(234, 91, 11)"> ';
+			buffer += ' 		<div > ';
+			buffer += '			<div class = "toolbarsearch" style="text-align:center "> ';
+			buffer += '	   			<span> ';
+			buffer += '					<img src = "MapasSoyDeliveryV4/images/lupa.png" class = "imgLupa"> ';
+			buffer += '					<input type="text" class="form-control AttributeCheckBox" maxlength = "20" style = "width:170px" placeholder="buscar poligono..." id = "txtbuscarpoly" onkeyup="buscarpoly()"> ';
+			buffer += '	   			</span> ';
 
-			buffer += '	<div class = "listaexpand" id = "poligonosdisponibles"> ';
-			buffer += '	</div> ';
-			buffer += '	<div class = "listaexpand" id = "poligonoscargados"> ';
-			buffer += '	</div> ';
-			buffer += ' </div> ';
-			buffer += ' </div> ';
-			buffer += ' </div> ';
+			buffer += '				<div class = "listaexpand" id = "poligonosdisponibles" style="margin-left: -20px;"> ';
+			buffer += '				</div> ';
+			buffer += '			</div> ';
+			buffer += '			<div class = "listaexpand" id = "poligonoscargados" style > ';
+			buffer += '			</div> ';
+			buffer += '		</div> ';
+			buffer += ' 	</div> ';
+
 			buffer += ' <div class="collapsibleX">Rutas</div> ';
 			buffer += '	<div class="contentX"> ';
 			buffer += '	   <div class="enmarcar" style="text-align:center"> ';
@@ -973,6 +974,7 @@ function initMap() {
 	}
 	//if (EXT_VAR_CARGAR_PUNTOS){
 	cargarPuntos(true);
+	buscarpolyXdefectosSinClickear();
 //	}
 	$("body").toggleClass("sidebar-collapse");
 
@@ -983,6 +985,8 @@ function initMap() {
 
 
 }
+
+
 
 function limpiarVector(vec){
   msg("***limpiarVector***");
@@ -2365,12 +2369,21 @@ function getParmPoligonosFromServer(_PoligonoId, _PoligonoNombre,_PoligonoUsuari
 
 }
 
-function cargarpoly(_PoligonoId){
+function cargarpoly(_PoligonoId, mostrar){
+
   var p = getParmPoligonosFromServer(_PoligonoId, "","","CON_PUNTOS");
-  getPoligonosFromServer(p);
+  getPoligonosFromServer(p, mostrar);
 
 }
 
+
+
+function buscarpolyXdefectosSinClickear(){
+
+    var p = getParmPoligonosFromServer("","","","CON_PUNTOS");
+    getPoligonosFromServer(p, false);
+
+}
 
 function buscarpoly(){
 
@@ -2383,6 +2396,7 @@ function buscarpoly(){
 		var div = document.getElementById("poligonosdisponibles");
 		div.innerHTML = "";
 		expandirMenuLateral();
+		refrescarMenuPoly(0);
 	  }
   }
 }
@@ -2394,12 +2408,13 @@ function presentarPoligonosEnDiv(vPoly){
   msg("***presentarPoligonosEnDiv***");
   var buffer = "";
   var div = document.getElementById("poligonosdisponibles");
+
   var cantitems = 0;
-  buffer = '<ul style="height: auto; overflow: hiden">';
+  buffer = '<ul style="height: auto;text-align: left;overflow: hiden">';
   for(i=0; (i < vPoly.length); i++){
       var p = vPoly[i];
       buffer += "<li class = 'lista' ";
-      buffer += ' onclick="cargarpoly(' + "'" + p.PoligonoId + "'" +') " ';
+      buffer += ' onclick="cargarpoly(' + "'" + p.PoligonoId + "'" +',true) " ';
       buffer += ">";
       buffer += p.PoligonoNombre;
       buffer += "</li>";
@@ -2407,9 +2422,8 @@ function presentarPoligonosEnDiv(vPoly){
   }
   buffer += "</ul>";
   div.innerHTML = buffer;
-  if (cantitems > 0){
-    refrescarMenuPoly(cantitems);
-  }
+  refrescarMenuPoly(cantitems);
+
 }
 
 function convertirPuntosAnumericos(vec){
@@ -2424,16 +2438,20 @@ function convertirPuntosAnumericos(vec){
   return puntos;
 }
 
-function cargarPligonoObtenido(vPoly){
+function cargarPligonoObtenido(vPoly,mostrar){
   //Muestra el poligono en el mapa
   msg("***cargarPligonoObtenido***");
-  for(i=0; (i < vPoly.length); i++){
-      var p = vPoly[i];
+
+  for(var k=0; (k < vPoly.length); k++){
+      var p = vPoly[k];
+
       if (!extistePolyAlArray(p.PoligonoId)){
-        var puntos = convertirPuntosAnumericos(p.puntos);
-        polyFromTheScratch(p.PoligonoId, p.PoligonoNombre, puntos);
+		var puntos = convertirPuntosAnumericos(p.puntos);
+
+		polyFromTheScratch(p.PoligonoId, p.PoligonoNombre, puntos,false);
       }
   }
+  cargarPoligonosEnLista(true);
 
 }
 
@@ -2456,7 +2474,7 @@ function setPolyModificado(id,mod){
 
 
 
-function polyFromTheScratch(id,desc,puntos){
+function polyFromTheScratch(id,desc,puntos,mostrar){
 
   var newShape = new google.maps.Polygon({
     paths:          puntos,
@@ -2471,7 +2489,8 @@ function polyFromTheScratch(id,desc,puntos){
     ov:"",
     jsonpoly: "",
     estadosalvado: "1",
-    zIndex:999999
+    zIndex:999999,
+	visible: mostrar
   });
 
 
@@ -2492,7 +2511,7 @@ function polyFromTheScratch(id,desc,puntos){
       doInfoWindow(newShape, e);
   });
 
-
+/*
 
   google.maps.event.addListener(newShape.getPath(), 'insert_at', function() {
       //setPolyModificado(newShape.tag, EDITADO);
@@ -2503,11 +2522,15 @@ function polyFromTheScratch(id,desc,puntos){
   google.maps.event.addListener(newShape.getPath(), 'set_at', function() {
       //setPolyModificado(newShape.tag, EDITADO);
   });
-  setSelection(newShape);
-  agregarPolyAlArray(newShape);
-  cargarPoligonosEnLista();
-  newShape.setMap(map);
+ */
 
+  agregarPolyAlArray(newShape);
+
+  if (mostrar){
+	setSelection(newShape);
+	newShape.setMap(map);
+	cargarPoligonosEnLista(mostrar);
+  }
 
   //return newShape;
 }
@@ -2568,7 +2591,7 @@ function actualizarJSONPoly(valor, id){
   }else{
     p.jsonpoly.PoligonoNombre = valor;
   }
-  cargarPoligonosEnLista();
+  cargarPoligonosEnLista(true);
 }
 
 function limpiarRuta(){
@@ -2587,19 +2610,23 @@ function eliminarPolyById(id){
   var p = getPolyById(id);
   limpiarPoligono(p);
 }
-function listaDePoligonos(){
+function listaDePoligonos(mostrar){
   msg("***listaDePoligonos***");
   var bufferHtml = '';
   for (i=0; i < vecPoligonos.length; i++){
       var idckh = 'chk_poly' + vecPoligonos[i].tag;
       bufferHtml += '<div class="checkbox">';
       bufferHtml += '<label for="'+ idckh +'"> ';
-      bufferHtml += '<input name="' + idckh + '" id="' + idckh + '" type="checkbox" checked  onclick="AccionPoligonos(' + "'" + vecPoligonos[i].tag + "'" +')">';
+	  if (vecPoligonos[i].visible){
+			bufferHtml += '<input name="' + idckh + '" id="' + idckh + '" type="checkbox" checked  onclick="AccionPoligonos(' + "'" + vecPoligonos[i].tag + "'" +')">';
+	  }else{
+			bufferHtml += '<input name="' + idckh + '" id="' + idckh + '" type="checkbox"   onclick="AccionPoligonos(' + "'" + vecPoligonos[i].tag + "'" +')">';
+	  }
       bufferHtml += vecPoligonos[i].caption
       bufferHtml += '</label>';
       if (vecPoligonos[i].jsonpoly != ""){
         bufferHtml += '<div style = "float:right">';
-        bufferHtml += '<img class = "imgGrid" src="' + PATHIMAGES + '/trash.png" onclick="eliminarPolyById(' + vecPoligonos[i].tag + ');cargarPoligonosEnLista();">';
+        bufferHtml += '<img class = "imgGrid" src="' + PATHIMAGES + '/trash.png" onclick="eliminarPolyById(' + vecPoligonos[i].tag + ');cargarPoligonosEnLista(false);">';
         bufferHtml += '</div>';
       }
       bufferHtml += '</div>';
@@ -2621,8 +2648,10 @@ function AccionPoligonos(tag){
   		p.setMap(null);
   	}else{
   		if (chk.checked){
+		  p.visible = true;
   		  p.setMap(map);
   		}else{
+		  p.visible = false;
   		  p.setMap(null);
   		}
   	}
@@ -2718,7 +2747,7 @@ function setDatosPoly(e){
   google.maps.event.addListener(newShape.getPath(), 'set_at', function() {
       //setPolyModificado(newShape.tag, EDITADO);
   });
-  cargarPoligonosEnLista();
+  cargarPoligonosEnLista(true);
 }
 
 function inicializarDrawingManager(){
@@ -2783,9 +2812,9 @@ function overlayClickListener() {
 }
 
 
-function cargarPoligonosEnLista(){
+function cargarPoligonosEnLista(mostrar){
     var d = document.getElementById("divlistazonas");
-    d.innerHTML =  listaDePoligonos();
+    d.innerHTML =  listaDePoligonos(mostrar);
 }
 
 
@@ -2831,7 +2860,8 @@ function repintarPoligono(_zona ,poly, _vPoligonoFillColor, _vPoligonoColor, _vA
       caption:  _zona.ZonaDsc,
       ov:"",
       jsonpoly: "",
-      estadosalvado: "0"
+      estadosalvado: "0",
+	  visible: true
     });
 
     google.maps.event.addListener(poligono, 'click', function() {
@@ -3284,7 +3314,11 @@ function refrescarMenuPoly(cantitems) {
   var elemento = document.getElementById("botonbusqueda");
   elemento.classList.toggle("activeX");
   var content = document.getElementById("contenidopoly");
-  content.style.maxHeight = (cantitems * 80) + "px";
+  if (cantitems==0){
+	content.style.height = "45px";
+  }else{
+	content.style.height = 45 + (cantitems * 30) + "px";
+  }
 }
 
 /*
@@ -3665,7 +3699,7 @@ function armarRutas2Server(){
 }
 
 
-function getPoligonosFromServer(_parametros){
+function getPoligonosFromServer(_parametros,mostrar){
   msg("***getPoligonosFromServer***");
   var parm = JSON.stringify(_parametros);
   mostrarWait();
@@ -3681,13 +3715,15 @@ function getPoligonosFromServer(_parametros){
           if (respuesta.sdtRespuestaWS.ok == "S"){
             if (_parametros.Modo == "CON_PUNTOS" ){
                 //Muestor el poligono en el mapa
-                cargarPligonoObtenido(respuesta.sdtWsPoligonos);
+                cargarPligonoObtenido(respuesta.sdtWsPoligonos,mostrar);
 
             }else{
                 //Muestro los resultados en un div
                 if (respuesta.sdtWsPoligonos != undefined){
                   presentarPoligonosEnDiv(respuesta.sdtWsPoligonos);
-                }
+                }else{
+					refrescarMenuPoly(0);
+				}
             }
           }else{
             mensajeError(respuesta.sdtRespuestaWS.errordesc)
@@ -3966,7 +4002,7 @@ function getJSONZonasCreacionManual(){
                     ZonasSistema.push(Zona);
                   }
                 });
-                cargarPoligonosEnLista();
+                cargarPoligonosEnLista(true);
                 ocultarWait();
         },
         error: function() {
