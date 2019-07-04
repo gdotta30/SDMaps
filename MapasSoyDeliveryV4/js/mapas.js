@@ -3874,6 +3874,7 @@ function cargarJsonPunto(PedidoId){
 		data: parms ,
 		success: function(Puntos ) {
 			msg("HAY 2");
+			
 			msg("HAY QUE VER: " + Puntos.sdtGetPuntos.length);
 			if (Puntos.sdtGetPuntos.length == 0){
 				mensajeNotificacion("No se incluyó el pedido, verifique el nro. de pedido o detalles como el estado, etc.");
