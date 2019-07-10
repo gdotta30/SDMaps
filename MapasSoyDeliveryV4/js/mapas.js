@@ -13,6 +13,8 @@ var vPoligonoColor          =     '#FF0000';
 var vPoligonoFillColor      =     '#FF0000';
 var vANCHOLABEL_1           =     40;
 var vANCHOLABEL_2           =     70;
+
+var URL_wsUpdPedidoLocation = 	  EXT_VAR_wsUpdPedidoLocation;
 var URLZONAS                =     EXT_VAR_URLZONAS;         //'http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/awsgetzonaskml.aspx';
 var URLZONASMANUAL          =     EXT_VAR_URLZONASMANUAL;   //"http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/awsgetzonas.aspx";
 var URLGETPuntoS           	=     EXT_VAR_URLGETPuntoS;     //"http://10.211.55.9/SoyDeliveryU11_New1.NetEnvironment/wsgetpuntos.aspx";
@@ -192,6 +194,8 @@ function  estaPedidoenZona(PedidoId, ZonaId){
 		}
 	}
 }
+
+
 
 function calcularOrigenTentativo(){
     msg("***calcularOrigenTentativo***");
@@ -564,68 +568,125 @@ function toggleBounce(m,m2) {
 */
 
 
-function agregaPuntoEnElMapa(Punto){
-		//agrega un punto al mapa
-		var marker;
-		var contentString = "";
-		//CREAR EL MAKER
-		var icono = "";
 
+function actualizarWsLocation(p){
 
-		if (Punto.PuntoHabilitado){
-			if (Punto.Marca == vMarcaORIGEN || Punto.Marca == vMarcaDESTINO){
-				icono  = iconBase + getIcono(Punto.Marca);
-			}else{
-				if (Punto.PuntoDeRuta || !esModRuta()){
-					icono  = iconBase + getIcono("RUTA" + Punto.Precedencia);
-				}else{
-					icono  = iconBase + getIcono("PEND" + Punto.Precedencia);
-				}
-			}
-		}else{
-			icono  = iconBase + getIcono("NOHAB" + Punto.Precedencia);
+	var parm = {
+			PedidoId: p.PedidoId,
+			VRutaVisitaPrecedencia:	p.Precedencia,
+			PedidoLocation: p.PuntoLat + "," + p.PuntoLong
 		}
 
-		Punto.Icono = icono;
-		marker= new google.maps.Marker({
-			position: new google.maps.LatLng({lat: Punto.PuntoLat, lng: Punto.PuntoLong}),
-			title: Punto.PuntoNombreCliente + " " + Punto.PuntoDireccion,
-			labelContent: Punto.PuntoId,
-			PedidoId: Punto.PedidoId,
-			labelAnchor: new google.maps.Point(vANCHOLABEL_1, vANCHOLABEL_2),
-			icon: { url: icono, scaledSize: new google.maps.Size(hSIZE_SVG, vSIZE_SVG) },
-			labelClass: vCLASE_CSS_LABELMARKER, // the CSS class for the label
-			draggable:      false,
-			map: map
-		});
+	$.ajax({
+        url: URL_wsUpdPedidoLocation,
+        type: "POST",
+        dataType: "json",
+        crossDomain: true,
+        data: JSON.stringify(parm),
+        success: function(respuesta) {
+			ocultarWait();
+			msg("respuesta " + JSON.stringify(respuesta));
+			if (respuesta.ok == "S"){
+				mensajeOK("Se actualizaron las coordenadas");
+			}else{
+				alerta(respuesta.errordesc);
+			}
+			ocultarWait();
+        },
+        error:
+            function() {
+              ocultarWait();
+              mensajeError('Falló el ws de actualización de coordenadas');
+            }
+    });
 
-		google.maps.event.addListener(marker, 'rightclick', function(e){
-		var menucontextualmapa = '<div id="menucontextualmapa" class="menucontextualmapa" onclick="this.style.display=' + "'" + 'none' + "'" + '">' +
-                                  "<div class = 'topbar' ><a class='cerrar' onclick='cerrarMenuContextOD();'>x</a></div> " +
-                                  '<p class = "enmarcar" id="pOrigen" onclick="MarcarOrigenDesdeMarker()">Marcar Origen</p>' +
-                                  '<p class = "enmarcar" id="pDestino" onclick="MarcarDestinoDesdeMarker()">Marcar Destino</p>' +
-                                  '</div>'
-        selMarker = marker;
-        var latLng = e.latLng;
-        var v = new TxtOverlay(latLng, menucontextualmapa, "labelzonas", map);
 
-        return false;
+}
 
-		});
+
+
+function PermitirMover(PuntoId){
+	for (var i=0; i < vecMarkersPuntos.length; i++){
+		if (vecMarkersPuntos[i].labelContent == PuntoId){
+			vecMarkersPuntos[i].setDraggable(true)
+		}
+	}
+}
+
+
+function NoPermitirMover(PuntoId){
+	for (var i=0; i < vecMarkersPuntos.length; i++){
+		if (vecMarkersPuntos[i].labelContent == PuntoId){
+			vecMarkersPuntos[i].setDraggable(false)
+		}
+	}
+}
+
+
+
+function agregaPuntoEnElMapa(Punto){
+	//agrega un punto al mapa
+	var marker;
+	var contentString = "";
+	//CREAR EL MAKER
+	var icono = "";
+
+
+	if (Punto.PuntoHabilitado){
+		if (Punto.Marca == vMarcaORIGEN || Punto.Marca == vMarcaDESTINO){
+			icono  = iconBase + getIcono(Punto.Marca);
+		}else{
+			if (Punto.PuntoDeRuta || !esModRuta()){
+				icono  = iconBase + getIcono("RUTA" + Punto.Precedencia);
+			}else{
+				icono  = iconBase + getIcono("PEND" + Punto.Precedencia);
+			}
+		}
+	}else{
+		icono  = iconBase + getIcono("NOHAB" + Punto.Precedencia);
+	}
+
+	Punto.Icono = icono;
+	marker= new google.maps.Marker({
+		position: new google.maps.LatLng({lat: Punto.PuntoLat, lng: Punto.PuntoLong}),
+		title: Punto.PuntoNombreCliente + " " + Punto.PuntoDireccion,
+		labelContent: Punto.PuntoId,
+		PedidoId: Punto.PedidoId,
+		labelAnchor: new google.maps.Point(vANCHOLABEL_1, vANCHOLABEL_2),
+		icon: { url: icono, scaledSize: new google.maps.Size(hSIZE_SVG, vSIZE_SVG) },
+		labelClass: vCLASE_CSS_LABELMARKER, // the CSS class for the label
+		draggable:      false,
+		map: map
+	});
+
+	google.maps.event.addListener(marker, 'rightclick', function(e){
+	var menucontextualmapa = '<div id="menucontextualmapa" class="menucontextualmapa" onclick="this.style.display=' + "'" + 'none' + "'" + '">' +
+							  "<div class = 'topbar' ><a class='cerrar' onclick='cerrarMenuContextOD();'>x</a></div> " +
+							 /* '<p class = "enmarcar" id="pOrigen" onclick="MarcarOrigenDesdeMarker()">Marcar Origen</p>' +
+								'<p class = "enmarcar" id="pDestino" onclick="MarcarDestinoDesdeMarker()">Marcar Destino</p>' + */
+							  '<p class = "enmarcar" id="pMover" onclick="PermitirMover(' + Punto.PuntoId + ')">Mover Punto</p>' +
+							  '</div>'
+		selMarker = marker;
+		var latLng = e.latLng;
+		var v = new TxtOverlay(latLng, menucontextualmapa, "labelzonas", map);
+
+		return false;
+
+	});
 
 
 	google.maps.event.addListener(marker, 'dblclick', function(e){
-	    var fichaPunto = muestroInformacionPunto(marker.labelContent);
-        msg("Ficha Punto = " + fichaPunto);
-        selMarker = marker;
-        var latLng = e.latLng;
-        var v = new TxtOverlay(latLng, fichaPunto, "labelzonas", map);
-        return false;
-     });
+		var fichaPunto = muestroInformacionPunto(marker.labelContent);
+		msg("Ficha Punto = " + fichaPunto);
+		selMarker = marker;
+		var latLng = e.latLng;
+		var v = new TxtOverlay(latLng, fichaPunto, "labelzonas", map);
+		return false;
+	 });
 
 
 
-     google.maps.event.addListener(marker, 'click', function(e){
+	 google.maps.event.addListener(marker, 'click', function(e){
 		for (i=0; i < vecMarkersPuntos.length; i++){
 			var m2 = vecMarkersPuntos[i];
 			if (marker != undefined){
@@ -638,16 +699,36 @@ function agregaPuntoEnElMapa(Punto){
 				}
 			}
 		}
+	 });
 
-     });
+	google.maps.event.addListener(marker, 'drag', function(e){
 
 
+	});
 
-      vecMarkersPuntos.push(marker);
+	google.maps.event.addListener(marker, 'dragend', function(e){
+		var lat = marker.getPosition().lat();
+		var lng = marker.getPosition().lng();
 
-	  if (Punto.Forzado){
-		toggleBounce(marker);
-	  }
+		for (var i=0; i < vectorDePuntosJSON.length; i++){
+			if (vectorDePuntosJSON[i].PuntoId == marker.labelContent){
+				vecMarkersPuntos[i].setDraggable(false);
+				var p = vectorDePuntosJSON[i];
+				p.PuntoLat = lat;
+				p.PuntoLong = lng;
+
+				actualizarWsLocation(p)
+
+			}
+		}
+
+	});
+
+	vecMarkersPuntos.push(marker);
+
+	if (Punto.Forzado){
+	toggleBounce(marker);
+	}
 
 }
 
@@ -3874,7 +3955,6 @@ function cargarJsonPunto(PedidoId){
 		data: parms ,
 		success: function(Puntos ) {
 			msg("HAY 2");
-			
 			msg("HAY QUE VER: " + Puntos.sdtGetPuntos.length);
 			if (Puntos.sdtGetPuntos.length == 0){
 				mensajeNotificacion("No se incluyó el pedido, verifique el nro. de pedido o detalles como el estado, etc.");
