@@ -665,6 +665,7 @@ function agregaPuntoEnElMapa(Punto){
 							 /* '<p class = "enmarcar" id="pOrigen" onclick="MarcarOrigenDesdeMarker()">Marcar Origen</p>' +
 								'<p class = "enmarcar" id="pDestino" onclick="MarcarDestinoDesdeMarker()">Marcar Destino</p>' + */
 							  '<p class = "enmarcar" id="pMover" onclick="PermitirMover(' + Punto.PuntoId + ')">Mover Punto</p>' +
+							  '<p class = "enmarcar" id="pMover" onclick="NoPermitirMover(' + Punto.PuntoId + ')">Fijar Punto</p>' +
 							  '</div>'
 		selMarker = marker;
 		var latLng = e.latLng;
@@ -712,7 +713,7 @@ function agregaPuntoEnElMapa(Punto){
 
 		for (var i=0; i < vectorDePuntosJSON.length; i++){
 			if (vectorDePuntosJSON[i].PuntoId == marker.labelContent){
-				vecMarkersPuntos[i].setDraggable(false);
+
 				var p = vectorDePuntosJSON[i];
 				p.PuntoLat = lat;
 				p.PuntoLong = lng;
