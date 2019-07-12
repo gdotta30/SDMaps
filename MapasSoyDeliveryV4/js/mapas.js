@@ -4104,7 +4104,7 @@ function mostrarDetallesPedido(_PedidoId){
 				}
 				for (var j=0; j < vectorDePuntosJSON[x].Productos.length; j++){
 					var p = vectorDePuntosJSON[x].Productos[j];
-					buffer +=  	"<strong>" +  p.PedidoProductoCodigo + " - " + p.PedidoProductoNombre + " Cantidad: " +	p.PedidoProductoCantidad + " </strong>&#013;&#010;";
+					buffer +=  	"<strong>" +  p.PedidoProductoCodigo + " - " + p.PedidoProductoNombre + " - " + p.PedidoProductoObservacion+ " Cantidad: " +	p.PedidoProductoCantidad + " </strong>&#013;&#010;";
 				}
 				if (buffer == ""){
 					buffer = "Sin Productos Detallados";
