@@ -4280,7 +4280,7 @@ function getJSONZonasCreacionManual(){
 }
 
 function  sacarCaracteresEspeciales(contenido){
-	var texto = contenido.toLowerCase().replace(/[\*\^\"'\!]/g, '').split(' ').join('-');
+	var texto = contenido.toLowerCase().replace(/[\*\^\"'\!]/g, ''); 
 	return texto;
 }
 
