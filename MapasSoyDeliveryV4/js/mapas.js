@@ -378,17 +378,17 @@ function rutear(rutear){
 
 			for (x=0; x < tope; x++){
 
-				if (!vectorDePuntosJSON[x].Forzado){
-					if (!esModRuta()){
-						var latlng = new google.maps.LatLng({lat: vectorDePuntosJSON[x].PuntoLat, lng: vectorDePuntosJSON[x].PuntoLong});
-						vectorDePuntosJSON[x].PuntoZonaId = getZonaLatLong(latlng);
-					}
-					if (vectorDePuntosJSON[x].Precedencia >= 2){
-						if (vectorDePuntosJSON[x].PuntoZonaId == getZonaEnUso()){
-							estaPedidoenZona(vectorDePuntosJSON[x].PedidoId, getZonaEnUso());
-						}
+
+				if (!esModRuta()){
+					var latlng = new google.maps.LatLng({lat: vectorDePuntosJSON[x].PuntoLat, lng: vectorDePuntosJSON[x].PuntoLong});
+					vectorDePuntosJSON[x].PuntoZonaId = getZonaLatLong(latlng);
+				}
+				if (vectorDePuntosJSON[x].Precedencia >= 2){
+					if (vectorDePuntosJSON[x].PuntoZonaId == getZonaEnUso()){
+						estaPedidoenZona(vectorDePuntosJSON[x].PedidoId, getZonaEnUso());
 					}
 				}
+
   		    }
 
 			for (var j=0; j < tope; j++){ //descarto
@@ -4280,7 +4280,7 @@ function getJSONZonasCreacionManual(){
 }
 
 function  sacarCaracteresEspeciales(contenido){
-	var texto = contenido.toLowerCase().replace(/[\*\^\"'\!]/g, ''); 
+	var texto = contenido.toLowerCase().replace(/[\*\^\"'\!]/g, '');
 	return texto;
 }
 
