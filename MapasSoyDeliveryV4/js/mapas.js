@@ -1769,6 +1769,7 @@ function dargAndDropValido(PedidoId, precedencia, ordenOriginal, posicionADondeS
 
 	if (encontre){
 		if (!vectorDePuntosJSON[pos].PuntoHabilitado){
+
 			return false;
 		}
 		return movimientoValido(vectorDePuntosJSON[pos], posicionADondeSeVaAMover);
@@ -1789,8 +1790,11 @@ function habilitarDragAndDropGrilla() {
 			var ordenOriginal 	= buscarDentroDeUnTr(ui.item.context, "orden");
 			var precedencia 	= buscarDentroDeUnTr(ui.item.context, "precedencia");
 
+
+
 			/* ver donde se va a mover */
-			var posicionADondeSeVaAMover = buscarDentroDeUnaTabla(event.target.parentElement, "posicion", PedidoId, "pedido")
+			var posicionADondeSeVaAMover = buscarDentroDeUnaTabla(event.target.parentElement, "posicion", PuntoId, "puntoid")
+
 
 			/* analizar si el movimiento sea valido */
 			if (!dargAndDropValido(PedidoId, precedencia, ordenOriginal, posicionADondeSeVaAMover)){
