@@ -1176,15 +1176,32 @@ function actualizarEnvioEnVectorDePuntos(vMarker){
   }
 }
 
+function getLatLongWareHouseNoGoogle(){
+  var encontre = false;
+  var latlng;
+  msg("***getLatLongHareHouse***");
+  for(var i=0; ((i<vectorOrigenes.length) && (!encontre)); i++){
+    if (vectorOrigenes[i].OrigenDefault == "S"){
+      o = vectorOrigenes[i];
+      latlng  = {lat: Number(o.OrigenLat), lng: Number(o.OrigenLong)};
+      encontre = true;
+    }
+  }
+  if (! encontre){
+	  mensajeError("No se cargo el WH");
+  }
+  return latlng;
+}
+
 
 function getLatLongWareHouse(){
   var encontre = false;
   var latlng;
   msg("***getLatLongHareHouse***");
-  for(i=0; ((i<vectorOrigenes.length) && (!encontre)); i++){
+  for(var i=0; ((i<vectorOrigenes.length) && (!encontre)); i++){
     if (vectorOrigenes[i].OrigenDefault == "S"){
       o = vectorOrigenes[i];
-      latlng  =new google.maps.LatLng({lat: o.OrigenLat, lng: o.OrigenLong});
+      latlng  =new google.maps.LatLng({lat: Number(o.OrigenLat), lng: Number(o.OrigenLong)});
       encontre = true;
     }
   }
@@ -3880,7 +3897,7 @@ function getRutaId(){
 }
 
 function getCabezalRutaJSON(visitas){
-  var hh =	getLatLongWareHouse();
+  var hh =	getLatLongWareHouseNoGoogle();
 
   var rutaCabezal = {
     VRutaId: getRutaId(),
@@ -3894,9 +3911,10 @@ function getCabezalRutaJSON(visitas){
     VRutaHoraFin:vVRutaVisitaFchSalida,
     VRutaHoraComienzo:vVRutaVisitaFchHorEntrada,
     VRRutaDirServiceData: "", //JSON.stringify(vVRRutaDirServiceData), SE COMENTA POR PROBLEMAS DE TRAFICO
-	VRutaOrigenLocation: hh.lat() + ", " + hh.lng(),
+	VRutaOrigenLocation: hh.lat + ", " + hh.lng,
     VRutaHabilitada:0,"visitas":visitas
 
+	//vercoco
   }
   //return JSON.stringify(rutaCabezal);
   return rutaCabezal;
