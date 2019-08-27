@@ -3,6 +3,14 @@
 
 // VARIABLES PARA PARAMETRIZAR
 
+
+var VAR_USA_COMPLEJIDAD  		=	EXT_VAR_USA_COMPLEJIDAD;
+var VAR_USA_SERVICIO  			=	EXT_VAR_USA_SERVICIO;
+var VAR_USA_PRECLASIFICACION  	=	EXT_VAR_USA_PRECLASIFICACION;
+var VAR_USA_TIPOVEHICULO  		=	EXT_VAR_USA_TIPOVEHICULO;
+var VAR_USA_NEGOCIO_X_NOMBRE 	=	EXT_VAR_USA_NEGOCIO_X_NOMBRE;
+
+
 var INDICE_CONTROL_Punto	=	  0;
 var MINCHARSSUGEST          =     2;
 var vAnchoLinea             =     3;
@@ -1658,6 +1666,25 @@ function getTableHeader(){
 	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;text-align:right;">#</th> ';
 	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;"></th> ';
 	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Nombre</th> ';
+
+	if (VAR_USA_COMPLEJIDAD){
+		buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Complejidad</th> ';
+	}
+
+	if (VAR_USA_SERVICIO){
+		buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Servicio</th> ';
+	}
+
+	if (VAR_USA_PRECLASIFICACION){
+		buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Pre. Cla.</th> ';
+
+	}
+
+	if (VAR_USA_TIPOVEHICULO){
+		buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Vehiculo</th> ';
+
+	}
+
 	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Dirección</th> ';
 
 	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:right;;">Hora Ini</th> ';
@@ -2013,10 +2040,56 @@ function mostrarRegistrosRuta(poly){
 			vHtml +=  ' <img   class = "imgTogle" src = "' +  p.Icono + '" onclick = "indicarPunto(' + p.PedidoId  + ')"/>';
 			vHtml += ' </td>';
 
+			if (VAR_USA_NEGOCIO_X_NOMBRE) {
+				vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
+				vHtml += '	<strong>' + p.PedidoNegocioNombre + '</strong>';
+				vHtml += ' </td>';
 
-			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
-			vHtml += '	<strong>' + p.PuntoNombreCliente + '</strong>';
-			vHtml += ' </td>';
+			}else{
+				vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
+				vHtml += '	<strong>' + p.PuntoNombreCliente + '</strong>';
+				vHtml += ' </td>';
+			}
+
+			/****** columnas opcionales *******/
+
+
+
+			if (VAR_USA_COMPLEJIDAD){
+
+
+				p.PedidoComplejidadClass
+
+
+				vHtml += '  <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
+				vHtml += '		<span class = "' + p.PedidoComplejidadClass + '">' +p.PedidoComplejidadDsc + ' </span>';
+				vHtml += ' </td>';
+			}
+
+			if (VAR_USA_SERVICIO){
+				vHtml += '  <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
+				vHtml += '		<span class = "' + p.PedidoServicioClass + '">' + p.ServicioNombre + ' </span>';
+				vHtml += ' </td>';
+			}
+
+			if (VAR_USA_PRECLASIFICACION){
+				vHtml += '  <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
+				vHtml += '		' + p.PedidoPreclaDsc + ' ';
+				vHtml += ' </td>';
+
+			}
+
+			if (VAR_USA_TIPOVEHICULO){
+				vHtml += '  <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
+				vHtml += '		' + p.PedidoTipoVehiculoNombre + ' ';
+				vHtml += ' </td>';
+
+			}
+
+
+			/***********************************/
+
+
 			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
 			vHtml += p.PuntoDireccion ;
 			vHtml += ' </td>';
