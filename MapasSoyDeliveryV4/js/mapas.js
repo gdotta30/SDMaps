@@ -3984,7 +3984,7 @@ function getCabezalRutaJSON(visitas){
     VRutaHoraFin:vVRutaVisitaFchSalida,
     VRutaHoraComienzo:vVRutaVisitaFchHorEntrada,
     VRRutaDirServiceData: "", //JSON.stringify(vVRRutaDirServiceData), SE COMENTA POR PROBLEMAS DE TRAFICO
-	VRutaOrigenLocation: hh.lat + ", " + hh.lng,
+	VRutaOrigenLocation: hh.lat + "," + hh.lng,
     VRutaHabilitada:0,"visitas":visitas
 
 	//vercoco
