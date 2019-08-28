@@ -4,11 +4,13 @@
 // VARIABLES PARA PARAMETRIZAR
 
 
+
 var VAR_USA_COMPLEJIDAD  		=	EXT_VAR_USA_COMPLEJIDAD;
 var VAR_USA_SERVICIO  			=	EXT_VAR_USA_SERVICIO;
 var VAR_USA_PRECLASIFICACION  	=	EXT_VAR_USA_PRECLASIFICACION;
 var VAR_USA_TIPOVEHICULO  		=	EXT_VAR_USA_TIPOVEHICULO;
-var VAR_USA_NEGOCIO_X_NOMBRE 	=	EXT_VAR_USA_NEGOCIO_X_NOMBRE;
+var VAR_USA_NEGOCIO_EN_TABLA	=	EXT_VAR_USA_NEGOCIO_EN_TABLA;
+var VAR_USA_NOMBRE_EN_TABLA		=	EXT_VAR_USA_NOMBRE_EN_TABLA;
 
 
 var INDICE_CONTROL_Punto	=	  0;
@@ -1665,7 +1667,14 @@ function getTableHeader(){
 	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;"></th> ';
 	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;text-align:right;">#</th> ';
 	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;"></th> ';
-	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Nombre</th> ';
+
+	if (VAR_USA_NEGOCIO_EN_TABLA){
+		buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Negocio</th> ';
+	}
+
+	if (VAR_USA_NOMBRE_EN_TABLA){
+		buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Nombre</th> ';
+	}
 
 	if (VAR_USA_COMPLEJIDAD){
 		buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Complejidad</th> ';
@@ -2040,12 +2049,15 @@ function mostrarRegistrosRuta(poly){
 			vHtml +=  ' <img   class = "imgTogle" src = "' +  p.Icono + '" onclick = "indicarPunto(' + p.PedidoId  + ')"/>';
 			vHtml += ' </td>';
 
-			if (VAR_USA_NEGOCIO_X_NOMBRE) {
+
+			if (VAR_USA_NEGOCIO_EN_TABLA) {
 				vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
 				vHtml += '	<strong>' + p.PedidoNegocioNombre + '</strong>';
 				vHtml += ' </td>';
 
-			}else{
+			}
+
+			if (VAR_USA_NOMBRE_EN_TABLA) {
 				vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
 				vHtml += '	<strong>' + p.PuntoNombreCliente + '</strong>';
 				vHtml += ' </td>';
