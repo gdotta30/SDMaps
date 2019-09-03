@@ -1996,7 +1996,7 @@ function mostrarRegistrosRuta(poly){
 						vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta"  value ="' + vRUTA.VRutaNom + '" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..." disabled></input></span></td>';
 					}
 				}
-				vHtml += '<td class = "celdaGrid" >' + '<input type ="button"  class="btn btn-default ButtonAccSoloBorderLarge" style = "min-width:100px" onclick="armarRutas2Server();" title = "Confirmar" value = "Confirmar">';
+				vHtml += '<td class = "celdaGrid" >' + '<input type ="button"  id= "btnrutas2server" class="btn btn-default ButtonAccSoloBorderLarge" style = "min-width:100px" onclick="armarRutas2Server();" title = "Confirmar" value = "Confirmar">';
 				vHtml += "</td>";
 				var minutosdelta = 0;
 				var minllegadas = 0;
@@ -4154,6 +4154,7 @@ function iniFlagruteo(){
 function setRutas2Server(jsonrutas){
   msg("***setRutas2Server***");
   mostrarWait();
+  document.getElementById("btnrutas2server").style.display = "none";
   console.log(jsonrutas);
   console.log(URLSETRUTAS);
   $.ajax({
@@ -4178,6 +4179,7 @@ function setRutas2Server(jsonrutas){
       		  }else{
       			  mensajeError(respuesta.errordesc);
       		  }
+			  document.getElementById("btnrutas2server").style.display = "block";
             ocultarWait();
           },
         error:
