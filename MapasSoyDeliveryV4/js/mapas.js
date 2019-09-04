@@ -2131,53 +2131,60 @@ function mostrarRegistrosRuta(poly){
 			var horasalida = "";
 			var minutosASumar =0;
 
-			tiempototal = tiempototal + Number(p.PuntoDuracionVisita) + Math.round(Number(p.PuntoTiempoArribo) / 60) ;
-			distanciatotal = distanciatotal + p.PuntoDistanciaArribo ;
-			if (horaDeInicio == null){
 
-				horaDeInicio = getFormatoDeFechaHora(new Date(fecha_hora));
-			}
-			var hora_visita0;
-			var hora_horario0;
-			var  hora_horario1;
-			var  hora_visita1;
-			if (p.PuntoTiempoArribo != undefined){
-				acumuladoMinutos += 	Math.round(Number(p.PuntoTiempoArribo) / 60); // + minutosdelta;
-				var fecha_hora_llegada = sumar_horas(DTFechaHoraInicioRuta, acumuladoMinutos);
+			if (((EXT_MOSTRAR_HORA_EN_RUTA &&  p.PuntoHabilitado) || p.VRutaVisitaEstado == "P") && ( p.FlagRuteo )){
+				tiempototal = tiempototal + Number(p.PuntoDuracionVisita) + Math.round(Number(p.PuntoTiempoArribo) / 60) ;
+				distanciatotal = distanciatotal + p.PuntoDistanciaArribo ;
+				if (horaDeInicio == null){
+
+					horaDeInicio = getFormatoDeFechaHora(new Date(fecha_hora));
+				}
+
+				var hora_visita0;
+				var hora_horario0;
+				var  hora_horario1;
+				var  hora_visita1;
 				if (p.PuntoTiempoArribo != undefined){
-					acumuladoMinutos += Number(p.PuntoDuracionVisita); //  + Math.round(Number(p.PuntoTiempoArribo) / 60);
-					fecha_hora = sumar_horas(DTFechaHoraInicioRuta, acumuladoMinutos);
-					p.fecha_hora_salida = fecha_hora;
-					vectorDePuntosJSON[i].fechaHora = fecha_hora;
-					if ((EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado) || p.VRutaVisitaEstado == "P"){
-					  horasalida =   getFormatoDeHora(getFormatoDeFechaHora(new Date(p.fecha_hora_salida )));
+					acumuladoMinutos += 	Math.round(Number(p.PuntoTiempoArribo) / 60); // + minutosdelta;
+					var fecha_hora_llegada = sumar_horas(DTFechaHoraInicioRuta, acumuladoMinutos);
+					if (p.PuntoTiempoArribo != undefined){
+						acumuladoMinutos += Number(p.PuntoDuracionVisita); //  + Math.round(Number(p.PuntoTiempoArribo) / 60);
+						fecha_hora = sumar_horas(DTFechaHoraInicioRuta, acumuladoMinutos);
+						p.fecha_hora_salida = fecha_hora;
+						vectorDePuntosJSON[i].fechaHora = fecha_hora;
+						if ((EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado) || p.VRutaVisitaEstado == "P"){
+						  horasalida =   getFormatoDeHora(getFormatoDeFechaHora(new Date(p.fecha_hora_salida )));
+						}
 					}
-				}
-				hora_visita0 = horaANumero(getFormatoDeHora(getFormatoDeFechaHora(new Date(fecha_hora_llegada))));
-				hora_horario0 = horaANumero(getFormatoDeHora(getFormatoDeFechaHora(new Date(p.PedidoHorarioIni))));
-				hora_horario1 = horaANumero(getFormatoDeHora(getFormatoDeFechaHora(new Date(p.PedidoHorarioFin))));
-				hora_visita1= horaANumero(getFormatoDeHora(getFormatoDeFechaHora(new Date(p.fecha_hora_salida))));
-				var estilo = getestilohorario(hora_horario0, hora_horario1, hora_visita0, hora_visita1);
-				if ((EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado)  || p.VRutaVisitaEstado == "P"){
-					vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" ' +  estilo + '><strong> ' + getFormatoDeHora(getFormatoDeFechaHora(new Date(fecha_hora_llegada)))  + '</strong>';
-
-					vHtml += ' </td> ';
-				} else{
-
-					vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;"></strong></td>';
+					hora_visita0 = horaANumero(getFormatoDeHora(getFormatoDeFechaHora(new Date(fecha_hora_llegada))));
+					hora_horario0 = horaANumero(getFormatoDeHora(getFormatoDeFechaHora(new Date(p.PedidoHorarioIni))));
+					hora_horario1 = horaANumero(getFormatoDeHora(getFormatoDeFechaHora(new Date(p.PedidoHorarioFin))));
+					hora_visita1= horaANumero(getFormatoDeHora(getFormatoDeFechaHora(new Date(p.fecha_hora_salida))));
 				}
 			}
+			var estilo = getestilohorario(hora_horario0, hora_horario1, hora_visita0, hora_visita1);
+			if ((EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado)  || p.VRutaVisitaEstado == "P"){
+				vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" ' +  estilo + '><strong> ' + getFormatoDeHora(getFormatoDeFechaHora(new Date(fecha_hora_llegada)))  + '</strong>';
+
+				vHtml += ' </td> ';
+			} else{
+
+				vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;"></strong></td>';
+			}
+
+
 			p.fecha_hora_llegada = fecha_hora_llegada;
 			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" ' + estilo + '>';
-			if ((EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado)  || p.VRutaVisitaEstado == "P"){
+			if (((EXT_MOSTRAR_HORA_EN_RUTA &&  p.PuntoHabilitado)  || p.VRutaVisitaEstado == "P") && ( p.FlagRuteo )){
 				vHtml += '	<Input type = "text" id ="dur_num_' + p.PuntoId + '" maxlength="3" value = "' + p.PuntoDuracionVisita + '" class = "form-control AttributeCheckBox" style = "max-width:50px" onblur = "validonumero(' + p.PuntoId + ')" placeholder = "5min" ></input>';
+				minutosdelta += Number(p.PuntoDuracionVisita);
 			}else{
-				//vHtml += '	<Input type = "text" id ="dur_num_' + p.PuntoId + '" maxlength="3" value = "' + p.PuntoDuracionVisita + '" class = "form-control AttributeCheckBox" style = "max-width:50px" disabled></input>';
+				vHtml += '	<Input type = "text" id ="dur_num_' + p.PuntoId + '" maxlength="3" value = "' + p.PuntoDuracionVisita + '" class = "form-control AttributeCheckBox" style = "max-width:50px" disabled></input>';
 				vHtml += '	';
 			}
 			vHtml += ' </td>';
-			minutosdelta += Number(p.PuntoDuracionVisita);
-			if ((EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado) || p.VRutaVisitaEstado == "P"){
+
+			if (((EXT_MOSTRAR_HORA_EN_RUTA &&  p.PuntoHabilitado) || p.VRutaVisitaEstado == "P") && ( p.FlagRuteo )){
 				vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" ' + estilo + '><strong>' +  horasalida + '</strong></td>';
 			}else{
 				vHtml += '<td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" ' + estilo + '><strong></strong></td>';
