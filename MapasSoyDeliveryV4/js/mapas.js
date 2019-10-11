@@ -2012,8 +2012,8 @@ function mostrarRegistrosRuta(poly){
 				var acumuladoMinutos = 0;
 			}
 			cantruteados ++;
-			if (p.FlagRuteo){
-			cntpuntos ++;
+			if (p.FlagRuteo && !p.PuntoOcultar){
+				cntpuntos ++;
 
 			}
 
