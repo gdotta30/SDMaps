@@ -480,6 +480,10 @@
   background-color: rgb(234, 91, 11);
 }
 
+.oculto{
+	display: none;
+}
+
 .contentX {
   padding: 0 10px;
   max-height: 0;

@@ -2249,13 +2249,18 @@ function getestilohorario(hora_horario0, hora_horario1, hora_visita0, hora_visit
 
 function clasesEstado(v){
   var c = "";
-  if (v.PuntoHabilitado){
-	  if (!v.FlagRuteo){
-		c = "muerto";
-	  }
-  }else{
-	  c = "estadonohab";
-  }
+
+	if (v.PuntoOcultar){
+		c = "oculto";
+		return c;
+	}
+	if (v.PuntoHabilitado){
+		  if (!v.FlagRuteo){
+			c = "muerto";
+		  }
+	}else{
+		c = "estadonohab";
+	}
   return c;
 }
 
