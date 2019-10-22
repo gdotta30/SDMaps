@@ -5,6 +5,7 @@
 
 
 
+var VAR_USA_CANTBULTOS  		=	true;
 var VAR_USA_COMPLEJIDAD  		=	EXT_VAR_USA_COMPLEJIDAD;
 var VAR_USA_SERVICIO  			=	EXT_VAR_USA_SERVICIO;
 var VAR_USA_PRECLASIFICACION  	=	EXT_VAR_USA_PRECLASIFICACION;
@@ -1668,6 +1669,10 @@ function getTableHeader(){
 	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;text-align:right;">#</th> ';
 	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;"></th> ';
 
+	if (VAR_USA_CANTBULTOS){
+		buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Bultos</th> ';
+	}
+
 	if (VAR_USA_NEGOCIO_EN_TABLA){
 		buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Negocio</th> ';
 	}
@@ -1976,7 +1981,7 @@ function mostrarRegistrosRuta(poly){
     var cntpuntos = 0;
 	var cantruteados = 0;
     var cabezal = true;
-
+	var cantTotalDeBultos = 0;
     for (i=0; i < vectorDePuntosJSON.length; i++){
       var p = vectorDePuntosJSON[i];
 
@@ -1985,7 +1990,7 @@ function mostrarRegistrosRuta(poly){
 				var color = vectorDePuntosJSON[i].Color;
 				vHtml += '<table  class = "tablaTopPaddingBottom" >';
 				vHtml += '<tr>';
-				vHtml += '<td><img id ="imgtogle_1" +  class="imgTogle" src="' + PATHIMAGES +'/up-arrow.svg" onclick="toggleListaRutaCollapse(1)"/></td><span>' + "[=&&1=]&nbsp&nbsp[=&&2=]" + '</span></td>';
+				vHtml += '<td><span>Bultos: [=&&8=] </td><span class="labeltablaruta">' + "[=&&1=]&nbsp&nbsp[=&&2=]" + '</span></td>';
 
 				if (!esModRuta()){
 					vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta" value ="' + vNombreRuta + '" onblur = "grabarNombreRuta()" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..."></input></span></td>';
@@ -2014,6 +2019,7 @@ function mostrarRegistrosRuta(poly){
 			cantruteados ++;
 			if (p.FlagRuteo && !p.PuntoOcultar){
 				cntpuntos ++;
+				cantTotalDeBultos += p.PedidoCantBultos;
 
 			}
 
@@ -2049,6 +2055,13 @@ function mostrarRegistrosRuta(poly){
 			vHtml +=  ' <img   class = "imgTogle" src = "' +  p.Icono + '" onclick = "indicarPunto(' + p.PedidoId  + ')"/>';
 			vHtml += ' </td>';
 
+
+			if (VAR_USA_CANTBULTOS){
+				vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
+				vHtml += '	<strong>' + p.PedidoCantBultos+ '</strong>';
+				vHtml += ' </td>';
+
+			}
 
 			if (VAR_USA_NEGOCIO_EN_TABLA) {
 				vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:left;">';
@@ -2213,7 +2226,9 @@ function mostrarRegistrosRuta(poly){
         var rep =  '<td"><td><img class= "imgGrid2" src="' + PATHIMAGES + '/recursopin.png' + '"></td><td><span class="labeltablaruta">&nbspPUNTOS:</span>&nbsp<span class = "valorescabezalruta">' + cntpuntos+ "</span></td>";
         rep +='<td><img class = "imgGrid2" src = "' + PATHIMAGES + '/way.png"></td><td><span class="labeltablaruta">RECORRIDO:</span>&nbsp<span class = "valorescabezalruta">' + Math.round(distanciatotal /1000) + '&nbspkm&nbsp</span></td><td><img class = "imgGrid2" src = "' + PATHIMAGES + '/time-left.png"></td><td><span class="labeltablaruta">Duración&nbsp</span><span class = "valorescabezalruta">' + tiempototal  + "</span>&nbspmin&nbsp</td>" ;
 
-        vHtml = vHtml.replace("[=&&1=]",rep);
+
+		vHtml = vHtml.replace("[=&&8=]", cantTotalDeBultos);
+        vHtml = vHtml.replace("[=&&1=]", rep);
 
 
         if (EXT_MOSTRAR_HORA_EN_RUTA){
