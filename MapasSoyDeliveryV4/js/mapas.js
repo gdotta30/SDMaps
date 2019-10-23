@@ -1990,7 +1990,7 @@ function mostrarRegistrosRuta(poly){
 				var color = vectorDePuntosJSON[i].Color;
 				vHtml += '<table  class = "tablaTopPaddingBottom" >';
 				vHtml += '<tr>';
-				vHtml += '<td><span>Bultos: [=&&8=] </td><span class="labeltablaruta">' + "[=&&1=]&nbsp&nbsp[=&&2=]" + '</span></td>';
+				vHtml += '<td><img class= "imgGrid2" src="' + PATHIMAGES + '/paquete.png' + '"></td><td class = "labeltablaruta celdaGrid"><span>BULTOS: <span class = "valorescabezalruta">[=&&8=]</span> </td><span class="labeltablaruta">' + "[=&&1=]&nbsp&nbsp[=&&2=]" + '</span></td>';
 
 				if (!esModRuta()){
 					vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta" value ="' + vNombreRuta + '" onblur = "grabarNombreRuta()" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..."></input></span></td>';
@@ -2145,7 +2145,7 @@ function mostrarRegistrosRuta(poly){
 			var minutosASumar =0;
 
 
-			if (((EXT_MOSTRAR_HORA_EN_RUTA &&  p.PuntoHabilitado) || p.VRutaVisitaEstado == "P") && ( p.FlagRuteo )){
+			if (((EXT_MOSTRAR_HORA_EN_RUTA &&  p.PuntoHabilitado && p.PuntoOcultar) || p.VRutaVisitaEstado == "P") && ( p.FlagRuteo )){
 				tiempototal = tiempototal + Number(p.PuntoDuracionVisita) + Math.round(Number(p.PuntoTiempoArribo) / 60) ;
 				distanciatotal = distanciatotal + p.PuntoDistanciaArribo ;
 				if (horaDeInicio == null){
