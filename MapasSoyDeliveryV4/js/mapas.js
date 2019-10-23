@@ -5,6 +5,7 @@
 
 
 
+var VAR_USA_PEDIDOEXTERNO		=	EXT_VAR_USA_PEDIDOEXTERNO;
 var VAR_USA_CANTBULTOS  		=	true;
 var VAR_USA_COMPLEJIDAD  		=	EXT_VAR_USA_COMPLEJIDAD;
 var VAR_USA_SERVICIO  			=	EXT_VAR_USA_SERVICIO;
@@ -649,6 +650,8 @@ function agregaPuntoEnElMapa(Punto){
 	var icono = "";
 
 
+
+
 	if (Punto.PuntoDeRuta || !esModRuta()){
 		icono  = iconBase + getIcono("RUTA" + Punto.Precedencia);
 	}else{
@@ -737,7 +740,11 @@ function agregaPuntoEnElMapa(Punto){
 	vecMarkersPuntos.push(marker);
 
 	if (Punto.Forzado){
-	toggleBounce(marker);
+		toggleBounce(marker);
+	}
+
+	if (Punto.PedidoColor != ""){
+		cambiarPin(Punto);
 	}
 
 }
@@ -776,7 +783,12 @@ function muestroInformacionPunto(PuntoId){
     	if (p.PuntoId != undefined){
           //html = html + '<div class="col-sm-8 col-md-8">';
           html = html + '<p class = "titulocampoficha">#Pedido</p>';
-          html = html + '<div onclick = "abrirEnOtraVentana(' + p.PedidoId + ')"><span>' + p.PedidoId + '</div></span>';
+		  if (VAR_USA_PEDIDOEXTERNO){
+			  html = html + '<div onclick = "abrirEnOtraVentana(' + p.PedidoId + ')"><span>' + p.PedidoExternalId + '</div></span>';
+			}else{
+				html = html + '<div onclick = "abrirEnOtraVentana(' + p.PedidoId + ')"><span>' + p.PedidoId + '</div></span>';
+			}
+
           html = html + '</div>';
           html = html + '<div class="col-sm-1 col-md-1">';
       //    html = html + '<img class ="imgInfo" src="' + PATHIMAGES + '/info.svg">';
@@ -1764,6 +1776,17 @@ function  getColorDelPin(p){
 
 	 if (p.FlagRuteo){
 		 if (p.PuntoHabilitado){
+
+			if (p.PedidoColor != undefined) {
+				if (p.PedidoColor != ""){
+					msg("COCOCHO [" + p.PedidoColor + "]");
+					color = p.PedidoColor;
+					return color;
+
+				}
+
+			}
+
 			 switch(p.precedencia){
 			   case "2":
 					color = "008000";
@@ -1775,6 +1798,7 @@ function  getColorDelPin(p){
 					color = "008000";
 					break;
 			}
+
 		 }else{
 			color = "808080";
 
@@ -1791,10 +1815,21 @@ function cambiarPin(p){
 
 	var color = getColorDelPin(p);
 
-	if (p.FlagRuteo){
+	if (p.FlagRuteo && p.PuntoOrden != 0){
 		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|" + p.PuntoOrden;
 	}else{
-		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|X"
+		switch(p.precedencia){
+		   case "2":
+				urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|E";
+				break;
+		   case "1":
+				urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|R";
+				break;
+		   default:
+				urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|E";
+				break;
+		}
+
 	}
 	for (var ii=0; (ii < vecMarkersPuntos.length); ii++){
 		var m = vecMarkersPuntos[ii];
@@ -2039,13 +2074,24 @@ function mostrarRegistrosRuta(poly){
 			vHtml += ' </td>';
 
 			vHtml += ' <td style="display:none;" id = "orden">' + p.PuntoOrden + '</td> ';
-			vHtml += ' <td style="display:none;" id = "pedido">' + p.PedidoId  + '</td> ';
+
+			if (VAR_USA_PEDIDOEXTERNO){
+				vHtml += ' <td style="display:none;" id = "pedido">' + p.PedidoExternalId  + '</td> ';
+			}else{
+				vHtml += ' <td style="display:none;" id = "pedido">' + p.PedidoId  + '</td> ';
+			}
 			vHtml += ' <td style="display:none;" id = "puntoid">' + p.PuntoId + '</td> ';
 			vHtml += ' <td style="display:none;" id = "precedencia">' + p.Precedencia  + '</td> ';
 
 			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;" onclick = "abrirEnOtraVentana(' + p.PedidoId + ')">';
-		//	vHtml += ' </td>';
-			vHtml += ' 			<div class="tooltip2">#' + p.PuntoOrden + '-' + p.PedidoId  + '';
+
+			if (VAR_USA_PEDIDOEXTERNO){
+
+				vHtml += ' 			<div class="tooltip2">#' + p.PuntoOrden + '-' + p.PedidoExternalId   + '';
+			}else{
+				vHtml += ' 			<div class="tooltip2">#' + p.PuntoOrden + '-' + p.PedidoId  + '';
+			}
+
 			vHtml += '			<span class="tooltiptext2">' + mostrarDetallesPedido(p.PedidoId) + '</span> ';
 			vHtml += ' 		</div> '
 			vHtml += ' </td>';
