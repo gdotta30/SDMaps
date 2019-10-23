@@ -2145,7 +2145,7 @@ function mostrarRegistrosRuta(poly){
 			var minutosASumar =0;
 
 
-			if (((EXT_MOSTRAR_HORA_EN_RUTA &&  p.PuntoHabilitado && p.PuntoOcultar) || p.VRutaVisitaEstado == "P") && ( p.FlagRuteo )){
+			if (((EXT_MOSTRAR_HORA_EN_RUTA &&  p.PuntoHabilitado && !p.PuntoOcultar) || p.VRutaVisitaEstado == "P") && ( p.FlagRuteo )){
 				tiempototal = tiempototal + Number(p.PuntoDuracionVisita) + Math.round(Number(p.PuntoTiempoArribo) / 60) ;
 				distanciatotal = distanciatotal + p.PuntoDistanciaArribo ;
 				if (horaDeInicio == null){
