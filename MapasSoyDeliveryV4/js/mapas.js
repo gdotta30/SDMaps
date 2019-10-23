@@ -1990,7 +1990,7 @@ function mostrarRegistrosRuta(poly){
 				var color = vectorDePuntosJSON[i].Color;
 				vHtml += '<table  class = "tablaTopPaddingBottom" >';
 				vHtml += '<tr>';
-				vHtml += '<td><img class= "imgGrid2" src="' + PATHIMAGES + '/paquete.png' + '"></td><td class = "labeltablaruta celdaGrid"><span>BULTOS: <span class = "valorescabezalruta">[=&&8=]</span> </td><span class="labeltablaruta">' + "[=&&1=]&nbsp&nbsp[=&&2=]" + '</span></td>';
+				vHtml += '<td><img class= "imgGrid2" src="' + PATHIMAGES + '/paquete.png' + '"></td><td><span class="labeltablaruta">&nbsp;BULTOS:</span>&nbsp;<span class = "valorescabezalruta">[=&&8=]</span> </td><span class="labeltablaruta">' + "[=&&1=]&nbsp&nbsp[=&&2=]" + '</span></td>';
 
 				if (!esModRuta()){
 					vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta" value ="' + vNombreRuta + '" onblur = "grabarNombreRuta()" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..."></input></span></td>';
