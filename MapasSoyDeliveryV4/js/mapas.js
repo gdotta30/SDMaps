@@ -665,7 +665,7 @@ function agregaPuntoEnElMapa(Punto){
 		labelContent: Punto.PuntoId,
 		PedidoId: Punto.PedidoId,
 		labelAnchor: new google.maps.Point(vANCHOLABEL_1, vANCHOLABEL_2),
-		icon: { url: icono, scaledSize: new google.maps.Size(hSIZE_SVG, vSIZE_SVG) },
+	//	icon: { url: icono, scaledSize: new google.maps.Size(hSIZE_SVG, vSIZE_SVG) },
 		labelClass: vCLASE_CSS_LABELMARKER, // the CSS class for the label
 		draggable:      false,
 		map: map
@@ -942,7 +942,8 @@ function getParametrosJsonPuntos(_PedidoId){
       FilterPuntoPaisCiudadId: 		VAR_EXT_FilterPuntoPaisCiudadId,
       FilterPuntoZonaId: 			VAR_EXT_FilterPuntoZonaId,
 	  FilterRutaId:  ((_PedidoId==0)?EXT_VAR_RUTAID:0),
-	  FilterPedidoId: _PedidoId
+	  FilterPedidoId: _PedidoId,
+	  FilterPedidoExternalId: _PedidoId
     }
     return JSON.stringify(parametro);
 }
@@ -1780,7 +1781,7 @@ function horaANumero(hora){
 function  getColorDelPin(p){
 	 var  color = "";
 
-	 if (p.FlagRuteo){
+
 		 if (p.PuntoHabilitado){
 
 			if (p.PedidoColor != undefined) {
@@ -1793,11 +1794,11 @@ function  getColorDelPin(p){
 
 			}
 
-			 switch(p.precedencia){
-			   case "2":
+			 switch(p.Precedencia){
+			   case 2:
 					color = "008000";
 					break;
-			   case "1":
+			   case 1:
 					color = "FF0000";
 					break;
 			   default:
@@ -1809,9 +1810,7 @@ function  getColorDelPin(p){
 			color = "808080";
 
 		 }
-	 }else{
-		 color = "FF4500";
-	 }
+
 	return color;
 
 
@@ -2081,11 +2080,7 @@ function mostrarRegistrosRuta(poly){
 
 			vHtml += ' <td style="display:none;" id = "orden">' + p.PuntoOrden + '</td> ';
 
-			if (VAR_USA_PEDIDOEXTERNO){
-				vHtml += ' <td style="display:none;" id = "pedido">' + p.PedidoExternalId  + '</td> ';
-			}else{
-				vHtml += ' <td style="display:none;" id = "pedido">' + p.PedidoId  + '</td> ';
-			}
+
 			vHtml += ' <td style="display:none;" id = "puntoid">' + p.PuntoId + '</td> ';
 			vHtml += ' <td style="display:none;" id = "precedencia">' + p.Precedencia  + '</td> ';
 
@@ -2103,8 +2098,20 @@ function mostrarRegistrosRuta(poly){
 			vHtml += ' </td>';
 
 			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;">';
+				switch(p.Precedencia){
+					case 1:
+						vHtml += '<span class ="icono" style="background-color: #' + getColorDelPin(p) + ';"> Retiro </span>'
+						break;
+					case 2:
+						vHtml += '<span class ="icono" style="background-color: #' + getColorDelPin(p) + ';"> Retiro </span>'
+						break;
+					default:
+						vHtml += '<span class ="icono" style="background-color: #' + getColorDelPin(p) + ';"> Retiro </span>'
+						break;
+				}
 
-			vHtml +=  ' <img   class = "imgTogle" src = "' +  p.Icono + '" onclick = "indicarPunto(' + p.PedidoId  + ')"/>';
+
+			//vHtml +=  ' <img   class = "imgTogle" src = "' +  p.Icono + '" onclick = "indicarPunto(' + p.PedidoId  + ')"/>';
 			vHtml += ' </td>';
 
 
@@ -3048,6 +3055,12 @@ function limpiarRuta(){
     d = vecDireccionDisplay[i];
     d.setMap(null);
   }
+
+  for (var i=0; i < vectorDePuntosJSON.length; i++){
+	  vectorDePuntosJSON[i].FlagRuteo = false;
+	  vectorDePuntosJSON[i].PuntoOrden = 0;
+  }
+  cargarPuntos(false);
   ExpandirMapa();
   var div_Puntos = document.getElementById("listaPuntos");
   div_Puntos.innerHTML = "";
