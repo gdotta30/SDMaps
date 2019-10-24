@@ -484,6 +484,17 @@
 	display: none;
 }
 
+
+.icono{
+
+	border-radius: 2px;
+    padding: 4px;
+    color: white;
+    display: table-cell;
+    width: 40px;
+    text-align: center;
+    vertical-align: middle;
+}
 .contentX {
   padding: 0 10px;
   max-height: 0;

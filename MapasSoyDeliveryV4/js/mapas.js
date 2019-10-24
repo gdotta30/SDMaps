@@ -665,7 +665,7 @@ function agregaPuntoEnElMapa(Punto){
 		labelContent: Punto.PuntoId,
 		PedidoId: Punto.PedidoId,
 		labelAnchor: new google.maps.Point(vANCHOLABEL_1, vANCHOLABEL_2),
-	//	icon: { url: icono, scaledSize: new google.maps.Size(hSIZE_SVG, vSIZE_SVG) },
+		icon: { url: icono, scaledSize: new google.maps.Size(hSIZE_SVG, vSIZE_SVG) },
 		labelClass: vCLASE_CSS_LABELMARKER, // the CSS class for the label
 		draggable:      false,
 		map: map
@@ -1027,7 +1027,7 @@ function modificarPuntoEnElMapa(Punto){
         vecMarkersPuntos[i].title        = Punto.PuntoNombreCliente + " " + Punto.PuntoDireccion;
         vecMarkersPuntos[i].labelContent = Punto.PuntoId;
         vecMarkersPuntos[i].labelAnchor  = new google.maps.Point(vANCHOLABEL_1, vANCHOLABEL_2);
-       // vecMarkersPuntos[i].setIcon({ url: icono, scaledSize: new google.maps.Size(hSIZE_SVG,vSIZE_SVG) });
+        vecMarkersPuntos[i].setIcon({ url: icono, scaledSize: new google.maps.Size(hSIZE_SVG,vSIZE_SVG) });
         vecMarkersPuntos[i].labelClass   = vCLASE_CSS_LABELMARKER; // the CSS class for the label
 		if (vecMarkersPuntos[i].PedidoColor != ""){
 			cambiarPin(vecMarkersPuntos[i]);
