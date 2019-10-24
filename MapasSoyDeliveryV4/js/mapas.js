@@ -1029,9 +1029,7 @@ function modificarPuntoEnElMapa(Punto){
         vecMarkersPuntos[i].labelAnchor  = new google.maps.Point(vANCHOLABEL_1, vANCHOLABEL_2);
         vecMarkersPuntos[i].setIcon({ url: icono, scaledSize: new google.maps.Size(hSIZE_SVG,vSIZE_SVG) });
         vecMarkersPuntos[i].labelClass   = vCLASE_CSS_LABELMARKER; // the CSS class for the label
-		if (vecMarkersPuntos[i].PedidoColor != ""){
-			cambiarPin(vecMarkersPuntos[i]);
-		}
+
         encontre = true;
       }
   }
@@ -1418,6 +1416,7 @@ function calcularTiemposYDistanciaXSoyDelivery(){
 
 
 function calcularYDesplegarLaRuta() {
+
     msg("***calcularYDesplegarLaRuta***")
 	if (VAR_PROVEEDOR_RUTAS == "SD"){
 		calcularTiemposYDistanciaXSoyDelivery();
@@ -1794,7 +1793,7 @@ function  getColorDelPin(p){
 
 			}
 
-			 switch(p.Precedencia){
+			switch(p.Precedencia){
 			   case 2:
 					color = "008000";
 					break;
@@ -2024,7 +2023,9 @@ function mostrarRegistrosRuta(poly){
 	var cantTotalDeBultos = 0;
     for (i=0; i < vectorDePuntosJSON.length; i++){
       var p = vectorDePuntosJSON[i];
+		p.PuntoOrden = 0;
 
+		cambiarPin(p);
         if (p.PuntoZonaId == poly){
 			if (cabezal){
 				var color = vectorDePuntosJSON[i].Color;
@@ -2103,10 +2104,10 @@ function mostrarRegistrosRuta(poly){
 						vHtml += '<span class ="icono" style="background-color: #' + getColorDelPin(p) + ';"> Retiro </span>'
 						break;
 					case 2:
-						vHtml += '<span class ="icono" style="background-color: #' + getColorDelPin(p) + ';"> Retiro </span>'
+						vHtml += '<span class ="icono" style="background-color: #' + getColorDelPin(p) + ';"> Entrega </span>'
 						break;
 					default:
-						vHtml += '<span class ="icono" style="background-color: #' + getColorDelPin(p) + ';"> Retiro </span>'
+						vHtml += '<span class ="icono" style="background-color: #' + getColorDelPin(p) + ';"> Entrega </span>'
 						break;
 				}
 
@@ -3059,6 +3060,7 @@ function limpiarRuta(){
   for (var i=0; i < vectorDePuntosJSON.length; i++){
 	  vectorDePuntosJSON[i].FlagRuteo = false;
 	  vectorDePuntosJSON[i].PuntoOrden = 0;
+	  cambiarPin(vectorDePuntosJSON[i]);
   }
   cargarPuntos(false);
   ExpandirMapa();
