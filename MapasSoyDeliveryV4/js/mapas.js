@@ -1009,13 +1009,16 @@ function getIcono(opcion){
 function modificarPuntoEnElMapa(Punto){
   var encontre = false;
 	var icono= "";
-	if (Punto.PuntoDeRuta || !esModRuta()){
+	/*if (Punto.PuntoDeRuta || !esModRuta()){
 		icono  = iconBase + getIcono("RUTA" + Punto.Precedencia);
 	}else{
 		icono  = iconBase + getIcono("PEND" + Punto.Precedencia);
-	}
+	}*/
 
 	Punto.Icono = icono;
+	if (Punto.PedidoColor != ""){
+		cambiarPin(Punto);
+	}
 
 	for (i = 0; ((i < vecMarkersPuntos.length) && (!encontre)) ; i++){
       if (vecMarkersPuntos[i].labelContent == Punto.PuntoId ){
@@ -1023,8 +1026,11 @@ function modificarPuntoEnElMapa(Punto){
         vecMarkersPuntos[i].title        = Punto.PuntoNombreCliente + " " + Punto.PuntoDireccion;
         vecMarkersPuntos[i].labelContent = Punto.PuntoId;
         vecMarkersPuntos[i].labelAnchor  = new google.maps.Point(vANCHOLABEL_1, vANCHOLABEL_2);
-        vecMarkersPuntos[i].setIcon({ url: icono, scaledSize: new google.maps.Size(hSIZE_SVG,vSIZE_SVG) });
+       // vecMarkersPuntos[i].setIcon({ url: icono, scaledSize: new google.maps.Size(hSIZE_SVG,vSIZE_SVG) });
         vecMarkersPuntos[i].labelClass   = vCLASE_CSS_LABELMARKER; // the CSS class for the label
+		if (vecMarkersPuntos[i].PedidoColor != ""){
+			cambiarPin(vecMarkersPuntos[i]);
+		}
         encontre = true;
       }
   }
@@ -1779,7 +1785,7 @@ function  getColorDelPin(p){
 
 			if (p.PedidoColor != undefined) {
 				if (p.PedidoColor != ""){
-					msg("COCOCHO [" + p.PedidoColor + "]");
+
 					color = p.PedidoColor;
 					return color;
 
