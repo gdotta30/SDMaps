@@ -1818,11 +1818,11 @@ function cambiarPin(p){
 	if (p.FlagRuteo && p.PuntoOrden != 0){
 		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|" + p.PuntoOrden;
 	}else{
-		switch(p.precedencia){
-		   case "2":
+		switch (p.Precedencia){
+		   case 2:
 				urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|E";
 				break;
-		   case "1":
+		   case 1:
 				urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|R";
 				break;
 		   default:
