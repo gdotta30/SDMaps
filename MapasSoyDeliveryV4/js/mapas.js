@@ -3057,11 +3057,7 @@ function limpiarRuta(){
     d.setMap(null);
   }
 
-  for (var i=0; i < vectorDePuntosJSON.length; i++){
-	  vectorDePuntosJSON[i].FlagRuteo = false;
-	  vectorDePuntosJSON[i].PuntoOrden = 0;
-	  cambiarPin(vectorDePuntosJSON[i]);
-  }
+
   cargarPuntos(false);
   ExpandirMapa();
   var div_Puntos = document.getElementById("listaPuntos");
