@@ -1881,13 +1881,12 @@ function habilitarDragAndDropGrilla() {
 		$("#sortable tbody").sortable({
 		cursor: "move",
 		update: function(event, ui) {
+
 			/* obtener valor que se esta moviendo */
 			var PedidoId 		= buscarDentroDeUnTr(ui.item.context, "pedido");
 			var PuntoId 		= buscarDentroDeUnTr(ui.item.context, "puntoid");
 			var ordenOriginal 	= buscarDentroDeUnTr(ui.item.context, "orden");
 			var precedencia 	= buscarDentroDeUnTr(ui.item.context, "precedencia");
-
-
 
 			/* ver donde se va a mover */
 			var posicionADondeSeVaAMover = buscarDentroDeUnaTabla(event.target.parentElement, "posicion", PuntoId, "puntoid")
@@ -4354,20 +4353,30 @@ function cargarJsonPunto(PedidoId){
 					Punto.distancia_aux = 0;
 					agregaPuntoEnElMapa(Punto);
 					vectorDePuntosJSON.push(Punto);
+					pos = maxOrdenDelaZona(getZonaEnUso());
+
+					Punto.PuntoOrden = pos.pos + 1;
+					MarcarDestino(vectorDePuntosJSON[pos.pos + 1].PuntoId);
 				}else{
 					var p = getPUntoById(Punto.PuntoId);
 					p.Forzado = true;
 					p.PuntoZonaId = getZonaEnUso();
+					if (p.PuntoOrden == 0)
+					{
+						pos = maxOrdenDelaZona(getZonaEnUso());
 
+						p.PuntoOrden = pos.pos + 1;
+						MarcarDestino(vectorDePuntosJSON[pos.pos + 1].PuntoId);
+
+
+
+					}
 				}
+				rutear(false);
 			  });
-			  if (esModRuta()){
-				  if (document.getElementById("listaPuntos") != undefined){
-					  if ( document.getElementById("listaPuntos").innerHTML != ""){
-						rutear(true);
-					  }
-				  }
-			  }
+
+
+
 			}
 		  ocultarWait();
 		},
