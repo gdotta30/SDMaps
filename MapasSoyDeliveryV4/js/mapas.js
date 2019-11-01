@@ -128,7 +128,7 @@ var esHoraUTC 		= false;
 var EXT_MOSTRAR_HORA_EN_RUTA  =  VAR_EXT_MOSTRAR_HORA_EN_RUTA;
 
 
-var VKEY = EXT_VAR_vKEY; //"AIzaSyAmAcD2utpt3GNw6LlM7cE1PCNUuYq2_I0"
+var VKEY = EXT_VAR_vKEY;
 
 var currentOverlay;
 
