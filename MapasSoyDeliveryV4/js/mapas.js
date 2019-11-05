@@ -124,7 +124,7 @@ var vMARKER_WHS     = "wh.png";
 var vMARKER_WHN     = "wh.png";
 var vTRAVEL_MODE    = 'DRIVING';
 var esHoraUTC 		= false;
-
+var lineaRuta;
 var EXT_MOSTRAR_HORA_EN_RUTA  =  VAR_EXT_MOSTRAR_HORA_EN_RUTA;
 
 
@@ -890,16 +890,7 @@ function muestroInformacionPunto(PuntoId){
 			}
         }
 
-		/*
 
-		&puntoitem.ServicioNombre = ServicioNombre
-			&puntoitem.PedidoNegocioNombre = PedidoNegocioNombre
-			&puntoitem.PedidoNegocioSucursalNombre = PedidoNegocioSucursalNombre
-			&puntoitem.PedidoComplejidadDsc  = PedidoComplejidad.EnumerationDescription()
-			&puntoitem.PedidoTipoVehiculoNombre = PedidoTipoVehiculoNombre
-			&puntoitem.PuntoDetalle			=	PedidoDetalle
-
-		*/
 
 		html = html + '</div>';
     	html += '    <div class="row enmarcar">';
@@ -1010,11 +1001,6 @@ function getIcono(opcion){
 function modificarPuntoEnElMapa(Punto){
   var encontre = false;
 	var icono= "";
-	/*if (Punto.PuntoDeRuta || !esModRuta()){
-		icono  = iconBase + getIcono("RUTA" + Punto.Precedencia);
-	}else{
-		icono  = iconBase + getIcono("PEND" + Punto.Precedencia);
-	}*/
 
 	Punto.Icono = icono;
 	if (Punto.PedidoColor != ""){
@@ -1140,15 +1126,12 @@ function initMap() {
 	if (EXT_VAR_CARGAR_ORIGENES){
 		cargarOrigenes();
 	}
-	//if (EXT_VAR_CARGAR_PUNTOS){
+
 	cargarPuntos(true);
 	buscarpolyXdefectosSinClickear();
-//	}
+
 	$("body").toggleClass("sidebar-collapse");
 
-	// if (esModRuta()){
-	//	  rutear(rutear);
-	//  }
 
 
 
@@ -1239,11 +1222,6 @@ function getLatLongWareHouse(){
   return latlng;
 }
 
-/*
-function rutaCerradaEnOrigen(){
-  return (rutaCerradaWH || rutaCerradaUsuario);
-
-}*/
 
 
 
@@ -1267,7 +1245,6 @@ function calcularRutaParcial(ds, dd, primerlatlng, ultimalatlng, waypts, vecPedP
       if (status === 'OK') {
   		dd.setDirections(response);
   		dd.setMap(map);
-  		//vVRRutaDirServiceData.push(response); COMENTADO POR PROBLEMAS EN ARMADO DE RUTAS Y TAMAÑO DE ENVIO
   		var route = response.routes[0];
   		var waypoint_order = route.waypoint_order;
   		var n = num;
@@ -1405,10 +1382,6 @@ function calcularTiemposYDistanciaXSoyDelivery(){
               mensajeError('Falló el ws de distancias y tiempos');
             }
     });
-
-	//Obtener y procesar
-
-	//Desplegar la ruta
 
 
 }
@@ -1876,6 +1849,7 @@ function dargAndDropValido(PedidoId, precedencia, ordenOriginal, posicionADondeS
 	}
 }
 
+
 function habilitarDragAndDropGrilla() {
 	$(function() {
 		$("#sortable tbody").sortable({
@@ -1903,19 +1877,27 @@ function habilitarDragAndDropGrilla() {
 
 				/* ordenar y mostrar */
 				var pos = minOrdenDelaZona(getZonaEnUso());
+
 				OrdenarVector();
 				MarcarOrigen(vectorDePuntosJSON[pos.pos].PuntoId);
 				pos = maxOrdenDelaZona(getZonaEnUso());
 				MarcarDestino(vectorDePuntosJSON[pos.pos].PuntoId);
+
+
 				cargarPuntos(false);
 				modoOptimizacion	= false;
 				calcularYDesplegarLaRuta();
 
+
+
 			}
 		},
 		stop:  function(e, ui) {
+			dibujarFlechasRuta(getZonaEnUso());
 			},
 		beforeStop:  function(e, ui) {
+			lineaRuta.setMap(null);
+
 			},
 		placeholder: "sortable-placeholder",
 		helper: function(e, tr)
@@ -2012,6 +1994,94 @@ function buscarDentroDeUnaTabla(tabla, campoARetornar, valorABuscar,campoNombre)
 	return tdEncontrado;
 }
 
+
+function MapsP2P(p1, p2){
+    //dipuja linea de punto a punto
+
+	msg( "Trazar linea " + JSON.stringify(p1) + " " + JSON.stringify(p2));
+
+	if (p1.lat != 0) {
+
+		if (lineaRuta == undefined){
+
+			lineaRuta = new google.maps.Polyline({
+				path: [
+					p1,
+					p2,
+				],
+				strokeColor: "#0000FF",
+				strokeOpacity: 4.0,
+				strokeWeight: 3,
+
+				icons: [{
+					  icon: {
+							  path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW,
+							  strokeColor:'#0000ff',
+							  fillColor:'#000000',
+							  fillOpacity:3
+							},
+					  repeat:'100px'
+				   }],
+
+				map: map
+			})
+		}else{
+
+
+			  lineaRuta.getPath().getArray().push(p1);
+			  lineaRuta.getPath().getArray().push(p2);
+
+
+			  if (lineaRuta.getMap() == null){
+				  lineaRuta.setMap(map);
+
+			  }
+
+		}
+
+	}
+}
+
+
+function dibujarFlechasRuta(ZonaId){
+
+  var path = [];
+  lineaRuta.setPath(path);
+
+
+  var punto1 = undefined;
+  var punto2 = undefined;
+  for (var i=0; i < vectorDePuntosJSON.length; i++){
+	var p = vectorDePuntosJSON[i];
+	if (p.PuntoZonaId == ZonaId && !p.PuntoOcultar){
+		if (p.FlagRuteo){
+
+			if (punto1 != undefined){
+				punto2 = punto1;
+			}
+			var lat = p.PuntoLat;
+			var lng = p.PuntoLong;
+
+			punto1 = new google.maps.LatLng({lat: lat, lng: lng});
+
+			if (punto1 != undefined && punto2 != undefined){
+				MapsP2P(punto2, punto1);
+
+			}
+
+		}
+	}
+  }
+  cargarPuntos(false);
+}
+
+
+
+function toFixed(num, fixed) {
+    var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+    return num.toString().match(re)[0];
+}
+
 function mostrarRegistrosRuta(poly){
     msg("***mostrarRegistrosRuta***");
 
@@ -2020,12 +2090,15 @@ function mostrarRegistrosRuta(poly){
 	var cantruteados = 0;
     var cabezal = true;
 	var cantTotalDeBultos = 0;
+	var punto1 = undefined;
+	var punto2 = undefined;
     for (i=0; i < vectorDePuntosJSON.length; i++){
       var p = vectorDePuntosJSON[i];
-		p.PuntoOrden = 0;
 
+		p.PuntoOrden = 0;
 		cambiarPin(p);
-        if (p.PuntoZonaId == poly){
+        if (p.PuntoZonaId == poly && !p.PuntoOcultar){
+
 			if (cabezal){
 				var color = vectorDePuntosJSON[i].Color;
 				vHtml += '<table  class = "tablaTopPaddingBottom" >';
@@ -2057,9 +2130,23 @@ function mostrarRegistrosRuta(poly){
 				var acumuladoMinutos = 0;
 			}
 			cantruteados ++;
-			if (p.FlagRuteo && !p.PuntoOcultar){
+			if (p.FlagRuteo){
 				cntpuntos ++;
 				cantTotalDeBultos += p.PedidoCantBultos;
+				if (punto1 != undefined){
+					punto2 = punto1;
+				}
+				var lat = p.PuntoLat;
+				var lng = p.PuntoLong;
+
+				punto1 = new google.maps.LatLng({lat: lat, lng: lng});
+
+				if (punto1 != undefined && punto2 != undefined){
+					MapsP2P(punto2, punto1);
+
+				}
+
+
 
 			}
 
@@ -2111,8 +2198,7 @@ function mostrarRegistrosRuta(poly){
 				}
 
 
-			//vHtml +=  ' <img   class = "imgTogle" src = "' +  p.Icono + '" onclick = "indicarPunto(' + p.PedidoId  + ')"/>';
-			vHtml += ' </td>';
+				vHtml += ' </td>';
 
 
 			if (VAR_USA_CANTBULTOS){
@@ -2235,7 +2321,7 @@ function mostrarRegistrosRuta(poly){
 				}
 			}
 			var estilo = getestilohorario(hora_horario0, hora_horario1, hora_visita0, hora_visita1);
-			if ((EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado)  || p.VRutaVisitaEstado == "P"){
+			if ((EXT_MOSTRAR_HORA_EN_RUTA && p.FlagRuteo &&  p.PuntoHabilitado)  || (p.VRutaVisitaEstado == "P" && p.FlagRuteo &&  p.PuntoHabilitado)){
 				vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" ' +  estilo + '><strong> ' + getFormatoDeHora(getFormatoDeFechaHora(new Date(fecha_hora_llegada)))  + '</strong>';
 
 				vHtml += ' </td> ';
@@ -2439,12 +2525,12 @@ function noIncluirRuta(PuntoId){
 	if (!esModRuta()){
 		limpiarRuta();
 		modoOptimizacion = false;
-		rutear(true);
+		rutear(false);
 	}else{
 		if (vRUTA.VRutaEstado == "P"){
 			limpiarRuta();
 			modoOptimizacion = false;
-			rutear(true);
+			rutear(false);
 		}else{
 			modoOptimizacion = false;
 			rutear(false);
@@ -3054,9 +3140,12 @@ function limpiarRuta(){
   for (var i=0; (i < vecDireccionDisplay.length); i++){
     d = vecDireccionDisplay[i];
     d.setMap(null);
+
   }
-
-
+  if (lineaRuta != undefined){
+	lineaRuta.setMap(null);
+	lineaRuta = undefined;
+  }
   cargarPuntos(false);
   ExpandirMapa();
   var div_Puntos = document.getElementById("listaPuntos");
@@ -4373,6 +4462,7 @@ function cargarJsonPunto(PedidoId){
 					}
 				}
 				rutear(false);
+				dibujarFlechasRuta(getZonaEnUso());
 			  });
 
 
