@@ -4,7 +4,6 @@
 // VARIABLES PARA PARAMETRIZAR
 
 
-
 var VAR_USA_PEDIDOEXTERNO		=	EXT_VAR_USA_PEDIDOEXTERNO;
 var VAR_USA_CANTBULTOS  		=	true;
 var VAR_USA_COMPLEJIDAD  		=	EXT_VAR_USA_COMPLEJIDAD;
@@ -339,6 +338,34 @@ function generarMenuLateral(){
 			buffer += '		</div> ';
 			buffer += ' 	</div> ';
 
+
+			buffer += ' <div id = "divmetododeruteo" class="collapsibleX">Configuración</div> ';
+			buffer += ' 	<div id = "contenidopoly" class="contentX" style="background-color: rgb(234, 91, 11)"> ';
+			buffer += ' 		<div > ';
+			buffer += '			<div class = "toolbarsearch" style="text-align:center "> ';
+			buffer += '	   			<span> ';
+			buffer += '					<img src = "MapasSoyDeliveryV4/images/lupa.png" class = "imgLupa"> ';
+
+			buffer += '					<select class="form-control AttributeCheckBox" name="select" maxlength = "20" style = "width:170px"  id = "selmetodoruteo"> ';
+			buffer += '						<option value="1" selected>Estandar SD</option> ' ;
+			buffer += '						<option value="2">Por Hora</option> ';
+
+			buffer += '					</select> ';
+
+
+
+			buffer += '	   			</span> ';
+
+			buffer += '				<div class = "listaexpand" id = "poligonosdisponibles" style="margin-left: -20px;"> ';
+			buffer += '				</div> ';
+			buffer += '			</div> ';
+			buffer += '			<div class = "listaexpand" id = "poligonoscargados" style > ';
+			buffer += '			</div> ';
+			buffer += '		</div> ';
+			buffer += ' 	</div> ';
+
+
+
 			buffer += ' <div class="collapsibleX">Rutas</div> ';
 			buffer += '	<div class="contentX"> ';
 			buffer += '	   <div class="enmarcar" style="text-align:center"> ';
@@ -415,6 +442,7 @@ function rutear(rutear){
 
 
 			if (rutear){
+
 				calcularOrigenTentativo();
 				inicializarInfoRutas(getZonaEnUso());
 				var posOrigen = getPosOrigen(getZonaEnUso());
@@ -436,6 +464,8 @@ function rutear(rutear){
 					  }
 					}
 				}
+
+
 			}else{
 				//OOOOOO
 				  OrdenarVector();
@@ -460,6 +490,7 @@ function rutear(rutear){
 				calcularYDesplegarLaRuta();
 			}
 			selecteShapeRuteada = selectedShape;
+
 
   });
 
@@ -574,16 +605,6 @@ function toggleBounce(m) {
 }
 
 
-/*
-function toggleBounce(m,m2) {
-	m.setAnimation(google.maps.Animation.BOUNCE);
-	m2.setAnimation(google.maps.Animation.BOUNCE);
-	setTimeout(function(){
-		m.setAnimation(null);
-		m2.setAnimation(null);
-	}, 3000);
-}
-*/
 
 
 
@@ -1386,11 +1407,76 @@ function calcularTiemposYDistanciaXSoyDelivery(){
 
 }
 
+function procesarOrdenServRuteo(sdtWsRutas){
+	for (j=0; j < sdtWsRutas.length; j++){
+		var r = sdtWsRutas[j];
+		for (i=0; i < r.visitas.length; i++){
+			var v = r.visitas[i];
+			for (k=0; k < vectorDePuntosJSON.length; k++){
+				var p = vectorDePuntosJSON[k];
+				if (p.PedidoId == v.VRutaVisitaPedidoId && p.Precedencia == v.VRutaVisitaPrecedencia){
 
+					p.PuntoOrden 					= v.VRutaVisitaOrden;
+				}
+			}
+		}
+	}
+
+}
+
+function consumirServOrtools(){
+	//var VAR_USA_ORTOOLS		=	true;
+	//var VAR_SRV_ORTOOLS		=	"TIMEWINDOW";
+
+	var vecVisitas = armarJSONSoloDeVisitas(getZonaEnUso());
+
+	var entradaOrtools = {
+		servicio : VAR_SRV_ORTOOLS,
+		sdtWsRutas : vecVisitas
+	}
+
+	msg("WS ORTOOLS PARM " + JSON.stringify(entradaOrtools));
+	//Enviar
+	$.ajax({
+        url: VAR_SRV_RUTEO,
+        type: "POST",
+        dataType: "json",
+        crossDomain: true,
+        data: JSON.stringify(entradaOrtools),
+        success: function(respuesta) {
+			ocultarWait();
+			msg("Respuesta del ORTT= " + JSON.stringify(respuesta));
+			if (respuesta.sdtrespuestaws.ok == "S"){
+				msg(JSON.stringify(respuesta));
+				procesarOrdenServRuteo(respuesta.sdtWsRutas);
+				OrdenarVector();
+				refrescarGrillaruta();
+				/*
+				if (VAR_PROVEEDOR_RUTAS == "SD"){
+					calcularTiemposYDistanciaXSoyDelivery();
+					return;
+				}*/
+			}else{
+				mensajeError(respuesta.sdtrespuestaws.errordesc);
+			}
+			ocultarWait();
+        },
+        error:
+            function() {
+              ocultarWait();
+              mensajeError('Falló el ws de ruteo');
+            }
+    });
+
+}
 
 function calcularYDesplegarLaRuta() {
 
     msg("***calcularYDesplegarLaRuta***")
+
+
+
+
 	if (VAR_PROVEEDOR_RUTAS == "SD"){
 		calcularTiemposYDistanciaXSoyDelivery();
 		return;
@@ -1588,6 +1674,14 @@ function getDtControl(){
 	return buffer;
 }
 
+
+function getFormatoDeHoraNumeros(fechahora){
+
+	var v = fechahora.split(" ");
+	var v2 = v[1].replace(":","");
+	return v2;
+
+}
 
 function getFormatoDeHora(fechahora){
 
@@ -2618,12 +2712,43 @@ function OrdenarVectorXDistancia(){
 function OrdenarVector(){
     //ordena el vector de Puntos segun el atributo orden
     msg("***OrdenarVector***");
+
     vectorDePuntosJSON.sort(function (a, b)
     {
         return a.PuntoOrden-b.PuntoOrden;
     });
 }
 
+function OrdenarPorHora(){
+    //ordena el vector de Puntos segun el atributo orden
+    msg("***OrdenarVector***");
+    vectorDePuntosJSON.sort(function (a, b)
+    {
+
+		if (a.Marca == vMarcaORIGEN || b.Marca == vMarcaORIGEN)
+			return a.PuntoOrden-b.PuntoOrden;
+
+
+
+
+		var distancia =  calcdistancia(new google.maps.LatLng({lat: a.PuntoLat, lng: a.PuntoLong}) , new google.maps.LatLng({lat: b.PuntoLat, lng: b.PuntoLong}));
+
+
+		if (distancia <= 800)
+		{
+
+			return a.PuntoOrden-b.PuntoOrden;
+
+		}
+		if (a.HoraHorden == b.HoraHorden){
+			return a.PuntoOrden-b.PuntoOrden;
+		}
+		else
+		{
+			return Number(a.HoraHorden)-Number(b.HoraHorden);
+		}
+    });
+}
 
 
 
@@ -3814,6 +3939,8 @@ function  expandirMenuLateral(){
 		content.style.maxHeight  = "220px";
 		content = coll[2].nextElementSibling;
 		content.style.maxHeight  = "220px";
+		content = coll[3].nextElementSibling;
+		content.style.maxHeight  = "220px";
 	 }
 
 }
@@ -4098,22 +4225,111 @@ function cumplePrecedecia(p, listaposiciones){
 
 }
 
+
+
+
+function esperaValida(ele,p){
+	var _esperaValida = 10;
+	var dif = Number(getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(ele.PedidoHorarioIni)))) - Number(getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(p.PedidoHorarioIni))));
+	msg("Dif " + dif);
+	if (dif < 0){
+		dif  = (dif * -1);
+	}
+
+	msg(" Espera ++++ " + dif);
+	if  (dif <= _esperaValida){
+		msg("Espera valida " + dif + " " + Number(getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(ele.PedidoHorarioIni)))) + " " + Number(getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(p.PedidoHorarioIni)))));
+		return true;
+	}else{
+		msg("Espera in valida " + dif + " " + Number(getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(ele.PedidoHorarioIni)))) + " " + Number(getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(p.PedidoHorarioIni)))));
+		return false;
+	}
+
+}
+
+
+function esperaDif(ele,p){
+
+	var dif = Number(getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(ele.PedidoHorarioIni)))) - Number(getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(p.PedidoHorarioIni))));
+	if (dif < 0){
+		dif  = (dif * -1);
+	}
+
+	msg("Dif " + dif + "  con " + Number(getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(ele.PedidoHorarioIni)))) + " " +  Number(getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(p.PedidoHorarioIni)))));
+
+	return dif ;
+
+}
+
+function cotaDif(ele,p){
+
+	var difcota = Number(ele.HoraHorden) - Number(p.HoraHorden);
+	if (difcota < 0)
+	{
+		difcota = difcota * -1;
+	}
+	return difcota;
+}
+
+
+
+function sigDeMenorDist(ele,lista, listaposiciones){
+  var mindistancia = MAXVALUE;
+
+  var   v = {PuntoId: 0, PedidoId: 0, Precedencia: 0, Posicion: -1};
+  var hordenarPorHora = ($("#selmetodoruteo").val() == "2");
+  for (i=0; i < lista.length; i++){
+    var p = lista[i];
+	msg(" p.PuntoZonaId ===> " + p.PuntoZonaId);
+    if ((ele.PuntoId != p.PuntoId) && (p.PuntoZonaId  == getZonaEnUso())){
+      var distancia =  calcdistancia(new google.maps.LatLng({lat: ele.PuntoLat, lng: ele.PuntoLong}) , new google.maps.LatLng({lat: p.PuntoLat, lng: p.PuntoLong}));//distanciaEntre2Puntos(ele.PuntoLat, ele.PuntoLong, p.PuntoLat, p.PuntoLong);
+      msg("Distancias " + distancia);
+	  if (hordenarPorHora){
+		  if ((!esperaValida(ele,p)) && (distancia > 100)){
+				distancia =  distancia + (esperaDif(ele,p) * 60 * 2.5);
+		  }
+	  }
+	  if (distancia < mindistancia){
+			msg("Pasa la espera valida!!!!")
+			if (cumplePrecedecia(p, listaposiciones)){
+
+
+				mindistancia 	= 	distancia;
+				v.PuntoId 		=	p.PuntoId;
+				v.PedidoId 		= 	p.PedidoId;
+				v.Precedencia 	=  	p.Precedencia;
+				v.Posicion		= 	i;
+				msg("V===>" + JSON.stringify(v));
+			}
+      }
+    }
+  }
+
+  return v;
+}
+/*
 function sigDeMenorDist(ele,lista, listaposiciones){
   var mindistancia = MAXVALUE;
   var   v = {PuntoId: 0, PedidoId: 0, Precedencia: 0, Posicion: -1};
+  var hordenarPorHora = ($("#selmetodoruteo").val() == "2");
   for (i=0; i < lista.length; i++){
     var p = lista[i];
 	msg(" p.PuntoZonaId ===> " + p.PuntoZonaId);
     if ((ele.PuntoId != p.PuntoId) && (p.PuntoZonaId  == getZonaEnUso())){
       var distancia =  calcdistancia(new google.maps.LatLng({lat: ele.PuntoLat, lng: ele.PuntoLong}) , new google.maps.LatLng({lat: p.PuntoLat, lng: p.PuntoLong}));//distanciaEntre2Puntos(ele.PuntoLat, ele.PuntoLong, p.PuntoLat, p.PuntoLong);
       if (distancia < mindistancia){
-        if (cumplePrecedecia(p, listaposiciones)){
-			mindistancia 	= 	distancia;
-			v.PuntoId 		=	p.PuntoId;
-			v.PedidoId 		= 	p.PedidoId;
-			v.Precedencia 	=  	p.Precedencia;
-			v.Posicion		= 	i;
-			msg("V===>" + JSON.stringify(v));
+
+
+
+		if ((!hordenarPorHora) || (hordenarPorHora && esperaValida(ele,p))){
+			if (cumplePrecedecia(p, listaposiciones)){
+				mindistancia 	= 	distancia;
+				v.PuntoId 		=	p.PuntoId;
+				v.PedidoId 		= 	p.PedidoId;
+				v.Precedencia 	=  	p.Precedencia;
+				v.Posicion		= 	i;
+				msg("V===>" + JSON.stringify(v));
+			}
 		}
       }
     }
@@ -4121,7 +4337,7 @@ function sigDeMenorDist(ele,lista, listaposiciones){
 
   return v;
 }
-
+*/
 function getRutaNombre(){
   var nomruta = document.getElementById("nombreruta");
   if (nomruta == undefined){
@@ -4443,12 +4659,13 @@ function cargarJsonPunto(PedidoId){
 					agregaPuntoEnElMapa(Punto);
 					vectorDePuntosJSON.push(Punto);
 					pos = maxOrdenDelaZona(getZonaEnUso());
-
+					Punto.HoraHorden = getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(Punto.PedidoHorarioFin))) + "" + getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(Punto.PedidoHorarioIni)));
 					Punto.PuntoOrden = pos.pos + 1;
 					MarcarDestino(vectorDePuntosJSON[pos.pos + 1].PuntoId);
 				}else{
 					var p = getPUntoById(Punto.PuntoId);
 					p.Forzado = true;
+					p.HoraHorden = getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(p.PedidoHorarioFin))) + "" + getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(p.PedidoHorarioIni)));
 					p.PuntoZonaId = getZonaEnUso();
 					if (p.PuntoOrden == 0)
 					{
@@ -4511,6 +4728,9 @@ function cargarJsonPuntos(cargarDesdeWEB){
 						Punto.Forzado = false;
                         Punto.FlagRuteo = true;
                         Punto.distancia_aux = 0;
+
+
+						Punto.HoraHorden = getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(Punto.PedidoHorarioFin))) + "" + getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(Punto.PedidoHorarioIni)));
                         agregaPuntoEnElMapa(Punto);
                         vectorDePuntosJSON.push(Punto);
                     }
