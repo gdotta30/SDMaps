@@ -339,8 +339,8 @@ function generarMenuLateral(){
 			buffer += ' 	</div> ';
 
 
-			buffer += ' <div id = "divmetododeruteo" class="collapsibleX">Configuración</div> ';
-			buffer += ' 	<div id = "contenidopoly" class="contentX" style="background-color: rgb(234, 91, 11)"> ';
+			buffer += ' <div id = "divmetododeruteo" class="collapsibleX" style="display: none;">Configuración</div> ';
+			buffer += ' 	<div id = "contenidopoly" class="contentX" style="background-color: rgb(234, 91, 11); display: none;"> ';
 			buffer += ' 		<div > ';
 			buffer += '			<div class = "toolbarsearch" style="text-align:center "> ';
 			buffer += '	   			<span> ';
