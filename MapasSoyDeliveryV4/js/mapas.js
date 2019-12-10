@@ -1034,10 +1034,17 @@ function modificarPuntoEnElMapa(Punto){
         vecMarkersPuntos[i].title        = Punto.PuntoNombreCliente + " " + Punto.PuntoDireccion;
         vecMarkersPuntos[i].labelContent = Punto.PuntoId;
         vecMarkersPuntos[i].labelAnchor  = new google.maps.Point(vANCHOLABEL_1, vANCHOLABEL_2);
-        vecMarkersPuntos[i].setIcon({ url: icono, scaledSize: new google.maps.Size(hSIZE_SVG,vSIZE_SVG) });
+        //vecMarkersPuntos[i].setIcon({ url: icono, scaledSize: new google.maps.Size(hSIZE_SVG,vSIZE_SVG) });
         vecMarkersPuntos[i].labelClass   = vCLASE_CSS_LABELMARKER; // the CSS class for the label
 
         encontre = true;
+		if (vecMarkersPuntos[i].Forzado){
+			toggleBounce(marker);
+		}
+
+		if (vecMarkersPuntos[i].PedidoColor != ""){
+			cambiarPin(vecMarkersPuntos[i]);
+		}
       }
   }
   return encontre;
@@ -1924,8 +1931,8 @@ function dargAndDropValido(PedidoId, precedencia, ordenOriginal, posicionADondeS
 	var pos = 0;
 
 	var encontre = false;
-	for (var i=0; i < vectorDePuntosJSON.length && !encontre; i++){
-		if (vectorDePuntosJSON[i].PedidoId == PedidoId && vectorDePuntosJSON[i].Precedencia == precedencia){
+	for (var i=0; ((i < vectorDePuntosJSON.length) && (!encontre)); i++){
+		if ((vectorDePuntosJSON[i].PedidoId == PedidoId) && (vectorDePuntosJSON[i].Precedencia == precedencia)){
 			pos = i;
 			encontre = true;
 		}
@@ -1938,27 +1945,27 @@ function dargAndDropValido(PedidoId, precedencia, ordenOriginal, posicionADondeS
 		}
 		return movimientoValido(vectorDePuntosJSON[pos], posicionADondeSeVaAMover);
 	}else{
-
+		mensajeOK("No encontró " + PedidoId + " " + precedencia);
 		return true;
 	}
 }
 
 
 function habilitarDragAndDropGrilla() {
-	$(function() {
+//	$(function() {
 		$("#sortable tbody").sortable({
 		cursor: "move",
 		update: function(event, ui) {
+
 
 			/* obtener valor que se esta moviendo */
 			var PedidoId 		= buscarDentroDeUnTr(ui.item.context, "pedido");
 			var PuntoId 		= buscarDentroDeUnTr(ui.item.context, "puntoid");
 			var ordenOriginal 	= buscarDentroDeUnTr(ui.item.context, "orden");
 			var precedencia 	= buscarDentroDeUnTr(ui.item.context, "precedencia");
-
 			/* ver donde se va a mover */
-			var posicionADondeSeVaAMover = buscarDentroDeUnaTabla(event.target.parentElement, "posicion", PuntoId, "puntoid")
 
+			var posicionADondeSeVaAMover = buscarDentroDeUnaTabla(event.target.parentElement, "posicion", PuntoId, "puntoid")
 
 			/* analizar si el movimiento sea valido */
 			if (!dargAndDropValido(PedidoId, precedencia, ordenOriginal, posicionADondeSeVaAMover)){
@@ -1968,7 +1975,6 @@ function habilitarDragAndDropGrilla() {
 			}else{
 				/* si el movimiento es valido, se toma el orden que quedó en la tabla */
 				asignarOrdenDesdeLaTablaOrdenada(event.target.parentElement);
-
 				/* ordenar y mostrar */
 				var pos = minOrdenDelaZona(getZonaEnUso());
 
@@ -1976,7 +1982,6 @@ function habilitarDragAndDropGrilla() {
 				MarcarOrigen(vectorDePuntosJSON[pos.pos].PuntoId);
 				pos = maxOrdenDelaZona(getZonaEnUso());
 				MarcarDestino(vectorDePuntosJSON[pos.pos].PuntoId);
-
 
 				cargarPuntos(false);
 				modoOptimizacion	= false;
@@ -1987,10 +1992,9 @@ function habilitarDragAndDropGrilla() {
 			}
 		},
 		stop:  function(e, ui) {
-			dibujarFlechasRuta(getZonaEnUso());
+		//	dibujarFlechasRuta(getZonaEnUso());
 			},
 		beforeStop:  function(e, ui) {
-			lineaRuta.setMap(null);
 
 			},
 		placeholder: "sortable-placeholder",
@@ -2005,7 +2009,7 @@ function habilitarDragAndDropGrilla() {
 				return $helper;
 			}
 		}).disableSelection();
-	});
+	//});
 
 
 
@@ -2236,7 +2240,7 @@ function mostrarRegistrosRuta(poly){
 				punto1 = new google.maps.LatLng({lat: lat, lng: lng});
 
 				if (punto1 != undefined && punto2 != undefined){
-					MapsP2P(punto2, punto1);
+					//MapsP2P(punto2, punto1);
 
 				}
 
@@ -2263,6 +2267,8 @@ function mostrarRegistrosRuta(poly){
 
 
 			vHtml += ' <td style="display:none;" id = "puntoid">' + p.PuntoId + '</td> ';
+			vHtml += ' <td style="display:none;" id = "pedido">' + p.PedidoId + '</td> ';
+
 			vHtml += ' <td style="display:none;" id = "precedencia">' + p.Precedencia  + '</td> ';
 
 			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p)+ '" style="text-align:right;" onclick = "abrirEnOtraVentana(' + p.PedidoId + ')">';
@@ -4280,19 +4286,18 @@ function sigDeMenorDist(ele,lista, listaposiciones){
   var hordenarPorHora = ($("#selmetodoruteo").val() == "2");
   for (i=0; i < lista.length; i++){
     var p = lista[i];
-	msg(" p.PuntoZonaId ===> " + p.PuntoZonaId);
+
     if ((ele.PuntoId != p.PuntoId) && (p.PuntoZonaId  == getZonaEnUso())){
       var distancia =  calcdistancia(new google.maps.LatLng({lat: ele.PuntoLat, lng: ele.PuntoLong}) , new google.maps.LatLng({lat: p.PuntoLat, lng: p.PuntoLong}));//distanciaEntre2Puntos(ele.PuntoLat, ele.PuntoLong, p.PuntoLat, p.PuntoLong);
-      msg("Distancias " + distancia);
+
 	  if (hordenarPorHora){
 		  if ((!esperaValida(ele,p)) && (distancia > 100)){
 				distancia =  distancia + (esperaDif(ele,p) * 60 * 2.5);
 		  }
 	  }
 	  if (distancia < mindistancia){
-			msg("Pasa la espera valida!!!!")
-			if (cumplePrecedecia(p, listaposiciones)){
 
+			if (cumplePrecedecia(p, listaposiciones)){
 
 				mindistancia 	= 	distancia;
 				v.PuntoId 		=	p.PuntoId;
@@ -4679,7 +4684,7 @@ function cargarJsonPunto(PedidoId){
 					}
 				}
 				rutear(false);
-				dibujarFlechasRuta(getZonaEnUso());
+				//dibujarFlechasRuta(getZonaEnUso());
 			  });
 
 
