@@ -4647,44 +4647,58 @@ function cargarJsonPunto(PedidoId){
 		crossDomain: true,
 		data: parms ,
 		success: function(Puntos ) {
-			msg("HAY 2");
-			msg("HAY QUE VER: " + Puntos.sdtGetPuntos.length);
+			msg("HAY x");
+
+			msg(JSON.stringify(Puntos));
+
+			msg("HAY xX");
+			if (Puntos.sdtRespuestaWs.ok  != "S"){
+				mensajeError(Puntos.sdtRespuestaWs.errordesc);
+				return;
+			}
+
+
+
 			if (Puntos.sdtGetPuntos.length == 0){
 				mensajeNotificacion("No se incluyó el pedido, verifique el nro. de pedido o detalles como el estado, etc.");
 			}else{
+
+
 				$.each(Puntos.sdtGetPuntos, function(i, Punto) {
-				if (!existePuntoEnVectorDePuntos(Punto.PuntoId )){
-					var myLatLng = new google.maps.LatLng({lat: Punto.PuntoLat, lng: Punto.PuntoLong});
-					if (esModRuta()){
-						Punto.PuntoZonaId = getZonaEnUso();
-					}
-					Punto.FlagRuteo = true;
-					Punto.Forzado = true;
-					Punto.distancia_aux = 0;
-					agregaPuntoEnElMapa(Punto);
-					vectorDePuntosJSON.push(Punto);
-					pos = maxOrdenDelaZona(getZonaEnUso());
-					Punto.HoraHorden = getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(Punto.PedidoHorarioFin))) + "" + getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(Punto.PedidoHorarioIni)));
-					Punto.PuntoOrden = pos.pos + 1;
-					MarcarDestino(vectorDePuntosJSON[pos.pos + 1].PuntoId);
-				}else{
-					var p = getPUntoById(Punto.PuntoId);
-					p.Forzado = true;
-					p.HoraHorden = getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(p.PedidoHorarioFin))) + "" + getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(p.PedidoHorarioIni)));
-					p.PuntoZonaId = getZonaEnUso();
-					if (p.PuntoOrden == 0)
-					{
+
+
+					if (!existePuntoEnVectorDePuntos(Punto.PuntoId )){
+						var myLatLng = new google.maps.LatLng({lat: Punto.PuntoLat, lng: Punto.PuntoLong});
+						if (esModRuta()){
+							Punto.PuntoZonaId = getZonaEnUso();
+						}
+						Punto.FlagRuteo = true;
+						Punto.Forzado = true;
+						Punto.distancia_aux = 0;
+						agregaPuntoEnElMapa(Punto);
+						vectorDePuntosJSON.push(Punto);
 						pos = maxOrdenDelaZona(getZonaEnUso());
-
-						p.PuntoOrden = pos.pos + 1;
+						Punto.HoraHorden = getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(Punto.PedidoHorarioFin))) + "" + getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(Punto.PedidoHorarioIni)));
+						Punto.PuntoOrden = pos.pos + 1;
 						MarcarDestino(vectorDePuntosJSON[pos.pos + 1].PuntoId);
+					}else{
+						var p = getPUntoById(Punto.PuntoId);
+						p.Forzado = true;
+						p.HoraHorden = getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(p.PedidoHorarioFin))) + "" + getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(p.PedidoHorarioIni)));
+						p.PuntoZonaId = getZonaEnUso();
+						if (p.PuntoOrden == 0)
+						{
+							pos = maxOrdenDelaZona(getZonaEnUso());
+
+							p.PuntoOrden = pos.pos + 1;
+							MarcarDestino(vectorDePuntosJSON[pos.pos + 1].PuntoId);
 
 
 
+						}
 					}
-				}
-				rutear(false);
-				//dibujarFlechasRuta(getZonaEnUso());
+					rutear(false);
+					//dibujarFlechasRuta(getZonaEnUso());
 			  });
 
 
