@@ -4422,10 +4422,10 @@ function getVisitasRutaJSON(vecVisitas,p){
       VRutaVisitaDuracion:        p.PuntoTiempoArribo,
       VRutaVisitaDuracionTxt:     p.PuntoTiempoArriboTxt,
       VRutaTiempoEstimadoEntrega: p.PuntoDuracionVisita,
-      VRutaVisitaDireccion:       p.PuntoDireccion,
+      VRutaVisitaDireccion:       sacarCaracteresEspeciales(p.PuntoDireccion),
       VRutaVisitaGeolocation:      p.PuntoLat + "," + p.PuntoLong,
       VRutaVisitaTelefonoContacto:      p.PuntoTelefonoCliente,
-	  	VRutaVisitaNombreContacto: p.PuntoNombreCliente,
+	  	VRutaVisitaNombreContacto: sacarCaracteresEspeciales(p.PuntoNombreCliente),
 	  	VRutaVisitaPrecedencia:	p.Precedencia,
 	  	VRutaVisitaPedidoId: p.PedidoId
     }
@@ -4803,9 +4803,10 @@ function getJSONZonasCreacionManual(){
 }
 
 function  sacarCaracteresEspeciales(contenido){
-	var texto = contenido.toLowerCase().replace(/[\*\^\"'\!]/g, '');
+	var texto = contenido.toLowerCase().replace(/[\*\^\"'\!\?áéíó]/g, '');
 	return texto;
 }
+
 
 
 function mostrarDetallesPedido(_PedidoId){
