@@ -726,10 +726,16 @@ function muestroInformacionPunto(PuntoId) {
 			if (p.PuntoId != undefined) {
 				//html = html + '<div class="col-sm-8 col-md-8">';
 				html = html + '<p class = "titulocampoficha">#Pedido</p>';
-				if (VAR_USA_PEDIDOEXTERNO) {
+				if (VAR_USA_PEDIDOEXTERNO == 'E') {
 					html = html + '<div onclick = "abrirEnOtraVentana(' + p.PedidoId + ')"><span>' + p.PedidoExternalId + '</div></span>';
 				} else {
-					html = html + '<div onclick = "abrirEnOtraVentana(' + p.PedidoId + ')"><span>' + p.PedidoId + '</div></span>';
+					if (VAR_USA_PEDIDOEXTERNO == 'A' && p.PedidoExternalId != '') {
+						html = html + '<div onclick = "abrirEnOtraVentana(' + p.PedidoId + ')"><span>' + p.PedidoId + '</div></span>';
+						html = html + '<p class = "titulocampoficha">#Externo</p>';
+						html = html + '<div onclick = "abrirEnOtraVentana(' + p.PedidoId + ')"><span>' + p.PedidoExternalId + '</div></span>';
+					}else {
+						html = html + '<div onclick = "abrirEnOtraVentana(' + p.PedidoId + ')"><span>' + p.PedidoId + '</div></span>';
+					}
 				}
 				html = html + '</div>';
 				html = html + '<div class="col-sm-1 col-md-1">';
@@ -1648,19 +1654,18 @@ function getTableHeader() {
 	}
 
 	if (VAR_USA_PRECLASIFICACION) {
-		buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Pre. Cla.</th> ';
+		buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Precla</th> ';
 
 	}
 
 	if (VAR_USA_TIPOVEHICULO) {
-		buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Vehiculo</th> ';
-
+		buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Vehículo</th> ';
 	}
 
 	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:left;;">Dirección</th> ';
 
-	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:right;;">Hora Ini</th> ';
-	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:right;;">Hora Fin</th> ';
+	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:right;;">Inicio</th> ';
+	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:right;;">Fin</th> ';
 	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:right;;">Distancia</th> ';
 
 	buffer += ' <th class="gx-tab-padding-fix-1 WorkWithTitle" style="white-space:nowrap;text-align:right;;">Tiempo</th> ';
@@ -2001,10 +2006,10 @@ function mostrarRegistrosRuta(poly) {
 				var color = vectorDePuntosJSON[i].Color;
 				vHtml += '<table  class = "tablaTopPaddingBottom" >';
 				vHtml += '<tr>';
-				vHtml += '<td><img class= "imgGrid2" src="' + PATHIMAGES + '/paquete.png' + '"></td><td><span class="labeltablaruta">&nbsp;BULTOS:</span>&nbsp;<span class = "valorescabezalruta">[=&&8=]</span> </td><span class="labeltablaruta">' + "[=&&1=]&nbsp&nbsp[=&&2=]" + '</span></td>';
+				vHtml += '<td><img class= "imgGrid2" src="' + PATHIMAGES + '/paquete.png' + '"></td><td><span class="labeltablaruta">&nbsp;Bultos:</span>&nbsp;<span class = "valorescabezalruta">[=&&8=]</span> </td><span class="labeltablaruta">' + "[=&&1=]&nbsp&nbsp[=&&2=]" + '</span></td>';
 
 				if (!esModRuta()) {
-					vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta" value ="' + vNombreRuta + '" onblur = "grabarNombreRuta()" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..."></input></span></td>';
+					vHtml += '<td class = "celdaGrid" ><span class="labeltablaruta">Nombre:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta" value ="' + vNombreRuta + '" onblur = "grabarNombreRuta()" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..."></input></span></td>';
 				} else {
 					if (vRUTA.VRutaEstado == "P") {
 						vHtml += '<td class = "celdaGrid" ><span>Nombre&nbspde&nbspRuta:</td><td><input class = "form-control AttributeCheckBox" id="nombreruta"  value ="' + vNombreRuta + '" maxLenght="20" style= "width: auto;" placeholder="Ingrese Nombre..." onblur = "grabarNombreRuta()"></input></span></td>';
@@ -2072,10 +2077,14 @@ function mostrarRegistrosRuta(poly) {
 
 			vHtml += ' <td class="gx-tab-padding-fix-1 gx-attribute celdaGrid ' + clasesEstado(p) + '" style="text-align:right;" onclick = "abrirEnOtraVentana(' + p.PedidoId + ')">';
 
-			if (VAR_USA_PEDIDOEXTERNO) {
-				vHtml += ' 			<div class="tooltip2">#' + p.PuntoOrden + '-' + p.PedidoExternalId + '';
+			if (VAR_USA_PEDIDOEXTERNO == 'E') {
+				vHtml += ' 			<div class="tooltip2">#' + p.PuntoOrden + '-' + p.PedidoExternalId;
 			} else {
-				vHtml += ' 			<div class="tooltip2">#' + p.PuntoOrden + '-' + p.PedidoId + '';
+				if (VAR_USA_PEDIDOEXTERNO == 'A' && p.PedidoExternalId != '') {
+					vHtml += ' 		<div class="tooltip2">#' + p.PuntoOrden + '-' + p.PedidoId + ' - '+ p.PedidoExternalId;
+				}else {
+					vHtml += ' 		<div class="tooltip2">#' + p.PuntoOrden + '-' + p.PedidoId;
+				}
 			}
 
 			vHtml += '			<span class="tooltiptext2">' + mostrarDetallesPedido(p.PedidoId) + '</span> ';
@@ -2241,15 +2250,15 @@ function mostrarRegistrosRuta(poly) {
 	if (!cabezal) {
 		vHtml += '</table>';
 		vHtml += '</div>';
-		var rep = '<td"><td><img class= "imgGrid2" src="' + PATHIMAGES + '/recursopin.png' + '"></td><td><span class="labeltablaruta">&nbspPUNTOS:</span>&nbsp<span class = "valorescabezalruta">' + cntpuntos + "</span></td>";
-		rep += '<td><img class = "imgGrid2" src = "' + PATHIMAGES + '/way.png"></td><td><span class="labeltablaruta">RECORRIDO:</span>&nbsp<span class = "valorescabezalruta">' + Math.round(distanciatotal / 1000) + '&nbspkm&nbsp</span></td><td><img class = "imgGrid2" src = "' + PATHIMAGES + '/time-left.png"></td><td><span class="labeltablaruta">Duración&nbsp</span><span class = "valorescabezalruta">' + tiempototal + "</span>&nbspmin&nbsp</td>";
+		var rep = '<td"><td><img class= "imgGrid2" src="' + PATHIMAGES + '/recursopin.png' + '"></td><td><span class="labeltablaruta">&nbspVisitas:</span>&nbsp<span class = "valorescabezalruta">' + cntpuntos + "</span></td>";
+		rep += '<td><img class = "imgGrid2" src = "' + PATHIMAGES + '/way.png"></td><td><span class="labeltablaruta">Distancia:</span>&nbsp<span class = "valorescabezalruta">' + Math.round(distanciatotal / 1000) + '&nbspkm&nbsp</span></td><td><img class = "imgGrid2" src = "' + PATHIMAGES + '/time-left.png"></td><td><span class="labeltablaruta">Duración&nbsp</span><span class = "valorescabezalruta">' + tiempototal + "</span>&nbspmin&nbsp</td>";
 
 		vHtml = vHtml.replace("[=&&8=]", cantTotalDeBultos);
 		vHtml = vHtml.replace("[=&&1=]", rep);
 
 		if (EXT_MOSTRAR_HORA_EN_RUTA) {
 			//vHtml = vHtml.replace("[=&&2=]", "Inicio&nbsp<strong>" + getFormatoDeFechaHora(new Date(DTFechaHoraInicioRuta)) + "</strong>,&nbspfin&nbsp<strong>" + getFormatoDeFechaHora(new Date(fecha_hora))) ;
-			vHtml = vHtml.replace("[=&&2=]", '<td class = "celdaGrid" ><span class="labeltablaruta">INICIO</td><td >' + getDtControl() + '</span></td><td class = "celdaGrid"><span class="labeltablaruta">FIN</span></td><td><span class = "valorescabezalruta">' + rellenarConNBSP(getFormatoDeFechaHora(new Date(fecha_hora)))) + "</span></td>";
+			vHtml = vHtml.replace("[=&&2=]", '<td class = "celdaGrid" ><span class="labeltablaruta">Inicio</td><td >' + getDtControl() + '</span></td><td class = "celdaGrid"><span class="labeltablaruta">Fin:</span></td><td><span class = "valorescabezalruta">' + rellenarConNBSP(getFormatoDeFechaHora(new Date(fecha_hora)))) + "</span></td>";
 		}
 	}
 	vVRutaVisitaFchSalida = getFormatoDeFechaHoraISO(new Date(fecha_hora));
