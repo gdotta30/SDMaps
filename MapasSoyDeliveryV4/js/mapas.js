@@ -7,6 +7,7 @@ var VAR_USA_PRECLASIFICACION = EXT_VAR_USA_PRECLASIFICACION;
 var VAR_USA_TIPOVEHICULO = EXT_VAR_USA_TIPOVEHICULO;
 var VAR_USA_NEGOCIO_EN_TABLA = EXT_VAR_USA_NEGOCIO_EN_TABLA;
 var VAR_USA_NOMBRE_EN_TABLA = EXT_VAR_USA_NOMBRE_EN_TABLA;
+var VAR_USA_RUTA_CERRADA = EXT_VAR_USA_RUTA_CERRADA;
 
 var INDICE_CONTROL_Punto = 0;
 var MINCHARSSUGEST = 2;
@@ -128,6 +129,9 @@ var varincluirentregasfueraderutas = false;
 
 var vRUTA;
 var vNombreRuta = "";
+var VRutaHoraFin ;
+var VRutaDistancia;
+
 
 var semaforo = 0;
 var cantsemaforo = 0;
@@ -1282,6 +1286,9 @@ function calcularTiemposYDistanciaXSoyDelivery() {
 		success: function(respuesta) {
 			ocultarWait();
 			if (respuesta.sdtRespuestaWS.ok == "S") {
+				VRutaHoraFin = respuesta.sdtWsRutas[0].VRutaHoraFin;
+				VRutaDistancia = respuesta.sdtWsRutas[0].VRutaDistancia;
+			
 				procesarTiemposYDistancias(respuesta.sdtWsRutas);
 				refrescarGrillaruta();
 			} else {
@@ -2250,9 +2257,19 @@ function mostrarRegistrosRuta(poly) {
 	if (!cabezal) {
 		vHtml += '</table>';
 		vHtml += '</div>';
-		var rep = '<td"><td><img class= "imgGrid2" src="' + PATHIMAGES + '/recursopin.png' + '"></td><td><span class="labeltablaruta">&nbspVisitas:</span>&nbsp<span class = "valorescabezalruta">' + cntpuntos + "</span></td>";
-		rep += '<td><img class = "imgGrid2" src = "' + PATHIMAGES + '/way.png"></td><td><span class="labeltablaruta">Distancia:</span>&nbsp<span class = "valorescabezalruta">' + Math.round(distanciatotal / 1000) + '&nbspkm&nbsp</span></td><td><img class = "imgGrid2" src = "' + PATHIMAGES + '/time-left.png"></td><td><span class="labeltablaruta">Duración&nbsp</span><span class = "valorescabezalruta">' + tiempototal + "</span>&nbspmin&nbsp</td>";
+		var rep = "";
+		if (VAR_USA_RUTA_CERRADA == "S"){
+			tiempototal = DiferenciaEntreFechas(VRutaHoraFin,DTFechaHoraInicioRuta) ;
+			var fin = VRutaHoraFin;
+			distanciatotal= VRutaDistancia;
+			fecha_hora = VRutaHoraFin;
+			rep = '<td"><td><img class= "imgGrid2" src="' + PATHIMAGES + '/recursopin.png' + '"></td><td><span class="labeltablaruta">&nbspVisitas:</span>&nbsp<span class = "valorescabezalruta">' + cntpuntos + "</span></td>";
+			rep += '<td><img class = "imgGrid2" src = "' + PATHIMAGES + '/way.png"></td><td><span class="labeltablaruta">Distancia:</span>&nbsp<span class = "valorescabezalruta">' + Math.round(distanciatotal / 1000) + '&nbspkm&nbsp</span></td><td><img class = "imgGrid2" src = "' + PATHIMAGES + '/time-left.png"></td><td><span class="labeltablaruta">Duración&nbsp</span><span class = "valorescabezalruta">' + tiempototal + "</span>&nbspmin&nbsp</td>";
 
+		}else{
+			rep = '<td"><td><img class= "imgGrid2" src="' + PATHIMAGES + '/recursopin.png' + '"></td><td><span class="labeltablaruta">&nbspVisitas:</span>&nbsp<span class = "valorescabezalruta">' + cntpuntos + "</span></td>";
+			rep += '<td><img class = "imgGrid2" src = "' + PATHIMAGES + '/way.png"></td><td><span class="labeltablaruta">Distancia:</span>&nbsp<span class = "valorescabezalruta">' + Math.round(distanciatotal / 1000) + '&nbspkm&nbsp</span></td><td><img class = "imgGrid2" src = "' + PATHIMAGES + '/time-left.png"></td><td><span class="labeltablaruta">Duración&nbsp</span><span class = "valorescabezalruta">' + tiempototal + "</span>&nbspmin&nbsp</td>";
+		}
 		vHtml = vHtml.replace("[=&&8=]", cantTotalDeBultos);
 		vHtml = vHtml.replace("[=&&1=]", rep);
 
@@ -2276,6 +2293,18 @@ function getestilohorario(hora_horario0, hora_horario1, hora_visita0, hora_visit
 		v += ' style="text-align:center;  color: red; " ';
 	}
 	return v;
+}
+
+function DiferenciaEntreFechas(f1, f2){
+	var fecha1 = moment("2016-09-30 07:30:00", "YYYY-MM-DDTHH:mm:ss");
+	var fecha2 = moment("2016-10-03 07:30:00", "YYYY-MM-DDTHH:mm:ss");
+
+	var diff = fecha2.diff(fecha1, 'd'); // Diff in days
+	console.log(diff);
+
+	var diff = fecha2.diff(fecha1, 'h'); // Diff in hours
+	msg("LA di es " + diff);
+	return diff;
 }
 
 function clasesEstado(v) {
