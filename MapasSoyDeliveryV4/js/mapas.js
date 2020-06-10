@@ -135,6 +135,8 @@ var VRutaDistancia;
 
 var semaforo = 0;
 var cantsemaforo = 0;
+var VRutaDistanciaAlNegocio;
+var VRutaTiempoAlNegocio;
 
 function abrirEnOtraVentana(PedidoId) {
 	var url = URL_wsUrlLinkViewPedido + "?" + PedidoId;
@@ -1288,7 +1290,8 @@ function calcularTiemposYDistanciaXSoyDelivery() {
 			if (respuesta.sdtRespuestaWS.ok == "S") {
 				VRutaHoraFin = respuesta.sdtWsRutas[0].VRutaHoraFin;
 				VRutaDistancia = respuesta.sdtWsRutas[0].VRutaDistancia;
-			
+				VRutaDistanciaAlNegocio = respuesta.sdtWsRutas[0].VRutaDistanciaAlNegocio;
+				VRutaTiempoAlNegocio = respuesta.sdtWsRutas[0].VRutaTiempoAlNegocio;
 				procesarTiemposYDistancias(respuesta.sdtWsRutas);
 				refrescarGrillaruta();
 			} else {
@@ -1615,7 +1618,9 @@ function parcearDTFechaHoraInicio(c) {
 		} else {
 			DTFechaHoraInicioRuta = fecha.toString();
 		}
+		calcularTiemposYDistanciaXSoyDelivery();
 		refrescarGrillaruta();
+
 	} else {
 		console.log("Error");
 	}
@@ -1829,6 +1834,7 @@ function habilitarDragAndDropGrilla() {
 
 				cargarPuntos(false);
 				modoOptimizacion = false;
+				calcularTiemposYDistanciaXSoyDelivery();
 				calcularYDesplegarLaRuta();
 			}
 		},
@@ -2348,6 +2354,7 @@ function validonumero(PuntoId) {
 	if (esEntero(txt.value)) {
 		var p = getPUntoById(PuntoId)
 		p.PuntoDuracionVisita = txt.value;
+		calcularTiemposYDistanciaXSoyDelivery();
 		refrescarGrillaruta();
 		console.log("Entero valido");
 	} else {
@@ -4062,6 +4069,9 @@ function getCabezalRutaJSON(visitas) {
 		VRRutaDirServiceData: "", //JSON.stringify(vVRRutaDirServiceData), SE COMENTA POR PROBLEMAS DE TRAFICO
 		VRutaOrigenLocation: hh.lat + "," + hh.lng,
 		VRutaHabilitada: 0,
+		VRutaDistanciaAlNegocio: VRutaDistanciaAlNegocio,
+		VRutaTiempoAlNegocio: VRutaTiempoAlNegocio,
+		VRutaDistancia: VRutaDistancia,
 		"visitas": visitas
 		//vercoco
 	}
