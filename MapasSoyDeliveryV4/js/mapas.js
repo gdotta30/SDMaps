@@ -691,8 +691,11 @@ function agregaPuntoEnElMapa(Punto) {
 				p.PuntoLat = lat;
 				p.PuntoLong = lng;
 				actualizarWsLocation(p)
+
 			}
 		}
+		calcularYDesplegarLaRuta();
+		mostrarRegistrosRuta();
 	});
 
 	vecMarkersPuntos.push(marker);
@@ -703,6 +706,7 @@ function agregaPuntoEnElMapa(Punto) {
 	if (Punto.PedidoColor != "") {
 		cambiarPin(Punto);
 	}
+
 }
 
 function indicarPunto(PedidoId) {
@@ -1618,7 +1622,7 @@ function parcearDTFechaHoraInicio(c) {
 		} else {
 			DTFechaHoraInicioRuta = fecha.toString();
 		}
-		calcularTiemposYDistanciaXSoyDelivery();
+		calcularYDesplegarLaRuta();
 		refrescarGrillaruta();
 
 	} else {
@@ -1834,8 +1838,8 @@ function habilitarDragAndDropGrilla() {
 
 				cargarPuntos(false);
 				modoOptimizacion = false;
-				calcularTiemposYDistanciaXSoyDelivery();
 				calcularYDesplegarLaRuta();
+
 			}
 		},
 		stop: function(e, ui) {
@@ -2264,18 +2268,21 @@ function mostrarRegistrosRuta(poly) {
 		vHtml += '</table>';
 		vHtml += '</div>';
 		var rep = "";
-		if (VAR_USA_RUTA_CERRADA == "S"){
-			tiempototal = DiferenciaEntreFechas(VRutaHoraFin,DTFechaHoraInicioRuta) ;
+	//	if (VAR_USA_RUTA_CERRADA == "S"){
+
+			tiempototal = DiferenciaEntreFechas(VRutaHoraFin,DTFechaHoraInicioRuta)
+			msg("ppp: dif" + VRutaHoraFin + " - " + DTFechaHoraInicioRuta)
 			var fin = VRutaHoraFin;
 			distanciatotal= VRutaDistancia;
 			fecha_hora = VRutaHoraFin;
+			msg("ppp: VRutaHoraFin " + VRutaHoraFin);
 			rep = '<td"><td><img class= "imgGrid2" src="' + PATHIMAGES + '/recursopin.png' + '"></td><td><span class="labeltablaruta">&nbspVisitas:</span>&nbsp<span class = "valorescabezalruta">' + cntpuntos + "</span></td>";
 			rep += '<td><img class = "imgGrid2" src = "' + PATHIMAGES + '/way.png"></td><td><span class="labeltablaruta">Distancia:</span>&nbsp<span class = "valorescabezalruta">' + Math.round(distanciatotal / 1000) + '&nbspkm&nbsp</span></td><td><img class = "imgGrid2" src = "' + PATHIMAGES + '/time-left.png"></td><td><span class="labeltablaruta">Duración&nbsp</span><span class = "valorescabezalruta">' + tiempototal + "</span>&nbspmin&nbsp</td>";
 
-		}else{
+	/*	}else{
 			rep = '<td"><td><img class= "imgGrid2" src="' + PATHIMAGES + '/recursopin.png' + '"></td><td><span class="labeltablaruta">&nbspVisitas:</span>&nbsp<span class = "valorescabezalruta">' + cntpuntos + "</span></td>";
 			rep += '<td><img class = "imgGrid2" src = "' + PATHIMAGES + '/way.png"></td><td><span class="labeltablaruta">Distancia:</span>&nbsp<span class = "valorescabezalruta">' + Math.round(distanciatotal / 1000) + '&nbspkm&nbsp</span></td><td><img class = "imgGrid2" src = "' + PATHIMAGES + '/time-left.png"></td><td><span class="labeltablaruta">Duración&nbsp</span><span class = "valorescabezalruta">' + tiempototal + "</span>&nbspmin&nbsp</td>";
-		}
+		}*/
 		vHtml = vHtml.replace("[=&&8=]", cantTotalDeBultos);
 		vHtml = vHtml.replace("[=&&1=]", rep);
 
@@ -2285,8 +2292,9 @@ function mostrarRegistrosRuta(poly) {
 		}
 	}
 	vVRutaVisitaFchSalida = getFormatoDeFechaHoraISO(new Date(fecha_hora));
+	msg("ppp: vVRutaVisitaFchSalida " + vVRutaVisitaFchSalida);
 	vVRutaVisitaFchHorEntrada = getFormatoDeFechaHoraISO(new Date(DTFechaHoraInicioRuta));
-
+	msg("ppp: vVRutaVisitaFchHorEntrada " + vVRutaVisitaFchHorEntrada);
 	ContraerMapa();
 	return vHtml;
 }
@@ -2302,13 +2310,11 @@ function getestilohorario(hora_horario0, hora_horario1, hora_visita0, hora_visit
 }
 
 function DiferenciaEntreFechas(f1, f2){
-	var fecha1 = moment("2016-09-30 07:30:00", "YYYY-MM-DDTHH:mm:ss");
-	var fecha2 = moment("2016-10-03 07:30:00", "YYYY-MM-DDTHH:mm:ss");
+	var fecha1 = moment(f1, "YYYY-MM-DDTHH:mm:ss");
+	var fecha2 = moment(f2, "YYYY-MM-DDTHH:mm:ss");
 
-	var diff = fecha2.diff(fecha1, 'd'); // Diff in days
-	console.log(diff);
 
-	var diff = fecha2.diff(fecha1, 'h'); // Diff in hours
+	var diff = fecha1.diff(fecha2, 'm'); // Diff in hours
 	msg("LA di es " + diff);
 	return diff;
 }
@@ -2354,7 +2360,7 @@ function validonumero(PuntoId) {
 	if (esEntero(txt.value)) {
 		var p = getPUntoById(PuntoId)
 		p.PuntoDuracionVisita = txt.value;
-		calcularTiemposYDistanciaXSoyDelivery();
+		calcularYDesplegarLaRuta();
 		refrescarGrillaruta();
 		console.log("Entero valido");
 	} else {
@@ -2465,7 +2471,7 @@ function getFormatoDeFechaHoraISO(date) {
 	var hourFormatted = hour % 24 || 0; // hour returned in 24 hour format
 	var minuteFormatted = minute < 10 ? "0" + minute : minute;
 	var morning = ""; //hour < 12 ? "am" : "pm";
-	return addZero(year) + "-" + addZero(month) + "-" + addZero(day) + "T" + addZero(hourFormatted) + ":" + addZero(minute);
+	return addZero(year) + "-" + addZero(month) + "-" + addZero(day) + "T" + addZero(hourFormatted) + ":" + addZero(minute) + ":00";
 
 	//  msg("***getFormatoDeFechaHora***");
 	//  var s = "<span>" + addZero(day) + "/" + addZero(month) + "/" + addZero(year) + "&nbsp" + addZero(hour) + ":" + addZero(minute) + "</span>";
@@ -4386,6 +4392,7 @@ function cargarJsonPuntos(cargarDesdeWEB) {
 			success: function(Puntos) {
 				if (esModRuta()) {
 					vRUTA = Puntos.sdtCabezalRuta;
+					vVRutaVisitaFchHorEntrada = vRUTA.VRutaHoraComienzo;
 					DTFechaHoraInicioRuta = vRUTA.VRutaHoraComienzo;
 					vNombreRuta = vRUTA.VRutaNom;
 				}
