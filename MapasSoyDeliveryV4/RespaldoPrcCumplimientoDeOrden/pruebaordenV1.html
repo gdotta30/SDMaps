@@ -1,0 +1,128 @@
+<script>
+
+console.log("V1");
+
+var vOrdenOriginal  = [1,2,3,4,5,6,7,8,9,10];
+var vOrdenRealizado = [6,1,2,3,4,5,7,8,9,10];
+console.log("Debe penaizar solo 1");
+prcCumplimiento(vOrdenOriginal, vOrdenRealizado);
+
+
+
+
+console.log("NUEVA PRUEBA No debe penalizar ninguno");
+vOrdenOriginal = [1,2,3,4,5,6,7,8,9,10];
+vOrdenRealizado = [1,2,3,4,5,6,7,8,9,10];
+prcCumplimiento(vOrdenOriginal, vOrdenRealizado);
+
+
+console.log("");
+console.log("NUEVA PRUEBA Debe penalizar 2");
+vOrdenOriginal = [1,2,3,4,5,6,7,8,9,10];
+vOrdenRealizado = [1,6,2,3,4,5,7,9,8,10];
+prcCumplimiento(vOrdenOriginal, vOrdenRealizado);
+
+
+
+
+console.log("");
+console.log("NUEVA PRUEBA Debe penalizar 4");
+vOrdenOriginal = [1,2,3,4,5,6,7,8,9,10];
+vOrdenRealizado = [6,5,1,2,3,4,7,10,9,8];
+prcCumplimiento(vOrdenOriginal, vOrdenRealizado);
+
+console.log("");
+console.log("NUEVA PRUEBA Debe penalizar 4");
+vOrdenOriginal = [1,2,3,4,5,6,7,8,9,10];
+vOrdenRealizado = [6,5,1,2,3,4,7,10,9,8];
+prcCumplimiento(vOrdenOriginal, vOrdenRealizado);
+
+
+
+console.log("");
+console.log("NUEVA PRUEBA Debe penalizar 5");
+vOrdenOriginal = [1,2,3,4,5,6,7,8,9,10];
+vOrdenRealizado = [5,6,7,8,9,10,1,2,3,4];
+prcCumplimiento(vOrdenOriginal, vOrdenRealizado);
+
+
+
+
+function prcCumplimiento(vOrdenOriginal, vOrdenRealizado){
+	console.log("************** INICIAR ANALISIS ****************");
+	
+	var vecOrdenesRealizadosPenalizados = [];
+	
+	var pena = 0;
+	var j = 0;
+
+	var hayPena = false;
+	var hayPenaMayorOrdenEnOriginal = false
+	console.log("***Orden original***");
+	mostrarInfovector(vOrdenOriginal);
+	console.log("***Orden realizado***");
+	mostrarInfovector(vOrdenRealizado);
+	console.log("");
+	
+	for (var  i=0; (j < vOrdenRealizado.length); i++ ){
+			
+			if (hayPena){ 
+				i = i - 1;			
+			}
+			
+			hayPena = false;
+			
+			if (!yaFuePenalizado(vOrdenOriginal[i], vecOrdenesRealizadosPenalizados)){
+				if (Number(vOrdenOriginal[i]) < Number(vOrdenRealizado[j])){
+
+
+					pena = pena - 1;
+
+					console.log("Penaliza porque orden original es " + vOrdenOriginal[i] + " y orden realizado es " + vOrdenRealizado[j]);
+					
+					hayPena = true;
+					vecOrdenesRealizadosPenalizados.push(vOrdenRealizado[j]);
+				}
+				 
+				
+				j += 1;
+			}
+
+	}
+	console.log("");
+	
+	console.log("************** REPORTE FINAL ****************");
+	
+	console.log("Cantidad de penas " + pena);
+	console.log("Cantidad de visitas " + vOrdenOriginal.length);
+	var porcent = 0;
+	porcent = ((vOrdenOriginal.length + pena)/ vOrdenOriginal.length) * 100;
+	console.log("Porcent de cumplimento " + porcent);
+	console.log("Elementos penalizados");
+	mostrarInfovector(vecOrdenesRealizadosPenalizados);
+}
+
+function yaFuePenalizado(elemento, vecPenalizados){
+	
+	for(var i=0; i < vecPenalizados.length; i++){
+		if (vecPenalizados[i] == elemento){
+			return true
+		}
+	}
+	return false;
+}
+
+function mostrarInfovector(vec){
+	var buffer = "";
+	if (vec.length == 0){
+		console.log("No hay elementos");
+		return;
+	}
+	for(var z = 0; z< vec.length; z++){
+		buffer = buffer + ", " +  vec[z];
+	}
+	console.log(buffer);
+}
+
+
+</script>

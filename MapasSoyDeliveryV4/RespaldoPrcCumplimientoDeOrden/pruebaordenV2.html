@@ -1,0 +1,123 @@
+<script>
+
+console.log("V1");
+
+var vOrdenRealizado = [6,1,2,3,4,5,7,8,9,10];
+console.log("Debe penaizar solo 2");
+prcCumplimiento(vOrdenRealizado);
+
+
+
+
+console.log("NUEVA PRUEBA No debe penalizar ninguno");
+vOrdenRealizado = [1,2,3,4,5,6,7,8,9,10];
+prcCumplimiento(vOrdenRealizado);
+
+
+console.log("");
+console.log("NUEVA PRUEBA Debe penalizar 6");
+vOrdenRealizado = [1,6,2,3,4,5,7,9,8,10];
+prcCumplimiento(vOrdenRealizado);
+
+
+
+
+console.log("");
+console.log("NUEVA PRUEBA Debe penalizar 6");
+vOrdenRealizado = [6,5,1,2,3,4,7,10,9,8];
+prcCumplimiento(vOrdenRealizado);
+
+console.log("");
+console.log("NUEVA PRUEBA Debe penalizar 6");
+vOrdenRealizado = [6,5,1,2,3,4,7,10,9,8];
+prcCumplimiento(vOrdenRealizado);
+
+
+
+console.log("");
+console.log("NUEVA PRUEBA Debe penalizar 1");
+vOrdenRealizado = [5,6,7,8,9,10,1,2,3,4];
+prcCumplimiento(vOrdenRealizado);
+
+
+
+
+function prcCumplimiento(vOrdenRealizado){
+	console.log("************** INICIAR ANALISIS ****************");
+	
+	var vecOrdenesRealizadosPenalizados = [];
+	
+	var pena = 0;
+	var j = 0;
+	var cantSecuencias = 0;
+	var hayPena = false;
+	var hayPenaMayorOrdenEnOriginal = false
+	console.log("***Orden realizado***");
+	mostrarInfovector(vOrdenRealizado);
+	console.log("");
+	var primero = 9999;
+	var segundo = 0;
+	for (var  i=0; (i < vOrdenRealizado.length); i++ ){
+	
+		
+		segundo = vOrdenRealizado[i];
+		dif = segundo - primero;
+		
+		
+		console.log("segundo - primero " + segundo + " " + primero);
+		if (dif != 1){
+			cantSecuencias += 1;
+			vecOrdenesRealizadosPenalizados.push(vOrdenRealizado[i]);
+			console.log("Pena por dif  " + dif);
+		}
+	
+		primero = segundo;
+		
+
+	}
+	
+	pena = (cantSecuencias  - 1) * -1;
+	console.log("");
+	
+	console.log("************** REPORTE FINAL ****************");
+	console.log("Cantidad de secuencias " + cantSecuencias);
+	console.log("Cantidad de penas " + pena);
+	console.log("Cantidad de visitas " + vOrdenRealizado.length);
+	var porcent = 0;
+	porcent = ((vOrdenRealizado.length + pena)/ vOrdenRealizado.length) * 100;
+	console.log("Porcent de cumplimento " + porcent);
+	console.log("Elementos origen de secuencia");
+	mostrarInfovector(vecOrdenesRealizadosPenalizados);
+}
+
+
+
+
+
+
+
+function yaFuePenalizado(elemento, vecPenalizados){
+	
+	for(var i=0; i < vecPenalizados.length; i++){
+		if (vecPenalizados[i] == elemento){
+			return true
+		}
+	}
+	return false;
+}
+
+function mostrarInfovector(vec){
+	var buffer = "";
+	if (vec.length == 0){
+		console.log("No hay elementos");
+		return;
+	}
+	for(var z = 0; z< vec.length; z++){
+		buffer = buffer + ", " +  vec[z];
+	}
+	console.log(buffer);
+}
+
+
+
+</script>
