@@ -1,5 +1,6 @@
 // VARIABLES PARA PARAMETRIZAR
 var VAR_USA_PEDIDOEXTERNO = EXT_VAR_USA_PEDIDOEXTERNO;
+
 var VAR_USA_CANTBULTOS = true;
 var VAR_USA_COMPLEJIDAD = EXT_VAR_USA_COMPLEJIDAD;
 var VAR_USA_SERVICIO = EXT_VAR_USA_SERVICIO;
@@ -19,6 +20,8 @@ var vPoligonoColor = '#FF0000';
 var vPoligonoFillColor = '#FF0000';
 var vANCHOLABEL_1 = 40;
 var vANCHOLABEL_2 = 70;
+var hayRuta = false;
+var hayNuevoPunto = false;
 
 var URL_wsUrlLinkViewPedido = EXT_VAR_URLLINKVIEWPEDIDO;
 
@@ -243,6 +246,7 @@ function calcularOrigenTentativo() {
 }
 
 function limpiarRutaBoton() {
+	hayRuta = false;
 	iniFlagruteo();
 	limpiarRuta();
 }
@@ -694,8 +698,11 @@ function agregaPuntoEnElMapa(Punto) {
 
 			}
 		}
-		calcularYDesplegarLaRuta();
-		mostrarRegistrosRuta();
+		if (hayRuta){
+			calcularYDesplegarLaRuta();
+
+			mostrarRegistrosRuta(getZonaEnUso());
+		}
 	});
 
 	vecMarkersPuntos.push(marker);
@@ -706,6 +713,31 @@ function agregaPuntoEnElMapa(Punto) {
 	if (Punto.PedidoColor != "") {
 		cambiarPin(Punto);
 	}
+
+}
+
+
+function crearOrdenVista(ZonaId){
+	orden =0;
+	for (var i = 0; i < vectorDePuntosJSON.length; i++) {
+
+		if (vectorDePuntosJSON[i].PuntoZonaId == ZonaId) {
+
+			if (!vectorDePuntosJSON[i].PuntoOcultar){
+				if ((vectorDePuntosJSON[i].Precedencia == 2) || (vectorDePuntosJSON[i].Precedencia == 0)){
+					orden += 1;
+					vectorDePuntosJSON[i].PuntoOrdenVista = orden;
+				}else{
+
+					vectorDePuntosJSON[i].PuntoOrdenVista = -1;
+				}
+			}else{
+				vectorDePuntosJSON[i].PuntoOrdenVista = vectorDePuntosJSON[i].PuntoOrden;
+
+			}
+		}
+	}
+
 
 }
 
@@ -1198,6 +1230,7 @@ function calcularRutaParcial(ds, dd, primerlatlng, ultimalatlng, waypts, vecPedP
 							route.legs[i].duration.value,
 							route.legs[i].duration.text);
 
+
 					} else {
 						msg("No encontro el Punto ");
 					}
@@ -1297,6 +1330,7 @@ function calcularTiemposYDistanciaXSoyDelivery() {
 				VRutaDistanciaAlNegocio = respuesta.sdtWsRutas[0].VRutaDistanciaAlNegocio;
 				VRutaTiempoAlNegocio = respuesta.sdtWsRutas[0].VRutaTiempoAlNegocio;
 				procesarTiemposYDistancias(respuesta.sdtWsRutas);
+				crearOrdenVista(getZonaEnUso());
 				refrescarGrillaruta();
 			} else {
 				mensajeError(respuesta.sdtRespuestaWS.errordesc)
@@ -1753,7 +1787,7 @@ function cambiarPin(p) {
 	var color = getColorDelPin(p);
 
 	if (p.FlagRuteo && p.PuntoOrden != 0) {
-		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|" + p.PuntoOrden;
+		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|" + p.PuntoOrdenVista;
 	} else {
 		switch (p.Precedencia) {
 			case 2:
@@ -2014,11 +2048,14 @@ function mostrarRegistrosRuta(poly) {
 	var cantTotalDeBultos = 0;
 	var punto1 = undefined;
 	var punto2 = undefined;
+	hayRuta = false;
+
 	for (i = 0; i < vectorDePuntosJSON.length; i++) {
 		var p = vectorDePuntosJSON[i];
 		p.PuntoOrden = 0;
 		cambiarPin(p);
 		if (p.PuntoZonaId == poly && !p.PuntoOcultar) {
+
 			if (cabezal) {
 				var color = vectorDePuntosJSON[i].Color;
 				vHtml += '<table  class = "tablaTopPaddingBottom" >';
@@ -2049,6 +2086,7 @@ function mostrarRegistrosRuta(poly) {
 				cabezal = false;
 				var acumuladoMinutos = 0;
 			}
+			hayRuta = true;
 			cantruteados++;
 			if (p.FlagRuteo) {
 				cntpuntos++;
@@ -2934,18 +2972,32 @@ function polyFromTheScratch(id, desc, puntos, mostrar) {
 		doInfoWindow(newShape, e);
 	});
 
-	/*
+
 
 	  google.maps.event.addListener(newShape.getPath(), 'insert_at', function() {
 	      //setPolyModificado(newShape.tag, EDITADO);
+		  msg("hayNuevoPunto " + hayNuevoPunto);
+
+		  if (hayRuta && hayNuevoPunto){
+			 hayNuevoPunto = false;
+			rutearBoton();
+		  }
 	  });
+
+	  /*
 	  google.maps.event.addListener(newShape.getPath(), 'remove_at', function() {
 	      //setPolyModificado(newShape.tag, EDITADO);
 	  });
+	  */
 	  google.maps.event.addListener(newShape.getPath(), 'set_at', function() {
 	      //setPolyModificado(newShape.tag, EDITADO);
+		  msg("hayNuevoPunto " + hayNuevoPunto);
+		  if (hayRuta && hayNuevoPunto){
+			   hayNuevoPunto = false;
+			rutearBoton();
+		  }
 	  });
-	 */
+
 
 	agregarPolyAlArray(newShape);
 
@@ -3161,11 +3213,22 @@ function setDatosPoly(e) {
 	agregarPolyAlArray(newShape);
 	google.maps.event.addListener(newShape.getPath(), 'insert_at', function() {
 		//setPolyModificado(newShape.tag, EDITADO);
+		 msg("hayNuevoPunto " + hayNuevoPunto);
+		if (hayRuta && hayNuevoPunto){
+			 hayNuevoPunto = false;
+			rutearBoton();
+		}
 	});
 	google.maps.event.addListener(newShape.getPath(), 'remove_at', function() {
 		//setPolyModificado(newShape.tag, EDITADO);
 	});
 	google.maps.event.addListener(newShape.getPath(), 'set_at', function() {
+		 msg("hayNuevoPunto " + hayNuevoPunto);
+		if (hayRuta && hayNuevoPunto){
+			 hayNuevoPunto = false;
+			rutearBoton();
+		}
+
 		//setPolyModificado(newShape.tag, EDITADO);
 	});
 	cargarPoligonosEnLista(true);
@@ -4136,6 +4199,7 @@ function armarJSONRuta(ZonaId) {
 
 function armarRutas2Server() {
 	msg("***armarRutas2Server***");
+
 	var vecrutas = [];
 	var nomruta = document.getElementById("nombreruta");
 	if (myTrim(nomruta.value) == "") {
@@ -4331,8 +4395,10 @@ function cargarJsonPunto(PedidoId) {
 			if (Puntos.sdtGetPuntos.length == 0) {
 				mensajeNotificacion("No se incluyó el pedido, verifique el nro. de pedido o detalles como el estado, etc.");
 			} else {
+
 				$.each(Puntos.sdtGetPuntos, function(i, Punto) {
 					if (!existePuntoEnVectorDePuntos(Punto.PuntoId)) {
+						hayNuevoPunto = true;
 						var myLatLng = new google.maps.LatLng({
 							lat: Punto.PuntoLat,
 							lng: Punto.PuntoLong
@@ -4342,6 +4408,7 @@ function cargarJsonPunto(PedidoId) {
 						}
 						Punto.FlagRuteo = true;
 						Punto.Forzado = true;
+						Punto.PuntoOrdenVista = 0;
 						Punto.distancia_aux = 0;
 						agregaPuntoEnElMapa(Punto);
 						vectorDePuntosJSON.push(Punto);
@@ -4349,6 +4416,7 @@ function cargarJsonPunto(PedidoId) {
 						Punto.HoraHorden = getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(Punto.PedidoHorarioFin))) + "" + getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(Punto.PedidoHorarioIni)));
 						Punto.PuntoOrden = pos.pos + 1;
 						MarcarDestino(vectorDePuntosJSON[pos.pos + 1].PuntoId);
+
 					} else {
 						var p = getPUntoById(Punto.PuntoId);
 						p.Forzado = true;
@@ -4360,7 +4428,9 @@ function cargarJsonPunto(PedidoId) {
 							MarcarDestino(vectorDePuntosJSON[pos.pos + 1].PuntoId);
 						}
 					}
-					rutear(false);
+					limpiarRutaBoton();
+					rutearBoton();
+
 					//dibujarFlechasRuta(getZonaEnUso());
 				});
 			}
@@ -4408,6 +4478,7 @@ function cargarJsonPuntos(cargarDesdeWEB) {
 							Punto.PuntoZonaId = getZonaEnUso();
 						}
 						Punto.Forzado = false;
+						Punto.PuntoOrdenVista = 0;
 						Punto.FlagRuteo = true;
 						Punto.distancia_aux = 0;
 
