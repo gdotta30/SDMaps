@@ -4428,9 +4428,9 @@ function cargarJsonPunto(PedidoId) {
 							MarcarDestino(vectorDePuntosJSON[pos.pos + 1].PuntoId);
 						}
 					}
-					limpiarRutaBoton();
-					rutearBoton();
 
+					calcularYDesplegarLaRuta();
+					refrescarGrillaruta();
 					//dibujarFlechasRuta(getZonaEnUso());
 				});
 			}
