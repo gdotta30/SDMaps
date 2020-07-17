@@ -1787,7 +1787,13 @@ function cambiarPin(p) {
 	var color = getColorDelPin(p);
 
 	if (p.FlagRuteo && p.PuntoOrden != 0) {
-		urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|" + p.PuntoOrdenVista;
+		if (p.PuntoOrdenVista > 0){
+			urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|" + p.PuntoOrdenVista;
+		}else{
+			urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|R";
+
+
+		}
 	} else {
 		switch (p.Precedencia) {
 			case 2:
