@@ -2986,7 +2986,7 @@ function polyFromTheScratch(id, desc, puntos, mostrar) {
 
 		  if (hayRuta && hayNuevoPunto){
 			 hayNuevoPunto = false;
-			rutearBoton();
+			rutear(false);
 		  }
 	  });
 
@@ -3000,7 +3000,7 @@ function polyFromTheScratch(id, desc, puntos, mostrar) {
 		  msg("hayNuevoPunto " + hayNuevoPunto);
 		  if (hayRuta && hayNuevoPunto){
 			   hayNuevoPunto = false;
-			rutearBoton();
+			rutear(false);
 		  }
 	  });
 
@@ -3222,7 +3222,7 @@ function setDatosPoly(e) {
 		 msg("hayNuevoPunto " + hayNuevoPunto);
 		if (hayRuta && hayNuevoPunto){
 			 hayNuevoPunto = false;
-			rutearBoton();
+			rutear(false);
 		}
 	});
 	google.maps.event.addListener(newShape.getPath(), 'remove_at', function() {
@@ -3232,7 +3232,7 @@ function setDatosPoly(e) {
 		 msg("hayNuevoPunto " + hayNuevoPunto);
 		if (hayRuta && hayNuevoPunto){
 			 hayNuevoPunto = false;
-			rutearBoton();
+			rutear(false);
 		}
 
 		//setPolyModificado(newShape.tag, EDITADO);
