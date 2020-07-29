@@ -724,7 +724,7 @@ function crearOrdenVista(ZonaId){
 		if (vectorDePuntosJSON[i].PuntoZonaId == ZonaId) {
 
 			if (!vectorDePuntosJSON[i].PuntoOcultar){
-				if ((vectorDePuntosJSON[i].Precedencia == 2) || (vectorDePuntosJSON[i].Precedencia == 0)){
+				if ((vectorDePuntosJSON[i].Precedencia == 2) || (vectorDePuntosJSON[i].Precedencia == 0) || (vectorDePuntosJSON[i].PedidosMuestraAmbos)){
 					orden += 1;
 					vectorDePuntosJSON[i].PuntoOrdenVista = orden;
 				}else{
@@ -1000,8 +1000,7 @@ function modificarPuntoEnElMapa(Punto) {
 
 function existePuntoEnVectorDePuntos(PuntoId) {
 	var existe = false;
-	for (i = 0;
-		((i < vectorDePuntosJSON.length) && (!existe)); i++) {
+	for (var i = 0;	((i < vectorDePuntosJSON.length) && (!existe)); i++) {
 		if (vectorDePuntosJSON[i].PuntoId == PuntoId) {
 			existe = true;
 		}
@@ -1790,6 +1789,7 @@ function cambiarPin(p) {
 		if (p.PuntoOrdenVista > 0){
 			urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|" + p.PuntoOrdenVista;
 		}else{
+
 			urlpin = "https://chart.apis.google.com/chart?chst=d_map_spin&chld=0.5|0|" + color + "|10|b|R";
 
 
@@ -1866,7 +1866,6 @@ function habilitarDragAndDropGrilla() {
 				mensajeError("No se puede mover el punto, verifique la precedencia");
 
 			} else {
-				/* si el movimiento es valido, se toma el orden que quedó en la tabla */
 				asignarOrdenDesdeLaTablaOrdenada(event.target.parentElement);
 				/* ordenar y mostrar */
 				var pos = minOrdenDelaZona(getZonaEnUso());
@@ -4402,7 +4401,8 @@ function cargarJsonPunto(PedidoId) {
 				mensajeNotificacion("No se incluyó el pedido, verifique el nro. de pedido o detalles como el estado, etc.");
 			} else {
 
-				$.each(Puntos.sdtGetPuntos, function(i, Punto) {
+				$.each(Puntos.sdtGetPuntos, function(index, Punto) {
+					msg("Coco : " + index + " " + Punto.PuntoId + " " + Punto.Precedencia);
 					if (!existePuntoEnVectorDePuntos(Punto.PuntoId)) {
 						hayNuevoPunto = true;
 						var myLatLng = new google.maps.LatLng({
@@ -4412,20 +4412,30 @@ function cargarJsonPunto(PedidoId) {
 						if (esModRuta()) {
 							Punto.PuntoZonaId = getZonaEnUso();
 						}
+						msg("Coco x: " + index + " " + Punto.PuntoId + " " + Punto.Precedencia);
+
+
+
+
+
 						Punto.FlagRuteo = true;
 						Punto.Forzado = true;
 						Punto.PuntoOrdenVista = 0;
 						Punto.distancia_aux = 0;
 						agregaPuntoEnElMapa(Punto);
-						vectorDePuntosJSON.push(Punto);
+
 						pos = maxOrdenDelaZona(getZonaEnUso());
 						Punto.HoraHorden = getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(Punto.PedidoHorarioFin))) + "" + getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(Punto.PedidoHorarioIni)));
 						Punto.PuntoOrden = pos.pos + 1;
+						vectorDePuntosJSON.push(Punto);
 						MarcarDestino(vectorDePuntosJSON[pos.pos + 1].PuntoId);
 
 					} else {
 						var p = getPUntoById(Punto.PuntoId);
+						p.FlagRuteo = true;
 						p.Forzado = true;
+						p.PuntoOrdenVista = 0;
+						p.distancia_aux = 0;
 						p.HoraHorden = getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(p.PedidoHorarioFin))) + "" + getFormatoDeHoraNumeros(getFormatoDeFechaHora(new Date(p.PedidoHorarioIni)));
 						p.PuntoZonaId = getZonaEnUso();
 						if (p.PuntoOrden == 0) {
@@ -4434,9 +4444,11 @@ function cargarJsonPunto(PedidoId) {
 							MarcarDestino(vectorDePuntosJSON[pos.pos + 1].PuntoId);
 						}
 					}
-
 					calcularYDesplegarLaRuta();
-					refrescarGrillaruta();
+					rutear(false);
+
+					//calcularYDesplegarLaRuta();
+					//refrescarGrillaruta();
 					//dibujarFlechasRuta(getZonaEnUso());
 				});
 			}
