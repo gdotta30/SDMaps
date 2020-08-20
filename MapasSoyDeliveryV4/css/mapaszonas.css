@@ -1,0 +1,495 @@
+
+
+/* Tooltip */
+  .test + .tooltip > .tooltip-inner {
+    background-color: #f7ecb5;
+    color: black;
+    border: 1px solid #999999;
+    padding: 5px;
+    font-size: 12px;
+  }
+  /* Tooltip on top */
+  .test + .tooltip.top > .tooltip-arrow {
+    border-top: 5px solid green;
+  }
+  /* Tooltip on bottom */
+  .test + .tooltip.bottom > .tooltip-arrow {
+    border-bottom: 5px solid blue;
+  }
+  /* Tooltip on left */
+  .test + .tooltip.left > .tooltip-arrow {
+    border-left: 5px solid red;
+  }
+  /* Tooltip on right */
+  .test + .tooltip.right > .tooltip-arrow {
+    border-right: 5px solid black;
+  }
+
+  .tooltip-inner > h2 {
+      font-size: 12px;
+  }
+
+.titulocampoficha{
+  margin-top: 2px;
+  margin-bottom: 2px;
+  color: #999999;
+}
+
+
+.divgridretiro{
+	background-color: red;
+	border-radius: 50%;
+	color:white;
+	width: 30px;
+	height: 30px;
+	padding: 5px;
+	text-align: center;
+	font-weight: bold;
+
+}
+
+.divgridentrega{
+	background-color: green;
+	border-radius: 50%;
+	color:white;
+	width: 30px;
+	height: 30px;
+	padding: 5px;
+	text-align: center;
+	font-weight: bold;
+}
+
+
+.labeltablaruta{
+  color: rgb(234, 91, 11);
+  font-weight: bold;
+  margin-left: 2px;
+  margin-right: 2px;
+
+}
+
+.valorescabezalruta{
+  color: black;
+  font-weight: bold;
+  word-wrap: break-word;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+.flotante_central_contendedor{
+	position: absolute;
+	left: 29px;
+	top: 15px;
+	overflow: auto;
+	width: 220px;
+	height: auto;
+	margin-top: -20px;
+	margin-left: -15px;
+	float: left;
+	background-color: white;
+	font-size: 11px;
+	font-family: "Lucida Grande", "Arial", "sans-serif";
+	display: none;
+	z-index: 99999;
+	box-shadow:2px 2px 2px #a09e9e;
+
+}
+
+
+
+.lista{
+    font-family: "Lucida Grande", "Arial", sans-serif;
+    font-size: 12px;
+    white-space: nowrap;
+    display: block;
+    color:  black;
+    padding: 1px 1px 1px 1px;
+    text-decoration: none;
+    margin-top: 5px;
+    margin-left: -40px;
+    margin-bottom: 5px;
+}
+
+/* Change the link color on hover */
+.lista:hover {
+    background-color: #555;
+    color: white;
+}
+
+.flotante_central_contenido {
+  position: absolute;
+
+}
+
+.lateral{
+    width: 24%;
+    display: inline-block;
+    background-color: lightgray;
+    margin: auto;
+    vertical-align: top;
+    margin-left: 0px;
+    margin-right: 0px;
+    padding: 0;
+    display: none;
+}
+
+.fichapedido{
+  font-family: "Lucida Grande", "Arial", sans-serif;
+  font-size: 10px;
+  width:150px;
+  position:absolute;
+  height:250px;
+  color:0F0F0F;
+  cursor:pointer;
+  background:#FFFFFF;
+  border:2px solid #F0F0F0;
+  z-index:3;
+  padding: 4px;
+}
+
+
+.divconscroll{
+	overflow-y: scroll;
+	height: 250px;
+}
+}
+
+.grilla{
+	overflow-y: scroll;
+	height: 500px;
+	max-height: 500px;
+}
+
+
+.inputdegrilla{
+	width: 60px;
+	border-radius: 5;
+	padding:5px;
+	margin-left: 5px;
+	margin-right: 5px;
+
+}
+.mapa{
+	float: right;
+	overflow: hidden;
+	height:400px;
+	width: 100%;
+
+	margin-left: 20px;
+	margin-top: 0px;
+}
+
+.palabra{
+	word-wrap: break-word;
+}
+
+.menuancho{
+	position:absolute;
+    width:  250px;
+    height:auto;
+    padding:5px;
+    font-family: "Lucida Grande", "Arial", sans-serif;
+    font-size: 12px;
+    color:0F0F0F;
+    cursor:pointer;
+    background:#FFFFFF;
+    border:2px solid #F0F0F0;
+	border-radius: 5px;
+    z-index:9999;
+
+}
+
+.menucontextualmapa{
+    position:absolute;
+    width:  150px;
+    height:auto;
+    padding:5px;
+    font-family: "Lucida Grande", "Arial", sans-serif;
+    font-size: 12px;
+    color:0F0F0F;
+    cursor:pointer;
+    background:#FFFFFF;
+    border:2px solid #F0F0F0;
+	border-radius: 5px;
+    z-index:9999;
+
+}
+.listaPuntos{
+  display: inline-block;
+  width:100%;
+  height:25%;
+  background: white;
+
+
+
+}
+
+
+.derecha{
+  text-align: right;
+}
+
+.topbarsave{
+  width:auto;
+  height: 20px;
+  text-align: right;
+  margin-left: 2px;
+  margin-right:  2px;
+  margin-top: 2px;
+  padding: 2px;
+}
+
+.topbar{
+  width:100%;
+  height: 20px;
+  background-color: lightgray;
+  text-align: right;
+
+  font-family: "Lucida Grande", "Arial", sans-serif;
+  font-size: 12px
+
+}
+.enter{
+  display: block;
+}
+.cerrar{
+  text-align: right;
+  margin-right: 5px;
+}
+.cerrarleft{
+  text-align: left;
+  margin-right: 5px;
+}
+.backgrid{
+  display: block;
+  position: relative;
+  width:100%;
+}
+
+.linea{
+    width:auto;
+    display: inline;
+    position: relative;
+    background: white;
+    text-decoration-color: black;
+    font-family: "Lucida Grande", "Arial", sans-serif;
+    font-size: 10px;
+    color:0F0F0F;
+}
+
+.labelzonas{
+    width: auto;
+    position: absolute;
+    height: auto;
+    font-family: "Lucida Grande", "Arial", sans-serif;
+    font-size: 10px;
+    color: 0F0F0F;
+    cursor: pointer;
+    background: white;
+    border: 2px;
+    opacity: .95;
+    z-index: 0;
+    padding: 3px;
+    border-radius: 7px;
+    border-color: darkgrey;
+    border-style: solid;
+
+}
+
+.imagesearch{
+  margin-top: 10px;
+  height: 20px;
+
+}
+
+
+.divcolor{
+  margin-left: 20px;
+  margin-right: 20px;
+  width: 80px;
+  height: 20px;
+  vertical-align: middle;
+  display: inline;
+}
+
+.imgTogle{
+  height: 30px;
+  width: auto;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+
+.muerto{
+  text-align: left;
+  background-color: #f1f3f4;
+  color: #8d8f90;
+  font-style: italic;
+}
+
+
+.estadonohab{
+  text-align: left;
+  background-color: #D2E7F6;
+  color: #8d8f90;
+  font-style: italic;
+}
+
+.imgInfo{
+ height: 30px;
+ width: auto;
+
+}
+.imgGrid3{
+  padding-left: 10px;
+	padding-right: 10px;
+}
+
+.celdaGrid{
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.tablaTopPaddingBottom{
+	margin-bottom: 20px;
+  width: 100%;
+}
+
+
+
+.imgLupa{
+
+	height: 20px;
+	float: left;
+	margin-left: -10px;
+	margin-right: 10px;
+	margin-top: 7px;
+	vertical-align: middle;
+}
+
+
+.imgGrid{
+  height: 15px;
+  width: auto;
+  vertical-align: middle;
+}
+
+.imgGrid2{
+ height: 20px;
+ width: auto;
+ vertical-align: middle;
+ align:center;
+
+}
+
+.imgGridMuerto{
+ height: 20px;
+ width: auto;
+ vertical-align: middle;
+ align:center;
+ -webkit-filter: grayscale(100%);
+	filter: grayscale(100%);
+	-webkit-transition: .3s ease-in-out;
+	transition: .3s ease-in-out;
+}
+
+.imgGridMuerto:hover{
+ height: 20px;
+ width: auto;
+ vertical-align: middle;
+ align:center;
+ -webkit-filter: grayscale(0);
+	filter: grayscale(0);
+
+}
+
+
+
+
+.toolbarsearch{
+  vertical-align: top;
+  margin-left: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  height: 30px;
+  width: 100%;
+
+}
+
+.checkbox{
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.labelzonasedit{
+    width:250px;
+    position:absolute;
+    height:auto;
+    font-family: "Lucida Grande", "Arial", sans-serif;
+    font-size: 12px;
+    color:0F0F0F;
+    cursor:pointer;
+    background:#FFFFFF;
+    border:2px solid #F0F0F0;
+    z-index:3;
+}
+
+.divGral{
+	width: 101%;
+	height: 720px;
+	margin-left: -10px;
+}
+
+
+.collapsibleX {
+  background-color: rgb(234, 91, 11);
+  color: white;
+  cursor: pointer;
+  padding: 5px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 12px;
+  padding-left: 10px;
+  filter:alpha(Opacity=60);
+  -khtml-opacity:1;
+  -moz-opacity:1;
+  opacity:1;
+  z-index:3000;
+}
+
+.class_zonas{
+
+}
+
+.activeX, .collapsibleX:hover {
+  background-color: rgb(234, 91, 11);
+}
+
+.contentX {
+  padding: 0 10px;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-out;
+  background-color: white;
+  margin-bottom: 1px;
+  margin-top: 1px;
+}
+
+.listaexpand{
+	height: auto;
+	margin-bottom: 11px;
+	background-color: white;
+	margin-top: 11px;
+	margin-left: -8px;
+	margin-right: -8px;
+}
+
+
+.enmarcar{
+  padding-left: 5px;
+  padding-right: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
