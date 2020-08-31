@@ -133,7 +133,7 @@ function getZonaEnUso(){
 		return selectedShape.tag;
 	else
 		return 0;
-		
+
 }
 
 
@@ -236,18 +236,18 @@ function initMap() {
 
 	inicializarOverlays();
 	mostrarDivCentral();
-	
-	
-	inicializarDrawingManager();
-		
-	getJSONZonasCreacionManual();
-		
 
-	
-	
+
+	inicializarDrawingManager();
+
+	getJSONZonasCreacionManual();
+
+
+
+
 	ocultarWait();
 
-	
+
 	$("body").toggleClass("sidebar-collapse");
 
 
@@ -288,7 +288,7 @@ function limpiarPoligono(poly) {
 function eliminarPoly(){
   if (selectedShape != undefined){
 	limpiarPoligono(selectedShape);
-	
+
   }else{
 	  mensajeError("Haga click sobre el polígono de la zona");
   }
@@ -298,7 +298,7 @@ function eliminarPoly(){
 
 
 function revertirCambios(){
-	
+
 	getJSONZonasCreacionManual();
 
 }
@@ -401,7 +401,7 @@ function actualizarJSONPoly(valor, id){
   }else{
     p.jsonpoly.PoligonoNombre = valor;
   }
- 
+
 }
 
 
@@ -443,7 +443,7 @@ function guardarEditPoly(PoligonoId){
 
 
 function salvarZona(){
-	
+
 	if (selectedShape != undefined){
 		salvandoZona(selectedShape);
 	}else{
@@ -467,18 +467,18 @@ function guardarEditZona(PoligonoId){
 
 
 function setDatosPoly(e){
-	
+
   if (ZonasSistema.length > 0){
 	  mensajeError("Ya hay un poligono para la zona");
 	  e.overlay.setMap(null);
 	  return;
-  } 
+  }
   var newShape = e.overlay;
   newShape.type = e.type;
 
   newShape.tag      =  ZONAID_INSTANCIA,//newShapeUltId = newShapeUltId + 1;
   newShape.caption  = "";
- 
+
   var _PoligonoId = ZONAID_INSTANCIA;
   var _PoligonoNegocioId = EXT_VAR_NEGOCIOID;
   var _PoligonoSucursalId = EXT_VAR_NEGOCIOSUCURSALID;
@@ -496,8 +496,8 @@ function setDatosPoly(e){
   });
   setSelection(newShape);
   agregarPolyAlArray(newShape);
- 
-  
+
+
 }
 
 function inicializarDrawingManager(){
@@ -511,7 +511,7 @@ function inicializarDrawingManager(){
             // mouses down on it.
 			if (e.type == google.maps.drawing.OverlayType.POLYGON){
 				setDatosPoly(e);
-			
+
 			}
 
         }
@@ -573,10 +573,10 @@ function repintarPoligono(_zona ,poly, _vPoligonoFillColor, _vPoligonoColor, _vA
 
     google.maps.event.addListener(poligono, 'click', function() {
 
-	
+
 					setSelection(poligono);
 
-			
+
         //TODO setSelection(newShape);
     });
 
@@ -628,7 +628,7 @@ function agregarPolyAlArray(p){
   if (ZonasSistema.length > 0){
 	  mensajeNotificacion("Solo puede crearse un poligono");
   }
-  
+
   if (!extistePolyAlArray(p.tag)){
     ZonasSistema.push(p);
   }
@@ -643,7 +643,7 @@ function eliminarPoly(){
   if (selectedShape != undefined){
 	limpiarPoligono(selectedShape);
   }
-  
+
 }
 
 
@@ -684,7 +684,7 @@ function showDrawingManager(){
             ov:null,
             jsonpoly:"",
             estadosalvado: "0"
-        },		
+        },
         polylineOptions: {
             strokeColor: vCOLORBORDEPOLY_X_DEFECTO
         }
@@ -748,8 +748,8 @@ function getParametrosZonas(){
     var parametro = {
       fNegocioId: EXT_VAR_NEGOCIOID,
       fNegocioSucursalId: EXT_VAR_NEGOCIOSUCURSALID,
-      fNegocioSucursalZonaId: ZONAID_INSTANCIA,
-      fZonaId: 0,
+      fNegocioSucursalZonaId: 0,
+      fZonaId: ZONAID_INSTANCIA,
       fZonaPaisId: 0,
       fZonaPaisCiudadId: 0,
       fZonaTipoId: 0
@@ -1037,7 +1037,7 @@ function setZonas2Server(jsonZonas,id){
         success: function(respuesta) {
           msg("respuesta " + JSON.stringify(respuesta));
           if (respuesta.ok != "S"){
-          
+
             mensajeNotificacion(respuesta.errordesc);
           }
 
@@ -1057,13 +1057,13 @@ function setZonas2Server(jsonZonas,id){
 
 function getJSONZonasCreacionManual(){
   msg("***getJSONZonasCreacionManual***");
-  
+
   for(var i=0; i < ZonasSistema.length; i++){
 	 google.maps.event.clearListeners(map, 'bounds_changed');
 	  eliminarPoly(ZonasSistema[i]);
   }
-  
-  
+
+
   ZonasSistema = limpiarVector(ZonasSistema);
   var parms = getParametrosZonas();
   mostrarWait();
@@ -1092,10 +1092,10 @@ function getJSONZonasCreacionManual(){
                          Zona.ZonaPoly.push(l);
                     });
                     repintarPoligono(Zona, Zona.ZonaPoly, Zona.ZonaColorFondo, Zona.ZonaColorBorde, vAnchoLinea);
-                  
+
                   }
                 });
-               
+
                 ocultarWait();
         },
         error: function() {
@@ -1104,4 +1104,3 @@ function getJSONZonasCreacionManual(){
       }
     });
 }
-
